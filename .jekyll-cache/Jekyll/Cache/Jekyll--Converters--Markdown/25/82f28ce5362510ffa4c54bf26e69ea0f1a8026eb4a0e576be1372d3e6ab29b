@@ -1,0 +1,27 @@
+I"a<h1 id="将-aci-image-转换为-standalone-nxos-image">将 ACI image 转换为 standalone NXOS image</h1>
+<p><a href="https://www.cisco.com/c/en/us/td/docs/switches/datacenter/nexus9000/sw/7-x/upgrade/guide/b_Cisco_Nexus_9000_Series_NX-OS_Software_Upgrade_and_Downgrade_Guide_Release_7x/Converting_from_Cisco_NX_OS_to_ACI_Boot_Mode.pdf">官方参考文档-英文</a></p>
+
+<p>直接查找 <strong>Converting Back to Cisco NX-OS</strong></p>
+
+<ol>
+  <li>
+    <p>一般来说，ACI image 的 Nexus9000 bootflash 中如果没有 NXOS 镜像，需要借助 U 盘，将 NXOS 镜像放入 U 盘；</p>
+  </li>
+  <li>
+    <p>接上 console线，重启 ACI image 的 Nexus9000，按下 <kbd>Ctrl</kbd> + <kbd>C</kbd> 或者<kbd> Ctrl</kbd> + <kbd>]</kbd> 中断启动过程，进入 <code class="highlighter-rouge">loader&gt;</code> 模式</p>
+  </li>
+  <li>
+    <p>输入命令<code class="highlighter-rouge">cmdline recoverymode=1</code></p>
+  </li>
+  <li>
+    <p>输入命令 <code class="highlighter-rouge">dir</code>  来查看是否存在可用的 NXOS 启动镜像</p>
+  </li>
+  <li>
+    <p>输入命令<code class="highlighter-rouge">boot nxos.7.0.3.I7.6.bin</code>启动 NXOS image，若从 bootflash 启动，输入命令<code class="highlighter-rouge">boot usb1:nxos.7.0.3.I7.6.bin</code></p>
+  </li>
+</ol>
+
+<p>转换
+前一个 version，然后 APIC
+如果需要搞 FPGA</p>
+:ET
