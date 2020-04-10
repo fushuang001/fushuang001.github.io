@@ -9,8 +9,9 @@ description:    简单乐观爱创造
 <div
     class="g-banner home-banner {{ site.theme-color | prepend: 'banner-theme-' }}"
     data-theme="{{ site.theme-color }}"
-    style="{% if page.header-img %}background: url({{ /assets/img/blog-home.jpg | relative_url }}) no-repeat center center; background-size: cover;{% endif %}"
+    style="{% if page.header-img %}background: url({{ page.header-img | relative_url }}) no-repeat center center; background-size: cover;{% endif %}"
 >
+    <img class="header-img" src="/assets/img/blog-home.jpg" alt="">
     <h2>{{ page.home-title }}</h2>
     <h3>{{ page.description }}</h3>
 </div>
