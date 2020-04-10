@@ -15,9 +15,11 @@ url: '' # your host
 baseurl: ''
 
 # Navigation links
+# 这里添加的，会直接出现在右上角
 nav:
   home: '/'
   tags: '/tags.html'
+  About: '/about.html'
 
 # Footer
 footer:
