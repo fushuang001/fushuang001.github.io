@@ -1,8 +1,7 @@
 ---
-layout:         page
+layout:         default
 home-title:     三分钟的热度，就有三分钟的收获。
 description:    简单乐观爱创造
-cover:          /assets/img/blog-home.jpg
 ---
 
 {% include header.html %}
@@ -10,7 +9,7 @@ cover:          /assets/img/blog-home.jpg
 <div
     class="g-banner home-banner {{ site.theme-color | prepend: 'banner-theme-' }}"
     data-theme="{{ site.theme-color }}"
-    style="{% if page.header-img %}background: url({{ page.header-img | relative_url }}) no-repeat center center; background-size: cover;{% endif %}"
+    style="{% if page.header-img %}background: url({{ /assets/img/blog-home.jpg | relative_url }}) no-repeat center center; background-size: cover;{% endif %}"
 >
     <h2>{{ page.home-title }}</h2>
     <h3>{{ page.description }}</h3>
