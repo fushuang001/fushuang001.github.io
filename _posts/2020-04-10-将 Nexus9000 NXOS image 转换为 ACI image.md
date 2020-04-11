@@ -5,7 +5,7 @@ subtitle:       默认 Nexus9000 预装了 NXOS image，如果是 ACI 环境，�
 date:           2020-04-10
 author:         黄福森
 cover:          '/assets/img/bg-post-aci.png'
-tags:           Cisco, ACI Fabric Discovery
+tags:           Cisco, ACI-Fabric-Discovery
 ---
 
 
@@ -184,5 +184,6 @@ User Access Verification
  login: admin
 Password:
 ```
+**转载必须注明原文链接**
 
-[微信打赏](https://tva1.sinaimg.cn/large/007S8ZIlgy1gdpmfdxyp4j30u00u0wgy.jpg) | **转载必须注明原文链接**
+![微信打赏](https://tva1.sinaimg.cn/large/007S8ZIlgy1gdpmfdxyp4j30u00u0wgy.jpg)
