@@ -5,7 +5,7 @@ subtitle:       默认 Nexus9000 预装了 NXOS image，如果是 ACI 环境，�
 date:           2020-04-10
 author:         黄福森
 cover:          '/assets/img/bg-post-aci.png'
-tags:           Cisco, ACI
+tags:           Cisco, ACI Fabric Discovery
 ---
 
 
@@ -183,4 +183,9 @@ Do you want to enforce secure password standard (yes/no) [y]:
 User Access Verification
  login: admin
 Password:
+```
+
+```css
+	p{color:green}
+	转载必须注明原文链接
 ```
