@@ -185,7 +185,4 @@ User Access Verification
 Password:
 ```
 
-```css
-	p{color:green}
-	转载必须注明原文链接
-```
+[微信打赏](https://tva1.sinaimg.cn/large/007S8ZIlgy1gdpmfdxyp4j30u00u0wgy.jpg) | **转载必须注明原文链接**
