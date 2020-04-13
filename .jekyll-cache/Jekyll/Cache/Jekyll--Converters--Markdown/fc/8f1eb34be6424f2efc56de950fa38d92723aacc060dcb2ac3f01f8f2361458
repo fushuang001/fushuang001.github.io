@@ -1,0 +1,29 @@
+I"<h1 id="什么是普拉提">什么是普拉提</h1>
+<p>拉伸运动</p>
+
+<p>平衡身体</p>
+
+<h1 id="关于我">关于我</h1>
+
+<p>I don’t know</p>
+
+<h1 id="测试-markdown">测试 Markdown</h1>
+
+<blockquote>
+  <p>引用</p>
+</blockquote>
+
+<p><strong>加粗</strong></p>
+
+<ul>
+  <li>有</li>
+  <li>序</li>
+  <li>列</li>
+  <li>表</li>
+</ul>
+
+<p><a href="www.baidu.com">百度</a></p>
+
+<p>插入一张图
+<img src="https://raw.githubusercontent.com/18642870203/18642870203.github.io/master/assets/img/hero.png" alt="hero.jpg" /></p>
+:ET
