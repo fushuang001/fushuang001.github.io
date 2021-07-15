@@ -31,7 +31,7 @@ API(Application Programming Interface) 可以理解为应用程序之间的接�
 2. 之后申请 Webex Teams bot，保存自己的 bot token
 
 3. 设置 postman：
-
+```
   method: get
 
   url   : https://webexapis.com/v1/<function>
@@ -41,6 +41,7 @@ API(Application Programming Interface) 可以理解为应用程序之间的接�
     Authorization: Bearer <Your bot token here>
 
     Content-Type:  application/json
+```
 
 以下截图，用于查看Webex teams 相关 bot 所在的 rooms：
 
@@ -54,7 +55,7 @@ API(Application Programming Interface) 可以理解为应用程序之间的接�
 
 ![](/assets/img/post-CiscoWebexTeams-postman-3.png)
 
-4. 假如使用 Python 脚本去做测试，下面脚本整合了三个功能，新建 room、添加 members、发送 message
+4. 假如使用 **Python 脚本** 去做测试，下面脚本整合了三个功能，新建 room、添加 members、发送 message
 
 ```
 import requests, sys, json
@@ -116,7 +117,7 @@ Webex Teams 效果：
 
 # Webex Teams Chatbot 部署过程和测试截图
 
-[Webex chatBot](https://developer.webex.com/blog/from-zero-to-webex-teams-chatbot-in-15-minutes) 快速部署，参考 link 提供了保姆级部署方式，一步一步做出来效果，还是很让人开心的😄
+[Webex chatBot](https://developer.webex.com/blog/from-zero-to-webex-teams-chatbot-in-15-minutes) 快速部署，参考 link 提供了保姆级部署方式，一步一步做出来效果，还是很让人开心的 😄
 
 先放一张借来的效果图：
 
@@ -128,22 +129,28 @@ Webex Teams 效果：
   - Webex Teams bot/token
   - [webex-node-bot-framework](https://github.com/WebexSamples/webex-node-bot-framework) API
   - Webex Teams Chatbot 的后台服务器是需要能够通过 HTTP 交互的，[nGrok](https://dashboard.ngrok.com/get-started/setup) 可以把自己的电脑 ip_address:port 部署为 HTTP 服务器
+
       MBP Terminal:
         `cd /Users/fushuang/Downloads/`
+
         `./ngrok http 666 region=eu`
+
       web page    : `localhost:4040`
   - JavaScript, web/server-side scripting 服务器端脚本，可提供的功能，会用到 Node.js & npm
+
       npm
+
         `cd /Users/fushuang/Downloads/webex-bot-starter`
+
         `npm start`
 
-来一个流程图吧：
+来一个我最近手绘的流程图吧(顺带安利一下 iPad，Apple pencil，goodnote5 😂)：
 
 ![](/assets/img/post-CiscoWebexTeams-Chatbot1.png)
 
 **自定义webex-bot-starter的 configuration.json 以及 index.js 脚本**：
 
-  - 通过修改 `configuration.json` 文件，提供 Chatbot 需要的 bot token，监听的 webhookUrl * port
+  - 通过修改 `configuration.json` 文件，提供 Chatbot 需要的 bot token，监听的 webhookUrl & port
 ```
 {
   "webhookUrl": "http://936bd0449942.eu.ngrok.io",  // 注意`gGork` 若重启，这里的 link 就需要 update
@@ -175,6 +182,7 @@ framework.hears('hi', function (bot) {
 /* console.log(abc);   <<< if you want to see the details repspons*/
 });
 ```
+
 
 使用另一个 bot **Friday** 做的截图：
 
