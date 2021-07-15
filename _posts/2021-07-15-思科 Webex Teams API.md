@@ -133,7 +133,8 @@ Webex Teams 效果：
       MBP Terminal:
 
         cd /Users/fushuang/Downloads/
-         ./ngrok http 666 region=eu
+        ./ngrok http 666 region=eu
+
       web page    : `localhost:4040`
   - JavaScript, web/server-side scripting 服务器端脚本，可提供的功能，会用到 Node.js & npm
 
