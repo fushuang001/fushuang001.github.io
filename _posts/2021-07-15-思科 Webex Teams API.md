@@ -32,15 +32,11 @@ API(Application Programming Interface) 可以理解为应用程序之间的接�
 
 3. 设置 postman：
 ```
-  method: get
-
-  url   : https://webexapis.com/v1/<function>
-
-  Headers:
-
-    Authorization: Bearer <Your bot token here>
-
-    Content-Type:  application/json
+method: get
+url   : https://webexapis.com/v1/<function>
+Headers:
+  Authorization: Bearer <Your bot token here>
+  Content-Type:  application/json
 ```
 
 以下截图，用于查看Webex teams 相关 bot 所在的 rooms：
