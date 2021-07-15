@@ -131,18 +131,16 @@ Webex Teams 效果：
   - Webex Teams Chatbot 的后台服务器是需要能够通过 HTTP 交互的，[nGrok](https://dashboard.ngrok.com/get-started/setup) 可以把自己的电脑 ip_address:port 部署为 HTTP 服务器
 
       MBP Terminal:
-        `cd /Users/fushuang/Downloads/`
 
-        `./ngrok http 666 region=eu`
-
+        cd /Users/fushuang/Downloads/
+         ./ngrok http 666 region=eu
       web page    : `localhost:4040`
   - JavaScript, web/server-side scripting 服务器端脚本，可提供的功能，会用到 Node.js & npm
 
       npm
 
-        `cd /Users/fushuang/Downloads/webex-bot-starter`
-
-        `npm start`
+        cd /Users/fushuang/Downloads/webex-bot-starter
+        npm start
 
 来一个我最近手绘的流程图吧(顺带安利一下 iPad，Apple pencil，goodnote5 😂)：
 
@@ -167,8 +165,10 @@ bot.say         // Chatbot 发送消息
 bot.reply       // Chatbot 发送消息、文件
 var xxx         // 创建对象，一般都是 function 内有效，并非 global
 let xxx = xxx   // 赋值、调用
+```
 
 **调用 API 的测试脚本**
+```
 framework.hears('hi', function (bot) {
   console.log("someone asked for words, and this is powered by free API");
   responded = true;
