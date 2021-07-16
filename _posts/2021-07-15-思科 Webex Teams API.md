@@ -179,7 +179,7 @@ framework.hears('hi', function (bot) {
 /* console.log(abc);   <<< if you want to see the details repspons*/
 });
 ```
-
+补充一个 link，关于[免费 API，不需要 key 认证的](https://apipheny.io/free-api/)
 
 使用另一个 bot **Friday** 做的截图：
 
