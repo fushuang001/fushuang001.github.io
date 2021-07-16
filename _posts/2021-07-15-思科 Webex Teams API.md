@@ -189,3 +189,35 @@ framework.hears('hi', function (bot) {
 
 针对 API 的调用：
 ![](/assets/img/post-CiscoWebexTeams-Chatbot4.png)
+
+
+参考 quotes API，给出了一些 code 模板，测试使用的脚本如下：
+```
+framework.hears('quotes', function (bot) {
+  console.log("someone asked for quotes, and this is powered by free API");
+  responded = true;
+  var axios = require("axios").default;
+  var options = {
+    method: 'GET',
+    url: 'https://quotes15.p.rapidapi.com/quotes/random/',
+    headers: {
+      'x-rapidapi-key': '<your-key-here>',
+      'x-rapidapi-host': 'quotes15.p.rapidapi.com'
+    }
+  };
+  axios.request(options)
+    .then(function (response) {
+  	console.log(response.data);
+    bot.say(response.data.content)
+  })
+    .catch(function (error) {
+  	console.error(error);
+  });
+  responded = true;
+/* console.log(abc);   <<< if you want to see the details repspons*/
+});
+```
+
+console log 截图：
+
+![](assets/img/post-CiscoWebexTeams-Chatbot5.png)
