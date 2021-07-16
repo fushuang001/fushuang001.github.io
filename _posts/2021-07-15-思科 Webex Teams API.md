@@ -220,4 +220,4 @@ framework.hears('quotes', function (bot) {
 
 console log 截图：
 
-![](assets/img/post-CiscoWebexTeams-Chatbot5.png)
+![](/assets/img/post-CiscoWebexTeams-Chatbot5.png)
