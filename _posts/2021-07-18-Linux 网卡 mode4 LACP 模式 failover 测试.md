@@ -16,7 +16,7 @@ tags:           Linux, LACP, 802.3ad, Nexus VPC
 
 ![](/assets/img/post-Linux_bond_LACP-topo.png)
 
-**Nexus9000 VPC**
+## Nexus9000 VPC
 
 思科的 VPC 是一个 layer2/二层概念，是将两台 nexus 交换机捆绑为逻辑上的一台设备，对外提供 port-channel 服务，此架构里面没有 STP block 接口。
 
@@ -29,7 +29,7 @@ tags:           Linux, LACP, 802.3ad, Nexus VPC
     show lacp internal info interface ethernet 1/1 detail fsmlog    # `fsmlog` 会包含更多 event-history 的 log
 
 
-**Linux 网卡 bond**
+## Linux 网卡 bond
 
 通过 bond 将双网卡设置为不同模式，如主备、LACP 等，提供高可用性；
 
@@ -124,7 +124,10 @@ Google 了一些帖子，发现 Linux 可以依赖 `ARP` or `MII` 去监测链�
 
 首先 `ifdown` 不是一个合理的 failover 测试工具，推荐使用`ifenslave -d bond 0 eth0` 方式，更多的讨论细节可以参考[Redhat How to test nic bonding?](https://access.redhat.com/discussions/669983)，搬运工 highlight：
 
-      We've always found that using 'ifdown' to simulate a network failure is not a good practice. The best option obviously is to physically remove it or have the network team disable the port. If that's not possible, use "ifenslave" to detach an interface from a bond. For example, if bond0=eth0,eth1 and eth0 is active, use "ifenslave -d bond0 eth0".
+      We've always found that using 'ifdown' to simulate a network failure is not a good practice.
+      The best option obviously is to physically remove it or have the network team disable the port.
+      If that's not possible, use "ifenslave" to detach an interface from a bond.
+      For example, if bond0=eth0,eth1 and eth0 is active, use "ifenslave -d bond0 eth0".
 
 如果客户还是喜欢 `ifdown`，那么就让 __n9k交换机__ 来帮帮忙，配置 `lacp rate fast`，即要求 Linux server 每 1s 发送一次 LACP PDU，若 3s 收不到就认为 link failure，弃用之。
 
