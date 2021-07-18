@@ -4,7 +4,7 @@ title:          Linux 网卡 mode4 LACP 模式 failover 测试
 subtitle:		    Webex Teams 的 API 调用举例，仅用于备忘，其实是一些很基础的应用方式。
 date:           2021-07-18
 author:         Forest
-cover:          '/assets/img/'
+cover:          '/assets/img/post-Linux_bond_LACP-bg.png'
 tags:           Linux, LACP, 802.3ad, Nexus VPC
 ---
 
@@ -14,7 +14,7 @@ tags:           Linux, LACP, 802.3ad, Nexus VPC
 
 简易拓扑如下：
 
-![](/assets/img/)
+![](/assets/img/post-Linux_bond_LACP-topo.png)
 
 **Nexus9000 VPC**
 
