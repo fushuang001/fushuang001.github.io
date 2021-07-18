@@ -95,7 +95,7 @@ Google 了一些帖子，发现 Linux 可以依赖 `ARP` or `MII` 去监测链�
 
 1. 拔线以后，对应的 slave 网卡 MII: down
 
-2. `ifdown`， 对应的 slave 网卡从这个文件被 **remove** 了，这真的是人走茶凉一把好手了，于是系统里面看不到 bond0 的被 ifdown 的 eth<x> MII 信息，也就不会通知上层去 shutdown 这个端口了。这就是后续**n9k交换机**苦苦等待 90 秒的原因。
+2. `ifdown`， 对应的 slave 网卡从这个文件被 **remove** 了，这真的是人走茶凉一把好手了，于是系统里面看不到 bond0 的被 ifdown 的 eth<x> MII 信息，也就不会通知上层去 shutdown 这个端口了。这就是后续 **n9k交换机** 苦苦等待 90 秒的原因。
 
 
       root@localhost ~# cat /proc/net/bonding/bond0
@@ -119,6 +119,7 @@ Google 了一些帖子，发现 Linux 可以依赖 `ARP` or `MII` 去监测链�
       Slave Interface: ens1f1
       MII Status: up
       Link Failure Count: 0
+
 
 # 解决方法
 
