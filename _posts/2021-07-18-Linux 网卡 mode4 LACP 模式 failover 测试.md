@@ -47,7 +47,7 @@ tags:           Linux, LACP, 802.3ad, Nexus VPC
 
 2. n9k 命令行 `shutdown` 接口
 
-3. Linux server `ifdown eth<x>` 去 disableslave 接口
+3. Linux server `ifdown eth<x>` 去 disable slave 接口
 
 其中方式 1 和 2，流量切换在毫秒级完成，不丢包；
 
@@ -89,9 +89,9 @@ Google 了一些帖子，发现 Linux 可以依赖 `ARP` or `MII` 去监测链�
       therefore, the ARP monitor is not available in this mode.
 
 
-简单来说(毕竟复杂的我也不懂😂)，Linux server bond 在使用了 `mode 4 LACP/802.3ad` 模式下，只能依赖 `MII` 来监测 slave 网卡是否存活。
+简单来说(毕竟复杂的我也不懂😂 嗐)，Linux server bond 在使用了 `mode 4 LACP/802.3ad` 模式下，只能依赖 `MII` 来监测 slave 网卡是否存活。
 
-而测试过程里面可以看到 `watch cat /proc/net/bonding/bond0`的变化过程：
+而测试过程里面可以看到 `watch cat /proc/net/bonding/bond0` 的变化过程：
 
 1. 拔线以后，对应的 slave 网卡 MII: down
 
