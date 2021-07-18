@@ -1,7 +1,7 @@
 ---
 layout:         post
 title:          Linux 网卡 mode4 LACP 模式 failover 测试
-subtitle:		    Webex Teams 的 API 调用举例，仅用于备忘，其实是一些很基础的应用方式。
+subtitle:		    双网卡可以通过合理的设置和 failover 测试，来保障业务的高可用性。
 date:           2021-07-18
 author:         Forest
 cover:          '/assets/img/post-Linux_bond_LACP-bg.png'
