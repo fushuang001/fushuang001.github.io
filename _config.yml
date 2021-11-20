@@ -61,7 +61,7 @@ sns:
   weibo: '//weibo.com/2125003401'
   linkedin : 'https://www.linkedin.com/in/fusen-huang-cv'
   zhihu : 'https://www.zhihu.com/people/huang-fu-sen'
-  email : 'fushuang@cisco.com'
+  email : 'fusenhuang@nwcdcloud.cn'
 
 # Tags 设置标签
 recommend-tags: true # whether or not display recommend-tags on the sidebar
