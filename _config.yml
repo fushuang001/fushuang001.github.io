@@ -1,7 +1,7 @@
 # Site settings 配置站点
 title: '黄福森的独立博客'
 description: '很高兴能在这里与你分享我对技术和生活的思考。'
-keyword: '网络，ACI, VXLAN，Nexus switch, vPC，云计算'
+keyword: '云计算，ACI, VXLAN，Nexus/Catalyst switch'
 url: 'fushuang.top' # your host
 
 # when build blog on server, if you don't need baseurl, you should leave this value blank.
@@ -28,7 +28,7 @@ footer:
 # Author 配置博主信息
 author: '黄福森'
 nickname: '福双'
-bio: '售后技术支持工程师，Cisco ACI Solution Support Engineer, 对技术保持好奇心.'
+bio: '云计算技术支持，对技术保持好奇心.'
 avatar: '/assets/img/forest.jpg'
 
 # Search
