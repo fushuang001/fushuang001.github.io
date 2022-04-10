@@ -12,12 +12,12 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB
 [AWS technical essenticals](https://explore.skillbuilder.aws/learn/course/1851/play/45289/aws-technical-essentials-104)
 
 ## File storage
-类比 MacOS Finder，NAS(network attached storage)
-文件有目录结构/tree-like hierarchy，
-按照目录-子目录-文件来寻址
-metadata like filename, date, size, type...
-更新文件内容，本质上是替换
-适合多个 hosts 文件共享，sotage mounted onto multiple hosts
+类比 MacOS Finder，NAS(network attached storage)  
+文件有目录结构/tree-like hierarchy，  
+按照目录-子目录-文件来寻址  
+metadata like filename, date, size, type...  
+更新文件内容，本质上是替换  
+适合多个 hosts 文件共享，sotage mounted onto multiple hosts  
 
 ### instance store
 费用是包含在 EC2 里面的，重启即丢失。
