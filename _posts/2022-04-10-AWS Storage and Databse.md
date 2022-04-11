@@ -20,9 +20,14 @@ metadata like filename, date, size, type...
 适合多个 hosts 文件共享，sotage mounted onto multiple hosts  
 
 ### instance store
-费用是包含在 EC2 里面的，重启即丢失。  
 ephemeral block storage  
-
+This storage is located on disks that are physically attached to the host computer.   
+只能在 launch EC2 时候选择特定的 type，比如 c5d.large，其中 d 表示带有 instance store。  
+费用是包含在 EC2 里面的，lifetime 会随着 EC2 的 status 发生变化：
+  - 重启 EC2，理论上来说 EC2 依然会在原来的 physical host 启动，所以 instance store 数据不会丢失  
+  - stop, start EC2，就会在不同 physical host 启动，那么 instance store 数据会丢失  
+  - hibernates, terminate EC2，或者 underlying disk drive fails,instance store 数据会丢失  
+  
 ### EFS for linux, NFS file system
 一般情况下，EBS 只能够单次 attach 到单独 EC2  
 如果需要 attach to multiple EC2 the same time，可以考虑 EFS  
