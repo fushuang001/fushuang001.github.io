@@ -32,11 +32,17 @@ This storage is located on disks that are physically attached to the host comput
 
 
 ### EFS for linux, NFS file system
-一般情况下，EBS 只能够单次 attach 到单独 EC2  
-如果需要 attach to multiple EC2 the same time，可以考虑 EFS  
-[EFS FAQs](https://aws.amazon.com/efs/faq/)  
+对比 EBS：  
+- EBS 只能够单次 attach 到单独 EC2  
+- EBS 与 EC2 需要在相同 AZ  
+- EBS 支持扩容，但必须 stop EC2  
+- EFS 是 Region service，支持 attach to multiple EC2 the same time  
+- EFS 容量可以自动扩容，不影响 application  
+- EFS 支持 on-premises server 通过 DX 连接  
 
-EFS, FSx 都是按照用量付费，自动按需扩展容量；不需要像 EBS 一样 provision storage in advance.  
+[EFS FAQs](https://aws.amazon.com/efs/faq/)
+
+EFS, FSx 都是按照用量付费，自动按需扩展容量；不需要像 EBS 一样 provision storage in advance.
 
 ### FSx for Windows, SMB protocol
 Fully managed file server built on Windows Server that supports the SMB protocol  
