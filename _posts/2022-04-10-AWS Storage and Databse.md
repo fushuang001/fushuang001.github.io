@@ -27,7 +27,10 @@ This storage is located on disks that are physically attached to the host comput
   - 重启 EC2，理论上来说 EC2 依然会在原来的 physical host 启动，所以 instance store 数据不会丢失  
   - stop, start EC2，就会在不同 physical host 启动，那么 instance store 数据会丢失  
   - hibernates, terminate EC2，或者 underlying disk drive fails,instance store 数据会丢失  
-  
+
+![instance_store_volumes](/assets/img/post-instance_store_volumes.png)  
+
+
 ### EFS for linux, NFS file system
 一般情况下，EBS 只能够单次 attach 到单独 EC2  
 如果需要 attach to multiple EC2 the same time，可以考虑 EFS  
@@ -76,6 +79,8 @@ incremental backups，增量备份到 S3。
 **object = file & metadata**，每个 object 都有单独 identifier, using unique identifiers to look up objects when requested.  
 更新文件内容，实际是完整替换  
 适合大量数据、unstructured files  
+
+![object_storage](/assets/img/post-object_storage.png)  
 
 ### S3
 自动在三个 AZ 备份数据，提供灾备恢复能力  
