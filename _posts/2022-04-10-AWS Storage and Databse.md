@@ -10,7 +10,7 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
 
 # AWS Storage 存储
 [AWS technical essenticals](https://explore.skillbuilder.aws/learn/course/1851/play/45289/aws-technical-essentials-104)
-![示意图](assets/img/IMG_20220410-113827773.png)  
+![示意图](/assets/img/IMG_20220410-113827773.png)  
 
 ## File storage
 - 类比 MacOS Finder，NAS(network attached storage)  
@@ -30,7 +30,7 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
     - hibernates, terminate EC2，或者 underlying disk drive fails,instance store 数据会丢失  
 - 只能在 launch EC2 时候选择特定的 type，比如 c5d.large，其中 d 表示带有 instance store。  
   
-![instance_store_volumes](assets/img/post-instance_store_volumes.png)  
+![instance_store_volumes](/assets/img/post-instance_store_volumes.png)  
 
 ### EFS for linux, NFS file system
 对比 EBS：  
@@ -43,7 +43,7 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
 - EFS, FSx 不需要预置容量，可以按需自动扩展，按用量收费  
 - EFS 支持 on-premises server 通过 DX 连接  
 
-![EBS & EFS](assets/img/IMG_20220417-211334691.png)  
+![EBS & EFS](/assets/img/IMG_20220417-211334691.png)  
 
 [EFS FAQs](https://aws.amazon.com/efs/faq/)
 - EFS uses the Network File System version 4 (NFS v4) protocol.  
@@ -53,12 +53,12 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
 - Fully managed file server built on Windows Server that supports the SMB protocol  
 - 比如用于 Sharepoint, Microsoft SQL Server, Workspaces, IIS Web Server 或者任何其他 native Microsoft application  
 
-![FSx vs EFS](assets/img/IMG_20220527-202832571.png)  
+![FSx vs EFS](/assets/img/IMG_20220527-202832571.png)  
 
 [FSx for Windows file server FAQs](https://aws.amazon.com/fsx/windows/faqs/?nc=sn&loc=8)
 
 #### FSx for Lustre
-![FSx for Lustre](assets/img/IMG_20220527-203355484.png)  
+![FSx for Lustre](/assets/img/IMG_20220527-203355484.png)  
 
 ## Block storage
 - 类比 SAN(storage area network)  
@@ -93,9 +93,9 @@ Amazon EBS is useful when you must **retrieve data quickly(EBS provides sub-mill
 
 [需要关注 IOPS, throughput 之间的取舍。](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html)  
 
-![SSD](assets/img/IMG_20220528-182449903.png)  
+![SSD](/assets/img/IMG_20220528-182449903.png)  
 
-![HDD](assets/img/IMG_20220528-182517779.png)  
+![HDD](/assets/img/IMG_20220528-182517779.png)  
 
 ### EBS Snapshots
 incremental backups，增量备份到 S3。  
@@ -106,7 +106,7 @@ incremental backups，增量备份到 S3。
 - 更新文件内容，实际是完整替换  
 - 适合大量数据、unstructured files  
 
-![object_storage](assets/img/IMG_20220412-114307486.png)  
+![object_storage](/assets/img/IMG_20220412-114307486.png)  
 
 ### S3
 - 自动在三个 AZ 备份数据，提供灾备恢复能力；相对于 EBS 来说，S3 属于 Serverless  
@@ -126,7 +126,7 @@ incremental backups，增量备份到 S3。
 
 ### S3 分层
 不同生命周期不同场景，[为 objects 找到合适的存储层级](https://aws.amazon.com/cn/s3/storage-classes/?nc1=h_ls)，来节省费用  
-![S3 Storage Class](assets/img/IMG_20220504-193742380.png)  
+![S3 Storage Class](/assets/img/IMG_20220504-193742380.png)  
 
 S3 Intelligent-Tiering，智能分层，根据 object 访问频率，自动移动 object 到对应层级 (granular object level 颗粒度）  
 One Zone-Infrequent Access(One-Zone-IA)，低成本存储层级，不提供高可用冗余，适用于丢失之后易恢复的数据  
@@ -157,18 +157,18 @@ When you define a lifecycle policy configuration for an object or group of objec
 - It is a best practice to use aws s3 commands (such as **aws s3 cp**) for **multipart uploads and downloads**.   
 - These aws s3 commands automatically perform multipart uploading and downloading based on the file size.   
 - To learn more about using the AWS CLI to perform multipart uploads, see: [How do I use the AWS CLI to perform a multipart upload of a file to Amazon S3? ](https://aws.amazon.com/premiumsupport/knowledge-center/s3-multipart-upload-cli)  
-![Multipart upload](assets/img/IMG_20220519-151902183.png)  
+![Multipart upload](/assets/img/IMG_20220519-151902183.png)  
 
 ## Storage Gateway
 - 混合云存储服务，打通客户本地 (__低延迟__) 和 AWS 云上 (__容量几乎无上限__) 存储
 - [基本介绍](https://www.amazonaws.cn/storagegateway/)  
-![Storage_GW_types](assets/img/IMG_20220524-162856498.png)    
+![Storage_GW_types](/assets/img/IMG_20220524-162856498.png)    
 
 # AWS Databases 数据库
 [架构师 blog-选择正确的 DB](https://aws.amazon.com/cn/blogs/architecture/selecting-the-right-database-and-database-migration-plan-for-your-workloads/)
 [数据库自由](https://aws.amazon.com/cn/products/databases/freedom/?nc=sn&loc=5)
 
-![Database types](assets/img/IMG_20220408-151714840.png)  
+![Database types](/assets/img/IMG_20220408-151714840.png)  
 
 ## 关系型数据库 RDS
 - db.instance 按小时收费，不管数据库是不是被使用。Reserved instance 付费方式，同样可以用于 db.instance，更加省钱  
@@ -228,7 +228,7 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
   - 另一个可以提升性能的方式，是考虑 ElastiCache  
   - Asynchronous replication，是用于提升性能，并不是 Disaster Recovery  
 - 需要打开 automatic backups 才能使用 read replica  
-![Read_Replica](assets/img/IMG_20220420-131050551.png)  
+![Read_Replica](/assets/img/IMG_20220420-131050551.png)  
 
 ### when to use EC2 自建数据库
 如果客户需要底层硬件的控制权，或者使用一些 RDS 不支持的 feature，可以考虑在 EC2 自建数据库  
@@ -243,9 +243,9 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 - 无服务器 DB，按用量付费（不使用就没有费用，参考 lambda)，对于负载/访问量未知的业务，并且希望尽量省钱、高可用，可以考虑 Aurora    
 - Automated backups 是默认且必须 enabled，Backups do not impact database performance  
 
-![Writer, Reader 有各自 DNS Endpoint](assets/img/IMG_20220609-153921417.png)  
+![Writer, Reader 有各自 DNS Endpoint](/assets/img/IMG_20220609-153921417.png)  
 
-![Aurora Replica](assets/img/IMG_20220609-145209607.png)  
+![Aurora Replica](/assets/img/IMG_20220609-145209607.png)  
 
 ## 非关系型，key-value DynamoDB
 - 按使用情况和 DDB 存储容量收费 (read/write 不收费），并不是 per hour/second  
@@ -253,7 +253,7 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 - DDB 是 **serveless DB**，用户不需要关系 db.instance 和 HA；fully **managed NoSQL** database service.  
 - 高性能、毫秒级延迟，all of your data is __stored on solid-state disks (SSDs)__ and is automatically replicated across multiple AZs, providing built-in high availability and data durability.  
 - 默认是 [Eventually consistent](https://aws.amazon.com/dynamodb/faqs/)（写入，1 秒后所有数据一致）；另外还支持 Strongly consistent  
-![JSON/NoSQL](assets/img/IMG_20220528-202315635.png)  
+![JSON/NoSQL](/assets/img/IMG_20220528-202315635.png)  
 
 ### Components 组件
   - table -- items -- attributes  
@@ -275,7 +275,7 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 - 类似于 RDS Read Replica 只读副本，是为了数据高可用，降低延迟，可以达到微秒级/microseconds 响应  
 - AWS 托管，in-memory cache，支持 read, write  
 - DAX Cluster 会提供一个 Endpoint 给 client 使用，隐藏后面 scaling 的细节  
-![DAX_Cluster](assets/img/IMG_20220420-131351110.png)  
+![DAX_Cluster](/assets/img/IMG_20220420-131351110.png)  
 
 # AWS Data Warehouse 数据仓库
 本质上还是数据库，只不过从 architecture，infrastructure 与和 RDS, DynamoDB 都不一样  
@@ -283,8 +283,8 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 ## OLTP vs OLAP
 - RDS belongs to OLTP(Transaction)  
 - OLAP is much more complex, AWS Redshift is OLAP(Analytics)  
-![OLTP](assets/img/IMG_20220528-202456159.png)  
-![OLAP](assets/img/IMG_20220528-202520719.png)  
+![OLTP](/assets/img/IMG_20220528-202456159.png)  
+![OLAP](/assets/img/IMG_20220528-202520719.png)  
 
 ## Redshift
 - used for business intelligence  
