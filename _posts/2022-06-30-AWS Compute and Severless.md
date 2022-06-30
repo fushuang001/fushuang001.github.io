@@ -2,9 +2,9 @@
 layout:         post
 title:          AWS Compute Service: EC2, ECS/EKS, Lambda
 subtitle:		    备考 SAA 的笔记
-date:           2022-06-17
+date:           2022-06-30
 author:         Forest
-cover:          '//assets/img/img/post-aws-storage-db-bg.png'
+cover:          '/assets/img/2022-06-17-AWS%20Compute%20and%20Severless/IMG_20220630-200347542.png'
 tags:           AWS, SAA, EC2, Lambda, Serverless, ECS, EKS, Container
 ---
 
