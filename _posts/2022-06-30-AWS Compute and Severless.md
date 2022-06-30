@@ -1,7 +1,7 @@
 ---
 layout:         post
-title:          AWS Compute Service: EC2, ECS/EKS, Lambda
-subtitle:		    备考 SAA 的笔记
+title:          AWS Compute and Serverless
+subtitle:		    备考 SAA 的笔记 EC2, ECS/EKS, Lambda
 date:           2022-06-30
 author:         Forest
 cover:          '/assets/img/2022-06-17-AWS%20Compute%20and%20Severless/IMG_20220630-200347542.png'
