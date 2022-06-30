@@ -4,7 +4,7 @@ title:          AWS Compute and Serverless
 subtitle:		    备考 SAA 的笔记 EC2, ECS/EKS, Lambda
 date:           2022-06-30
 author:         Forest
-cover:          '/assets/img/2022-06-17-AWS%20Compute%20and%20Severless/IMG_20220630-200347542.png'
+cover:          '/assets/img/IMG_20220630-200347542.png'
 tags:           AWS, SAA, EC2, Lambda, Serverless, ECS, EKS, Container
 ---
 
@@ -20,7 +20,7 @@ What are the four main factors you should take into consideration when choosing 
 **Compliance, Latency, price, service availability**  
 
 ## Difference between Containers and VMs
-![Containers_VM](/assets/img/Compute%20as%20a%20Service/IMG_20220411-205413963.png)  
+![Containers_VM](/assets/img/IMG_20220411-205413963.png)  
 
 Containers **share** the same operating system and kernel as the host they exist on, whereas virtual machines contain their own operating system.   
 Each virtual machine must maintain a copy of an operating system, which results in a degree of wasted resources.  
@@ -28,18 +28,18 @@ A container is more **lightweight**. They spin up quicker, almost instantly. Thi
 While containers can provide speed, virtual machines offer the full strength of an operating system and more resources, like package installation, dedicated kernel, and more  
 
 ## Difference between Servessless and VMs  
-![Servessless_VM](/assets/img/Compute%20as%20a%20Service/IMG_20220411-205606892.png)  
+![Servessless_VM](/assets/img/IMG_20220411-205606892.png)  
 
 # VM - EC2  
 ## EC2 types  
-![some of the EC2 types](/assets/img/Compute%20as%20a%20Service/IMG_20220411-213020100.png)  
+![some of the EC2 types](/assets/img/IMG_20220411-213020100.png)  
 Spot instance 在被 AWS terminate 后，对应的 hour 不收费  
 on demand instance，用户自行 terminate，对应 hour 是收费的 
 
 ## Amazon Compute Optimizer 提出对 EC2 的建议  
 客户自行选择 EC2 types，在使用一段时间之后，可以根据 console 工具 - Compute Optimizer 来查看信息，基于 EC2 使用率、成本优化等的建议  
- ![Compute)Optimizer](/assets/img/Compute%20as%20a%20Service/IMG_20220420-173120029.png)  
-![EC2-EBS](/assets/img/Compute%20as%20a%20Service/IMG_20220420-173324986.png)  
+![Compute Optimizer](/assets/img/IMG_20220420-173120029.png)  
+![EC2-EBS](/assets/img/IMG_20220420-173324986.png)  
 
 ## EC2 lifecycle
 When you stop your instance, the data stored in memory (RAM) is lost.  
@@ -53,9 +53,9 @@ __Hibernate 休眠__，[记录当前状态，类似于当前快照，避免 memo
 
 When you stop-hibernate an instance, AWS signals the operating system to perform hibernation (suspend-to-disk), which **saves the contents from the instance memory (RAM) to the Amazon EBS root volume**.  
 
-![Hiberante_cycle](/assets/img/Compute%20as%20a%20Service/IMG_20220526-150521856.png)
+![Hiberante_cycle](/assets/img/IMG_20220526-150521856.png)
 
-![Enable_Hibernate_when_launch_EC2](/assets/img/Compute%20as%20a%20Service/IMG_20220526-151216558.png)  
+![Enable_Hibernate_when_launch_EC2](/assets/img/IMG_20220526-151216558.png)  
 
 __Terminate 终止__，销毁 EC2 实例，默认情况下，EC2 根卷 EBS 的 DeleteOnTermination 是 enable 状态，即 root EBS 随着 EC2 消失，无法找回。数据卷 EBS 的  DeleteOnTermination 默认 disabled。  
 tips 避免数据丢失：  
@@ -64,14 +64,14 @@ tips 避免数据丢失：
   - 使用 lifecycle 功能，定期做 AMI，移除过期 AMI  
   - 做 snapshots  
 
-![EC2 lifecycle](/assets/img/Compute%20as%20a%20Service/IMG_20220411-213159099.png)  
+![EC2 lifecycle](/assets/img/IMG_20220411-213159099.png)  
 
 ## EC2 SG, ACL
 Security Group is instance(ENI) level firewall. Stateful(Connection track), only allow  
 Network ACL act as Subnet level firewall. Stateless, allow and deny  
 
 ## ENI, ENA, EFA
-![ENI, ENA, EFA exam tips](/assets/img/Compute%20as%20a%20Service/IMG_20220526-110513168.png)  
+![ENI, ENA, EFA exam tips](/assets/img/IMG_20220526-110513168.png)  
 [ENA - 增强联网](https://docs.amazonaws.cn/zh_cn/AWSEC2/latest/UserGuide/enhanced-networking.html)，single root I/O Virtualization(SR-IOV) 提供更高网络性能，没有额外费用。可选 ENA/up to 100G, Intel 82599 Virtual Function(VF) intf/up to 10G  
 non-Nitro 平台的 EC2（比如 t2.micro) 升级 Nitro 平台（比如 t3.micro)，需要启用 ENA。  
 
@@ -91,7 +91,7 @@ To run and manage your containers, you need to install the Amazon **ECS containe
 
 Once the Amazon ECS container instances are up and running, you can perform actions that include, but are not limited to, launching and stopping containers, getting cluster state, scaling in and out, scheduling the placement of containers across your cluster, assigning permissions, and meeting availability requirements.  
 
-![ECS Cluster](/assets/img/Compute%20as%20a%20Service/IMG_20220411-212704829.png)  
+![ECS Cluster](/assets/img/IMG_20220411-212704829.png)  
 
 To prepare your application to run on Amazon ECS, you create a **task definition**. The task definition is a text file, in JSON format, that describes one or more containers. A task definition is similar to a blueprint that describes the resources you need to run a container, such as CPU, memory, ports, images, storage, and networking information.  
 
@@ -127,8 +127,8 @@ Fargate scales and manages the infrastructure, allowing developers to work on wh
 代码运行时收费，最长运行 15 分钟。  
 AWS rounds up duration to the nearest millisecond with no minimum execution time. With this pricing, it can be cost effective to run functions whose execution time is very low, such as functions with durations under 100 ms or low latency APIs  
 
-![Lamdba](/assets/img/Compute%20as%20a%20Service/IMG_20220411-214122122.png)  
-![build Lambda Functions](/assets/img/Compute%20as%20a%20Service/IMG_20220513-173152878.png)  
+![Lamdba](/assets/img/IMG_20220411-214122122.png)  
+![build Lambda Functions](/assets/img/IMG_20220513-173152878.png)  
 Access Permissions: Define which events can invoke the functin and what services Lambda is permitted to interact with.  
 
 ### How AWS Lambda works
@@ -156,13 +156,13 @@ print 'started your instances: ' + str(instances)
 
 # 不同架构举例
 视频里面通过 ELB_VM/EC2_DB_S3 的方式，讲解了一种通用的 3-tires 架构  
-![ELB_VM_DB](/assets/img/Compute%20as%20a%20Service/IMG_20220411-205732780.png)  
+![ELB_VM_DB](/assets/img/IMG_20220411-205732780.png)  
 
 API_Gateway 以及 Lambda  
-![API_Gateway_Lambda](/assets/img/Compute%20as%20a%20Service/IMG_20220411-205931420.png)  
+![API_Gateway_Lambda](/assets/img/IMG_20220411-205931420.png)  
 
 有些客户选择 ECS fargate，两层 ALB，应该是为了区分 presentation and application 层，避免服务器因为不同 workload 而过载。  
-![ELB_ECS_internal_ELB_ECS](/assets/img/Compute%20as%20a%20Service/IMG_20220411-210844117.png)  
+![ELB_ECS_internal_ELB_ECS](/assets/img/IMG_20220411-210844117.png)  
 
 # Lambda, ECS，EKS 取舍
-![Containers_or_Lambda](/assets/img/Compute%20as%20a%20Service/IMG_20220504-104738196.png)  
+![Containers_or_Lambda](/assets/img/IMG_20220504-104738196.png)  
