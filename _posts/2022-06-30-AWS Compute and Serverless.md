@@ -4,7 +4,7 @@ title:          AWS Compute and Serverless
 subtitle:		    备考 SAA 的笔记 EC2, ECS/EKS, Lambda
 date:           2022-06-30
 author:         Forest
-cover:          '/assets/img/IMG_20220630-200347542.png'
+cover:          '/assets/img/IMG_20220630-2 00347542.png'
 tags:           AWS, SAA, EC2, Lambda, Serverless, ECS, EKS, Container
 ---
 
