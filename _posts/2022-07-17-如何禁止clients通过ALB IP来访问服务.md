@@ -25,7 +25,8 @@ ALB + WAF，[WAF 直接 regular expression 正则表达式](https://docs.amazona
 
 __注意事项：__  
 1. 通过`RegexString`: `(\\b25[0-5]|\\b2[0-4][0-9]|\\b[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}` 来匹配 IP 地址，其他正则表达式可选，可以自行 Google  
-2. [若 ALB 同时是 NLB 的 target](https://aws.amazon.com/premiumsupport/knowledge-center/alb-static-ip/)，以上正则表达式同时会把 NLB ---> ALB 的 health check 给 block，导致 NLB --> ALB --> targets 的 health check failed；需要在 WAF Rules 使用第二条 `NotStatement "RegexString": "172.31.*` 将 NLB private IP CIDR 排除在外  
+2. [若 ALB 同时是 NLB 的 target](https://aws.amazon.com/premiumsupport/knowledge-center/alb-static-ip/)，以上正则表达式同时会把 NLB ---> ALB 的 health check 给 block，导致 NLB --> ALB --> targets 的 health check failed；  
+需要在 WAF Rules 使用第二条 `NotStatement "RegexString": "172.31.*` 将 NLB private IP CIDR 排除在外  
 3. 针对 HTTP, HTTPS requests 都可以生效  
 
 __测试效果：__  
@@ -84,6 +85,7 @@ content-type: application/json
 ```
 
 __WAF 相关规则__  
+```
 {
   "Name": "regular-expression-block-ip-direct-access",
   "Priority": 2,
