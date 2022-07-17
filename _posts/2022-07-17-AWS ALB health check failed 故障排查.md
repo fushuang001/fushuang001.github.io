@@ -1,4 +1,3 @@
-
 ---
 layout:         post
 title:          AWS ALB health check failed 故障排查
@@ -15,10 +14,10 @@ ALB 与后端实例健康检查失败，提示 state: unhealthy, reason: Target.
 # 分析过程  
 1. 首先根据 [ALB health check 相关文档](https://docs.amazonaws.cn/en_us/elasticloadbalancing/latest/application/target-group-health-checks.html)，简单预判 unhealthy reason
 > Related reason codes: 
-> Target.ResponseCodeMismatch
-> Target.Timeout 
-> Target.FailedHealthChecks, 一般是 target 原因导致
-> Elb.InternalError
+    Target.ResponseCodeMismatch
+    Target.Timeout 
+    Target.FailedHealthChecks, 一般是 target 原因导致
+    Elb.InternalError
 2. 检查 ALB 出向、EC2 入向 `Security Group` 放行了 health check 流量，`ACL` 保持默认；ALB health check success code 200  
 3. 由于客户的 EC2 Security Group 针对 0.0.0.0/0 开放 health check 端口的访问，于是从自己 EC2 测试，返回 HTTP code 200 OK  
 ```
