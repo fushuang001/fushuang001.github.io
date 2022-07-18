@@ -82,8 +82,20 @@ content-type: application/json
 {
 "Block Reason": "You are trying to connect ALB with it's IP address directly",
 "How To": "Try with ALB domain name"
+}
 ```
 
+```
+如果自定义 HTTP header 的 host 字段，172.31.x.x 是可以绕过去的
+[ec2-user@Bastion-ConsumerVPC-ZHY ~]$ curl mynxalb.com:8211 -H "Host: 1.1.1.1"
+{
+"Block Reason": "You are trying to connect ALB with it's IP address directly",
+"How To": "Try with ALB domain name"
+}
+[ec2-user@Bastion-ConsumerVPC-ZHY ~]$ curl mynxalb.com:8211 -H "Host: 172.31.1.1"
+apache always Listen 80; You make ELB Listener to listen different ports.
+```
+··
 __WAF 相关规则__  
 ```
 {
