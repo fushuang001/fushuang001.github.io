@@ -52,4 +52,4 @@ Eventbridge 的 crontab 持续检查 RDS DNS Hostname 解析到的 IP 是否发�
 首先依然是新注册 RDS IP 到 NLB 的延迟；  
 其次是 Eventbridge 的考量，crontab 间隔越短那么发现 RDS IP 变化越及时，但是相对费用会高一些；   
 再次是方案整体复杂度，虽说可以借助 CloudFormation 快速部署，不过学习成本比较高；  
-如果准备采用类似方案，更建议自己在 Linux EC2 DIY 一套 python 脚本，借助 AWS IAM User 的 AKSK 来实现 NLB 相关的操作，借助 crontab 来实现快速监控；  
+如果准备采用类似方案，更建议自己在 Linux EC2 DIY 一套 python 脚本（可以参考以上两篇 blog 的代码部分），借助 AWS IAM User 的 AKSK 来实现 NLB 相关的操作，借助 crontab 来实现快速监控；  
