@@ -24,10 +24,10 @@ public client -- NLB -- (internal, private to VPC)RDS
 首先 RDS 的 private IP 并不是固定的，可能会在维护事件、底层硬件故障中发生变化；  
 若发生变化，如何及时获取通知？使用新的 IP 来注册为 NLB 后端实例，注册过程耗时较长；  
 
-其次 NLB --> RDS 的健康检查/health check，有可能达到 RDS 的`max_connect_errors`上限，从而导致 health check 失败，并且 RDS 产生报错：  
+其次 NLB --> RDS 的健康检查/health check，有可能达到 RDS 的 `max_connect_errors` 上限，从而导致 health check 失败，并且 RDS 产生报错：  
 > Host is blocked because of many connection errors; unblock with 'mysqladmin flush-hosts'  
 
-[具体行为、解释可以参考](https://www.cnblogs.com/mask-xiexie/p/16174875.html)  
+[具体行为、解释可以参考这篇博客园](https://www.cnblogs.com/mask-xiexie/p/16174875.html)  
 
 # 引申的需求
 客户认为既然 RDS 的 IP 会发生变化，那么是否能直接使用 RDS DNS hostname 注册为 NLB 后端实例？  
@@ -52,4 +52,4 @@ Eventbridge 的 crontab 持续检查 RDS DNS Hostname 解析到的 IP 是否发�
 首先依然是新注册 RDS IP 到 NLB 的延迟；  
 其次是 Eventbridge 的考量，crontab 间隔越短那么发现 RDS IP 变化越及时，但是相对费用会高一些；   
 再次是方案整体复杂度，虽说可以借助 CloudFormation 快速部署，不过学习成本比较高；  
-如果准备采用类似方案，更建议自己在 Linux EC2 DIY 一套 python 脚本（可以参考以上两篇 blog 的代码部分），借助 AWS IAM User 的 AKSK 来实现 NLB 相关的操作，借助 crontab 来实现快速监控；  
+如果准备采用类似方案，更建议自己在 Linux EC2 DIY 一套 python 脚本（可以参考以上两篇 blog 的代码部分），借助 AWS IAM User 的 AKSK 来实现 NLB 相关的操作，借助 Linux crontab 来实现更加频繁的针对 RDS DNS 解析的监控；  
