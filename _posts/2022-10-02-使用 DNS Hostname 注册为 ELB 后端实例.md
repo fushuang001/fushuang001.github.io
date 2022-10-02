@@ -32,13 +32,21 @@ public client -- NLB -- (internal, private to VPC)RDS
 # 引申的需求
 客户认为既然 RDS 的 IP 会发生变化，那么是否能直接使用 RDS DNS hostname 注册为 NLB 后端实例？  
 由 NLB 解析最新的 RDS IP，若 IP 发生变化，自动指向新的 RDS 实例。  
-
+ 
 # 实现方式
 首先从 AWS 提供的方式来说，NLB 可以注册 EC2 instance id, ip address, ALB 类型的后端实例，不支持直接注册 DNS/Hostname 类型；  
+实际上 NLB, RDS 都是通过 DNS 解析来访问后端真正的服务器，如果通过 client -- NLB -- RDS 的方式，那么 DNS 解析就会有两次，这可能是 AWS 官方不提供这种类型配置的原因之一。 
+> NLB IP 是固定不变的，不过通过 DNS 解析，能够更加均衡的访问到 NLB 不同节点  
+> RDS 的 DNS TTL=20s，若出现 failover 等事件，刷新还是很快的  
+
 类似的需求在 AWS 一篇 global blog 当中提到了可以使用 Eventbridge(crontab)，Lambda(python script) 来实现，参考 [Hostname-as-Target for Network Load Balancers](https://aws.amazon.com/blogs/networking-and-content-delivery/hostname-as-target-for-network-load-balancers/)；  
 Eventbridge 的 crontab 持续检查 RDS DNS Hostname 解析到的 IP 是否发生变化；  
 若发生变化，Eventbridge 作为 Lambda trigger，调用 Lambda(python script) 将新的 IP 注册为 NLB 后端实例；  
 可以借助 S3 桶来保存 IP address 的历史记录。  
+
+最近阅读 AWS global blog，发现另一篇 blog 写了相似内容，可以参考 [Access Amazon RDS across VPCs using AWS PrivateLink and Network Load Balancer](https://aws.amazon.com/blogs/database/access-amazon-rds-across-vpcs-using-aws-privatelink-and-network-load-balancer/)  
+所涉及的架构、AWS 服务大同小异，是在相同 AWS region 之间的不同 AWS account/VPC 之间，如何更加安全的连接 clients -- RDS；  
+所面临的问题也是相似的。  
 
 # 存在的问题
 首先依然是新注册 RDS IP 到 NLB 的延迟；  
