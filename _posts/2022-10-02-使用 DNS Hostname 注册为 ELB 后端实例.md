@@ -25,7 +25,7 @@ public client -- NLB -- (internal, private to VPC)RDS
 若发生变化，如何及时获取通知？使用新的 IP 来注册为 NLB 后端实例，注册过程耗时较长；  
 
 其次 NLB --> RDS 的健康检查/health check，有可能达到 RDS 的`max_connect_errors`上限，从而导致 health check 失败，并且 RDS 产生报错：  
-> Host is blocked because of many connection errors; unblock with 'mysqladmin flush-hosts'
+> Host is blocked because of many connection errors; unblock with 'mysqladmin flush-hosts'  
 [具体行为、解释可以参考](https://www.cnblogs.com/mask-xiexie/p/16174875.html)  
 
 # 引申的需求
@@ -34,7 +34,7 @@ public client -- NLB -- (internal, private to VPC)RDS
 
 # 实现方式
 首先从 AWS 提供的方式来说，NLB 可以注册 EC2 instance id, ip address, ALB 类型的后端实例，不支持直接注册 DNS/Hostname 类型；  
-类似的需求在 AWS 一篇 global blog 当中提到了可以使用 Eventbridge(crontab)，Lambda(python script) 来实现，参考[Hostname-as-Target for Network Load Balancers](https://aws.amazon.com/blogs/networking-and-content-delivery/hostname-as-target-for-network-load-balancers/)；  
+类似的需求在 AWS 一篇 global blog 当中提到了可以使用 Eventbridge(crontab)，Lambda(python script) 来实现，参考 [Hostname-as-Target for Network Load Balancers](https://aws.amazon.com/blogs/networking-and-content-delivery/hostname-as-target-for-network-load-balancers/)；  
 Eventbridge 的 crontab 持续检查 RDS DNS Hostname 解析到的 IP 是否发生变化；  
 若发生变化，Eventbridge 作为 Lambda trigger，调用 Lambda(python script) 将新的 IP 注册为 NLB 后端实例；  
 可以借助 S3 桶来保存 IP address 的历史记录。  
