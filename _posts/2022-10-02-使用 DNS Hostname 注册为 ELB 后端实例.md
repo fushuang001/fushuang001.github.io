@@ -26,6 +26,7 @@ public client -- NLB -- (internal, private to VPC)RDS
 
 其次 NLB --> RDS 的健康检查/health check，有可能达到 RDS 的`max_connect_errors`上限，从而导致 health check 失败，并且 RDS 产生报错：  
 > Host is blocked because of many connection errors; unblock with 'mysqladmin flush-hosts'  
+
 [具体行为、解释可以参考](https://www.cnblogs.com/mask-xiexie/p/16174875.html)  
 
 # 引申的需求
