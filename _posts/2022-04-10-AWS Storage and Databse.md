@@ -52,15 +52,19 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
 ### FSx for Windows, SMB protocol
 - Fully managed file server built on Windows Server that supports the SMB protocol  
 - 比如用于 Sharepoint, Microsoft SQL Server, Workspaces, IIS Web Server 或者任何其他 native Microsoft application  
+- Migrating Existing Files to Amazon FSx for Windows File Server Using AWS DataSync  
 
 ![FSx vs EFS](/assets/img/IMG_20220527-202832571.png)  
 
 [FSx for Windows file server FAQs](https://aws.amazon.com/fsx/windows/faqs/?nc=sn&loc=8)
 
-#### FSx for Lustre
+### FSx for Lustre
+- AWS 托管服务，为计算负载提供可靠高效的 shared storage  
+- 可能的场景，比如 machine learning, high performance computing (HPC), video rendering, EDA  
+- [Mounting FSx for Lustre on an Amazon Fargate launch type isn't supported](https://docs.amazonaws.cn/en_us/fsx/latest/LustreGuide/mounting-ecs.html). 有一道类似 SAA-C03 考试题   
 ![FSx for Lustre](/assets/img/IMG_20220527-203355484.png)  
 
-## Block storage
+## EBS - Block storage
 - 类比 SAN(storage area network)  
 - 将文件分为固定大小的块/splits files into fixed-size chunks  
 - 每一块都有自己的地址；按照地址来查询数据  

@@ -36,6 +36,13 @@ While containers can provide speed, virtual machines offer the full strength of 
 Spot instance 在被 AWS terminate 后，对应的 hour 不收费  
 on demand instance，用户自行 terminate，对应 hour 是收费的 
 
+## EC2 Pricing
+如果 application 可以适应随时中断，__spot instance__ 竞价实例类型可能比较便宜，[最高可享受按需价格 90％ 的折扣](https://www.amazonaws.cn/ec2/pricing/?nc1=h_ls)  
+
+如果未来一段时间的用量可以预期，并且要求 EC2 稳定运行，可以考虑 [Savings Plans](https://docs.aws.amazon.com/zh_cn/whitepapers/latest/cost-optimization-reservation-models/savings-plans.html)，可以节约大概 66% - 72% 的费用，__Saving Plans__ 有两种形式，主要区别是 **Compute Saving Plans** 适用于 AWS account 下 EC2, Fargate, Lambda 等计算资源，可能更加灵活；**EC2 Instance Saving Plans** 只针对 EC2  
+
+稳定使用的 EC2，还可以考虑 __RI__ 预留实例，相比按需实例，预留实例为您提供大幅折扣（最高 72%）  
+
 ## Amazon Compute Optimizer 提出对 EC2 的建议  
 客户自行选择 EC2 types，在使用一段时间之后，可以根据 console 工具 - Compute Optimizer 来查看信息，基于 EC2 使用率、成本优化等的建议  
 ![Compute Optimizer](/assets/img/IMG_20220420-173120029.png)  
@@ -212,7 +219,6 @@ client -- API GW -- Lambda/EC2/DDB
 从实现的角度来说，通过 [SAM](https://aws.amazon.com/serverless/sam/) 部署，可以不那么关注 Lambda, API GW 的单独部署  
 SAM 还可以将测试环境部署到 local(docker)，节省 AWS 资源/cost    
 ![SAM Template](/assets/img/IMG_20221015-133001967.png)  
-
 
 # 不同架构举例
 视频里面通过 ELB_VM/EC2_DB_S3 的方式，讲解了一种通用的 3-tires 架构  
