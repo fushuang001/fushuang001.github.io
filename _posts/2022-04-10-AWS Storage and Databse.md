@@ -132,7 +132,11 @@ incremental backups，增量备份到 S3。
 不同生命周期不同场景，[为 objects 找到合适的存储层级](https://aws.amazon.com/cn/s3/storage-classes/?nc1=h_ls)，来节省费用  
 ![S3 Storage Class](/assets/img/IMG_20220504-193742380.png)  
 
-S3 Intelligent-Tiering，智能分层，根据 object 访问频率，自动移动 object 到对应层级 (granular object level 颗粒度）  
+S3 Intelligent-Tiering，智能分层，根据 object 访问频率，自动移动 object 到对应层级 (granular object level 颗粒度） 
+>S3 Intelligent-Tiering is a new Amazon S3 storage class designed for customers who want to optimize storage costs automatically when data access patterns change, without performance impact or operational overhead. S3 Intelligent-Tiering is the first cloud object storage class that delivers automatic cost savings by moving data between two access tiers – frequent access and infrequent access – when access patterns change, and is ideal for data with unknown or changing access patterns.
+>S3 Intelligent-Tiering stores objects in two access tiers: one tier that is optimized for frequent access and another lower-cost tier that is optimized for infrequent access. For a small monthly monitoring and automation fee per object, S3 Intelligent-Tiering monitors access patterns and moves objects that have not been accessed for 30 consecutive days to the infrequent access tier. There are no retrieval fees in S3 Intelligent-Tiering. If an object in the infrequent access tier is accessed later, it is automatically moved back to the frequent access tier. No additional tiering fees apply when objects are moved between access tiers within the S3 Intelligent-Tiering storage class. 
+>S3 Intelligent-Tiering is designed for 99.9% availability and 99.999999999% durability, and offers the same low latency and high throughput performance of S3 Standard.
+
 One Zone-Infrequent Access(One-Zone-IA)，低成本存储层级，不提供高可用冗余，适用于丢失之后易恢复的数据  
     
 ### S3 use cases
