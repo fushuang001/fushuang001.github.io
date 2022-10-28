@@ -234,7 +234,9 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 - Read Replica 用于提高性能：  
   - 假如说 db.instance 的负载过高，而且有大量 read 操作，与其扩容 db.instance，不如使用 Read Replica 更经济实惠。  
   - 另一个可以提升性能的方式，是考虑 ElastiCache  
+  - 指定 source DB，然后 RDS 会创建 snapshot of the source DB，创建 read-only instance from the snapshot  
   - Asynchronous replication，是用于提升性能，并不是 Disaster Recovery  
+  - To further maximize read performance, Amazon RDS for MySQL allows you to add table indexes directly to Read Replicas, without those indexes being present on the master.  
 - 需要打开 automatic backups 才能使用 read replica  
 ![Read_Replica](/assets/img/IMG_20220420-131050551.png)  
 
