@@ -141,13 +141,17 @@ incremental backups，增量备份到 S3。
 不同生命周期不同场景，[为 objects 找到合适的存储层级](https://aws.amazon.com/cn/s3/storage-classes/?nc1=h_ls)，来节省费用  
 ![S3 Storage Class](/assets/img/IMG_20220504-193742380.png)  
 
-S3 Intelligent-Tiering，智能分层，根据 object 访问频率，自动移动 object 到对应层级 (granular object level 颗粒度） 
->S3 Intelligent-Tiering is a new Amazon S3 storage class designed for customers who want to optimize storage costs automatically when data access patterns change, without performance impact or operational overhead. S3 Intelligent-Tiering is the first cloud object storage class that delivers automatic cost savings by moving data between two access tiers – frequent access and infrequent access – when access patterns change, and is ideal for data with unknown or changing access patterns.
->S3 Intelligent-Tiering stores objects in two access tiers: one tier that is optimized for frequent access and another lower-cost tier that is optimized for infrequent access. For a small monthly monitoring and automation fee per object, S3 Intelligent-Tiering monitors access patterns and moves objects that have not been accessed for 30 consecutive days to the infrequent access tier. There are no retrieval fees in S3 Intelligent-Tiering. If an object in the infrequent access tier is accessed later, it is automatically moved back to the frequent access tier. No additional tiering fees apply when objects are moved between access tiers within the S3 Intelligent-Tiering storage class. 
->S3 Intelligent-Tiering is designed for 99.9% availability and 99.999999999% durability, and offers the same low latency and high throughput performance of S3 Standard.
+||Standard 标准|Intelligent-Tiering 智能分层|Standard-IA 标准-IA|One Zone-IA 单区-IA|Glacier Instant Retrieval 即时检索|Glacier Flexible Retrieval 灵活检索|Deep Archive 深层归档|
+|----|----|----|----|----|----|----|----|
+|场景|频繁访问的数据，比如云应用程序、动态网站、内容分配、移动和游戏应用程序以及大数据分析|未知或变化的访问，根据访问频率自动将数据移至最经济实惠的访问层|不频繁访问，毫秒级检索；适合长期存储、备份|同左，单区|很少访问/per 季度，毫秒级检索；长期存储，比 Standard-IA 更经济，如医学图像、新闻媒体资产或用户生成的内容归档|很少访问/per half year，不需要立即访问但需要灵活地免费检索大量数据的归档数据|成本最低，监管严格的行业，如金融服务、医疗保健和公共部门 – 为了满足监管合规要求，将数据集保留 7—10 年或更长时间|
+|检索时间，首字节延迟|ms|ms|ms|ms|ms|minutes or hours|hours|
+|每个 object 最低容量费用|NA|NA|128KB|128KB|128KB|40KB|40KB|
+|最低存储持续时间费用|NA|NA，但是收取监控和自动化费用|30 天|30 天|90 天|90 天|180 天|
+|检索费用|NA|NA|每检索 1GB|每检索 1GB|每检索 1GB|每检索 1GB|每检索 1GB|
+|生命周期转换|Y|Y|Y|Y|Y|Y|Y|Y|
 
-One Zone-Infrequent Access(One-Zone-IA)，低成本存储层级，不提供高可用冗余，适用于丢失之后易恢复的数据  
-    
+>S3 Intelligent-Tiering 可监控访问模式，并将连续 30 天未访问的对象移动到不频繁访问层，并在 90 天未访问之后，移动到归档即时访问层。对于不需要即时检索的数据，您可以设置 S3 Intelligent-Tiering，以监控对象并在 180 天以上未访问后将其则移至深度归档访问层，从而实现高达 95% 的存储成本节省。
+
 ### S3 use cases
 The following list summarizes some of the most common ways you can use Amazon S3:  
 - **Backup and storage:** Amazon S3 is a natural place to back up files because it is highly redundant. As mentioned in the last unit, AWS stores your EBS snapshots in S3 to take advantage of its high availability.  
