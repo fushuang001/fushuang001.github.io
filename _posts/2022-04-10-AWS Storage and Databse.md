@@ -89,6 +89,9 @@ incremental backups，增量备份到 S3。
 - __strong consistency and file locking__    
 - 适用场景包括大数据、分析、内容管理、Web 服务   
 
+[Amazon EFS: How it works](https://docs.aws.amazon.com/efs/latest/ug/how-it-works.html)  
+![how-it-works](/assets/img/post-efs-ec2-how-it-works-Regional.png)  
+
 **对比 EBS：**    
 - EBS 只能够单次 attach 到单独 EC2  
 - EBS 与 EC2 需要在相同 AZ  
