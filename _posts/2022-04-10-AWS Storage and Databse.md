@@ -175,6 +175,7 @@ When you define a lifecycle policy configuration for an object or group of objec
 
 # 数据传输，混合云存储
 AWS 有多个服务可以将本地数据迁移到云端，何时应该选择哪一种服务？  
+
 ||S3 Storage Gateway|DataSync|aws s3 sync|Snowball|S3 Batch Operation 批操作|S3 Replication
 |----|----|----|----|----|----|----|
 |功能|配合 DataSync，SGW file GW 提供对已迁移数据的低延迟访问|端到端安全的数据转移、发现；初始数据传输|自动 multiple parts upload|TB, PB 级数据传输|||
