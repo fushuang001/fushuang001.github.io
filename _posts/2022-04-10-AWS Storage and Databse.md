@@ -134,7 +134,7 @@ incremental backups，增量备份到 S3。
   - https://myexamplebucket.s3.cn-north-1.amazonaws.com.cn/Downloads/123.pcap  
 - 虽然看上去 S3 可以配置/folders，不过实际上 files & folders 是在同一个 level，并不是 actual file hierarchy  
 
-### S3 分层
+### S3 不同层级的存储类型
 不同生命周期不同场景，[为 objects 找到合适的存储层级](https://aws.amazon.com/cn/s3/storage-classes/?nc1=h_ls)，来节省费用  
 ![S3 Storage Class](/assets/img/IMG_20220504-193742380.png)  
 
@@ -178,8 +178,8 @@ AWS 有多个服务可以将本地数据迁移到云端，何时应该选择哪�
 
 ||S3 Storage Gateway|DataSync|aws s3 sync|Snowball|S3 Batch Operation 批操作|S3 Replication
 |----|----|----|----|----|----|----|
-|功能|配合 DataSync，SGW file GW 提供对已迁移数据的低延迟访问|端到端安全的数据转移、发现；初始数据传输|自动 multiple parts upload|TB, PB 级数据传输|||
-|场景|DataSync 迁移数据，然后使用 SGW 的 file GW 配置来保留对已迁移数据的访问权限，从本地基于文件的应用程序进行持续更新|在线传输数据，本地和云端共存|日常使用|离线传输，比如带宽受限|大量数据操作|将 src S3 持续复制到 dst S3|
+|功能|配合 DataSync，SGW file GW 提供对已迁移数据的低延迟访问|端到端安全的数据转移、发现；初始数据传输|自动 multiple parts upload|TB, PB 级数据传输|copy objects, set object tags or ACLs, initiate object restores from Glacier, invoke Lambda function|new objects 复制|
+|场景|DataSync 迁移数据，然后使用 SGW 的 file GW 配置来保留对已迁移数据的访问权限，从本地基于文件的应用程序进行持续更新|在线传输数据，本地和云端共存|日常使用|离线传输，比如带宽受限|针对大量 objects 操作，可以通过 S3 inventory report 来针对性列出需要操作的 objects|将 src S3 持续复制到 dst S3|
 
 ## S3 Storage Gateway
 - **混合云**存储服务，打通客户本地 (__低延迟__) 和 AWS 云上 (__容量几乎无上限__) 存储
