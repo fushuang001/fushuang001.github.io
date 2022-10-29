@@ -12,15 +12,24 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
 [AWS technical essenticals](https://explore.skillbuilder.aws/learn/course/1851/play/45289/aws-technical-essentials-104)
 ![示意图](/assets/img/IMG_20220410-113827773.png)  
 
-## File storage
+可以区分为两大类，**File storage** 和 **object storage**  
+**File storage**  
 - 类比 MacOS Finder，NAS(network attached storage)  
 - 文件有目录结构/tree-like hierarchy，  
 - 按照目录-子目录-文件来寻址  
 - metadata like filename, date, size, type...  
-- 更新文件内容，本质上是替换  
+- 更新文件内容，本质上是替换发生变化的一小部分即可    
 - 适合多个 hosts 文件共享，sotage mounted onto multiple hosts  
 
-### instance store
+**Object storage**  
+- 类似 File storage，当作一整个文件存储，但是是 flat structure，并不是 hierachy  
+- **object = file & metadata**，每个 object 都有单独 identifier, using unique identifiers to look up objects when requested.  
+- 更新文件内容，实际是完整替换  
+- 适合大量数据、unstructured files  
+
+![object_storage](/assets/img/IMG_20220412-114307486.png)  
+
+## instance store - Block storage
 - ephemeral block storage  
 - This storage is located on disks that are physically attached to the host computer.   
   - **费用是包含在 EC2 里面的，不会额外收取其他费用**  
@@ -32,39 +41,7 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
   
 ![instance_store_volumes](/assets/img/post-instance_store_volumes.png)  
 
-### EFS for linux, NFS file system
-对比 EBS：  
-- EBS 只能够单次 attach 到单独 EC2  
-- EBS 与 EC2 需要在相同 AZ  
-- EBS 支持扩容，[扩容以后需要在 OS 层面做操作来识别新的容量](https://aws.amazon.com/premiumsupport/knowledge-center/ebs-volume-increase-os/)  
-- EBS 需要提前预置容量 (provision storage in advance.)，按总容量收费  
-- EFS 是 Region service，支持 attach to multiple EC2 the same time    
-- EFS 容量可以自动扩容，不影响 application  
-- EFS, FSx 不需要预置容量，可以按需自动扩展，按用量收费  
-- EFS 支持 on-premises server 通过 DX 连接  
-
-![EBS & EFS](/assets/img/IMG_20220417-211334691.png)  
-
-[EFS FAQs](https://aws.amazon.com/efs/faq/)
-- EFS uses the Network File System version 4 (NFS v4) protocol.  
-- __strong consistency and file locking__    
-
-### FSx for Windows, SMB protocol
-- Fully managed file server built on Windows Server that supports the SMB protocol  
-- 比如用于 Sharepoint, Microsoft SQL Server, Workspaces, IIS Web Server 或者任何其他 native Microsoft application  
-- Migrating Existing Files to Amazon FSx for Windows File Server Using AWS DataSync  
-
-![FSx vs EFS](/assets/img/IMG_20220527-202832571.png)  
-
-[FSx for Windows file server FAQs](https://aws.amazon.com/fsx/windows/faqs/?nc=sn&loc=8)
-
-### FSx for Lustre
-- AWS 托管服务，为计算负载提供可靠高效的 shared storage  
-- 可能的场景，比如 machine learning, high performance computing (HPC), video rendering, EDA  
-- [Mounting FSx for Lustre on an Amazon Fargate launch type isn't supported](https://docs.amazonaws.cn/en_us/fsx/latest/LustreGuide/mounting-ecs.html). 有一道类似 SAA-C03 考试题   
-![FSx for Lustre](/assets/img/IMG_20220527-203355484.png)  
-
-## EBS - Block storage
+## EBS - Block storage  
 - 类比 SAN(storage area network)  
 - 将文件分为固定大小的块/splits files into fixed-size chunks  
 - 每一块都有自己的地址；按照地址来查询数据  
@@ -104,15 +81,44 @@ Amazon EBS is useful when you must **retrieve data quickly(EBS provides sub-mill
 ### EBS Snapshots
 incremental backups，增量备份到 S3。  
 
-## Object storage
-- 类似 File storage，当作一整个文件存储，但是是 flat structure，并不是 hierachy  
-- **object = file & metadata**，每个 object 都有单独 identifier, using unique identifiers to look up objects when requested.  
-- 更新文件内容，实际是完整替换  
-- 适合大量数据、unstructured files  
+## EFS for linux, NFS file system
+[EFS FAQs](https://aws.amazon.com/efs/faq/)
+- serveless 无服务器弹性文件系统  
+- EFS uses the Network File System version 4 (NFS v4) protocol.  
+- EFS 只支持 Linux EC2，不支持 Windows EC2  
+- __strong consistency and file locking__    
+- 适用场景包括大数据、分析、内容管理、Web 服务   
 
-![object_storage](/assets/img/IMG_20220412-114307486.png)  
+**对比 EBS：**    
+- EBS 只能够单次 attach 到单独 EC2  
+- EBS 与 EC2 需要在相同 AZ  
+- EBS 支持扩容，[扩容以后需要在 OS 层面做操作来识别新的容量](https://aws.amazon.com/premiumsupport/knowledge-center/ebs-volume-increase-os/)  
+- EBS 需要提前预置容量 (provision storage in advance.)，按总容量收费  
+- EFS 是 Region service，支持 attach to multiple EC2 the same time    
+- EFS 容量可以自动扩容，不影响 application  
+- EFS, FSx 不需要预置容量，可以按需自动扩展，按用量收费  
+- EFS 支持 on-premises server 通过 DX 连接  
 
-### S3
+![EBS & EFS](/assets/img/IMG_20220417-211334691.png)  
+
+## FSx for Windows, SMB protocol
+- Fully managed file server built on Windows Server that supports the SMB protocol  
+- 比如用于 Sharepoint, Microsoft SQL Server, Workspaces, IIS Web Server 或者任何其他 native Microsoft application  
+- Migrating Existing Files to Amazon FSx for Windows File Server Using AWS DataSync  
+
+![FSx for Windows](/assets/img/post-FSx-for-Windowns.png)  
+
+[FSx for Windows file server FAQs](https://aws.amazon.com/fsx/windows/faqs/?nc=sn&loc=8)
+
+## FSx for Lustre
+- AWS 托管服务，为计算负载提供可靠高效的 **shared storage**    
+- 高性能文件系统，可扩展  
+- 通过创建 Lustre filesystem 然后关联 S3 bucket，创建 filesystem 时候，Lustre 查看 objects 并且保存一些信息到 metadata  
+- 适用的场景，比如 machine learning, high performance computing (HPC), video rendering, EDA  
+- [Mounting FSx for Lustre on an Amazon Fargate launch type isn't supported](https://docs.amazonaws.cn/en_us/fsx/latest/LustreGuide/mounting-ecs.html). 有一道类似 SAA-C03 考试题   
+![FSx for Lustre](/assets/img/post-FSx-forLustre.png)  
+
+## S3 - Object storage  
 - 自动在三个 AZ 备份数据，提供灾备恢复能力；相对于 EBS 来说，S3 属于 Serverless  
 - 单个文件最大 5 TB  
 - Everything in Amazon S3 is private by default // 默认情况下，所有 objects 是被保护起来的  
@@ -167,10 +173,21 @@ When you define a lifecycle policy configuration for an object or group of objec
 - To learn more about using the AWS CLI to perform multipart uploads, see: [How do I use the AWS CLI to perform a multipart upload of a file to Amazon S3? ](https://aws.amazon.com/premiumsupport/knowledge-center/s3-multipart-upload-cli)  
 ![Multipart upload](/assets/img/IMG_20220519-151902183.png)  
 
-## Storage Gateway
-- 混合云存储服务，打通客户本地 (__低延迟__) 和 AWS 云上 (__容量几乎无上限__) 存储
+# 数据传输，混合云存储
+AWS 有多个服务可以将本地数据迁移到云端，何时应该选择哪一种服务？  
+||S3 Storage Gateway|DataSync|aws s3 sync|Snowball|S3 Batch Operation 批操作|S3 Replication
+|----|----|----|----|----|----|----|
+|功能|配合 DataSync，SGW file GW 提供对已迁移数据的低延迟访问|端到端安全的数据转移、发现；初始数据传输|自动 multiple parts upload|TB, PB 级数据传输|||
+|场景|DataSync 迁移数据，然后使用 SGW 的 file GW 配置来保留对已迁移数据的访问权限，从本地基于文件的应用程序进行持续更新|在线传输数据，本地和云端共存|日常使用|离线传输，比如带宽受限|大量数据操作|将 src S3 持续复制到 dst S3|
+
+## S3 Storage Gateway
+- **混合云**存储服务，打通客户本地 (__低延迟__) 和 AWS 云上 (__容量几乎无上限__) 存储
 - [基本介绍](https://www.amazonaws.cn/storagegateway/)  
 ![Storage_GW_types](/assets/img/IMG_20220524-162856498.png)    
+
+## DataSync
+- end-to-end/端到端将本地 NFS, SMB, HDFS 数据迁移到 AWS S3, FSx, EFS；支持指定 sub-folder 增量移动数据  
+- 也可以在 AWS services 之间传输数据      
 
 # AWS Databases 数据库
 [架构师 blog-选择正确的 DB](https://aws.amazon.com/cn/blogs/architecture/selecting-the-right-database-and-database-migration-plan-for-your-workloads/)
