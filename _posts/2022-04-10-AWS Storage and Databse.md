@@ -144,7 +144,7 @@ incremental backups，增量备份到 S3。
 ||Standard 标准|Intelligent-Tiering 智能分层|Standard-IA 标准-IA|One Zone-IA 单区-IA|Glacier Instant Retrieval 即时检索|Glacier Flexible Retrieval 灵活检索|Deep Archive 深层归档|
 |----|----|----|----|----|----|----|----|
 |场景|频繁访问的数据，比如云应用程序、动态网站、内容分配、移动和游戏应用程序以及大数据分析|未知或变化的访问，根据访问频率自动将数据移至最经济实惠的访问层|不频繁访问，毫秒级检索；适合长期存储、备份|同左，单区|很少访问/per 季度，毫秒级检索；长期存储，比 Standard-IA 更经济，如医学图像、新闻媒体资产或用户生成的内容归档|很少访问/per half year，不需要立即访问但需要灵活地免费检索大量数据的归档数据|成本最低，监管严格的行业，如金融服务、医疗保健和公共部门 – 为了满足监管合规要求，将数据集保留 7—10 年或更长时间|
-|检索时间，首字节延迟|ms|ms|ms|ms|ms|minutes or hours|hours|
+|检索时间，首字节延迟|ms|ms|ms|ms|ms|minutes or hours|within 12 hours|
 |每个 object 最低容量费用|NA|NA|128KB|128KB|128KB|40KB|40KB|
 |最低存储持续时间费用|NA|NA，但是收取监控和自动化费用|30 天|30 天|90 天|90 天|180 天|
 |检索费用|NA|NA|每检索 1GB|每检索 1GB|每检索 1GB|每检索 1GB|每检索 1GB|
@@ -185,13 +185,31 @@ AWS 有多个服务可以将本地数据迁移到云端，何时应该选择哪�
 
 ||S3 Storage Gateway|DataSync|aws s3 sync|Snowball|S3 Batch Operation 批操作|S3 Replication
 |----|----|----|----|----|----|----|
-|功能|配合 DataSync，SGW file GW 提供对已迁移数据的低延迟访问|端到端安全的数据转移、发现；初始数据传输|自动 multiple parts upload|TB, PB 级数据传输|copy objects, set object tags or ACLs, initiate object restores from Glacier, invoke Lambda function|new objects 复制|
+|功能|配合 DataSync，SGW file GW 提供对已迁移数据的低延迟访问；File GW 提供 SMB, NFS-based access to data in S3 with local caching|端到端安全的数据转移、发现；初始数据传输|自动 multiple parts upload|TB, PB 级数据传输|copy objects, set object tags or ACLs, initiate object restores from Glacier, invoke Lambda function|new objects 复制|
 |场景|DataSync 迁移数据，然后使用 SGW 的 file GW 配置来保留对已迁移数据的访问权限，从本地基于文件的应用程序进行持续更新|在线传输数据，本地和云端共存|日常使用|离线传输，比如带宽受限|针对大量 objects 操作，可以通过 S3 inventory report 来针对性列出需要操作的 objects|将 src S3 持续复制到 dst S3|
 
 ## S3 Storage Gateway
 - **混合云**存储服务，打通客户本地 (__低延迟__) 和 AWS 云上 (__容量几乎无上限__) 存储
 - [基本介绍](https://www.amazonaws.cn/storagegateway/)  
-![Storage_GW_types](/assets/img/IMG_20220524-162856498.png)    
+
+### SGW 分类
+File Gateway  
+- 直接存储到 S3  
+- 支持 SMB, NFS-based 文件系统  
+
+FSx File Gateway  
+- store and retrieve files in FSx for Windows File Server  
+- SMB protocol  
+- 通过 FSx File Gateway 写入的数据，可以直接被 FSx for Windows File Server 读取  
+
+Volume Gateway  
+- Stored Volumes  
+  - 所有数据保存在本地，异步备份到 S3  
+  - Entire dataset is stored on site and is asynchronously backed up to S3  
+- Cached Volumes  
+  - 所有数据保存在 S3，本地有经常访问数据的缓存  
+  - Entire dataset is stored on S3 and the most frequently accessed data is cached on site.  
+Gateway Virtual Tape Library 磁带网关  
 
 ## DataSync
 - end-to-end/端到端将本地 NFS, SMB, HDFS 数据迁移到 AWS S3, FSx, EFS；支持指定 sub-folder 增量移动数据  
@@ -321,7 +339,7 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 ![OLTP](/assets/img/IMG_20220528-202456159.png)  
 ![OLAP](/assets/img/IMG_20220528-202520719.png)  
 
-## Redshift
+## Redshift -- cloud data warehouse
 - used for business intelligence  
 - Amazon Redshift 是一种完全托管的企业 PB 级数据仓库服务  
 - fast and powerful, fully managed, petabyte-scale data warehouse service  
@@ -339,16 +357,18 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 - 至少三份 copies of your data(original, replica on compute node, backup in S3)  
 - 支持 asynchronously 复制 snapshots 到另一个 region S3，做 DR  
 
-# AWS ElasticCache 云缓存
-- ElasticCache is a web service that makes it easy to deploy, operate and scale an in-memory cache in the cloud.  
+# AWS ElastiCache 云缓存
+- ElastiCache is a web service that makes it easy to deploy, operate and scale an in-memory cache in the cloud.  
 - it improves the performance of web applications by allowing you to retrive info from fast, managed, in-memory caches, instead of relaying entirely on slower disk-based database  
-- ElasticCache to speed up performance of existing databases(frequent identical queries)   
+- ElastiCache to speed up performance of existing databases(frequent identical queries)   
   - 比如网站的 top 50 浏览量，基本上变化不大，那么就没必要把这些数据存储到 disk-based database，可以直接从 __in-memory cache__ 读取  
   - 用于提高现有 DB 的性能（经常访问的相同的内容）    
-  - 应该和 RDS Read Replica 有功能上重合的地方，比如说，都可以用来 increase db and web application performance  
+  - 和 RDS Read Replica 类似，比如说，都可以用来 increase db and web application performance  
+  - 但是 ElastiCache 是 nonrelelational database    
 - 支持两款 open-source in-memory caching engines:  
   - Memcached  
     - if you need a simple solution, to scale horizontally  
   - Redis  
     - Redis is Multi-AZ
     - you can do backups and restores of Redis  
+    - Redis Cluster supports up to 15 shards and single cluster supports to run workloads up to 6.1 TB of in-memory capacity  
