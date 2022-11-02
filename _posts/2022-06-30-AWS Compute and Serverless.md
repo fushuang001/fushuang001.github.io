@@ -82,6 +82,24 @@ Network ACL act as Subnet level firewall. Stateless, allow and deny
 [ENA - 增强联网](https://docs.amazonaws.cn/zh_cn/AWSEC2/latest/UserGuide/enhanced-networking.html)，single root I/O Virtualization(SR-IOV) 提供更高网络性能，没有额外费用。可选 ENA/up to 100G, Intel 82599 Virtual Function(VF) intf/up to 10G  
 non-Nitro 平台的 EC2（比如 t2.micro) 升级 Nitro 平台（比如 t3.micro)，需要启用 ENA。  
 
+## EC2 Placement Group 置放群组
+为了满足特定 workload 需求，可以将 EC2 逻辑上放到同一个 [placement group](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html)，优势可能包括低延迟、高吞吐量  
+>There is no charge for creating a placement group.
+
+Cluster-集群  
+- instances inside same AZ  
+- low-latency network performance
+- HPC  
+
+Partition-分区  
+- 将实例分布在不同的逻辑分区上，以便一个分区中的实例组不会与不同分区中的实例组使用相同的基础硬件  
+- 该策略通常为大型分布式和重复的工作负载所使用  
+- 例如，Hadoop、Cassandra 和 Kafka  
+
+Spread-分布  
+- 将一小组实例严格放置在不同的基础硬件上以减少相关的故障  
+- 可以跨可用区  
+
 # Containers
 对比 EC2，containers 启动更快。  
 **一次编译，在任意位置运行**。Development -  QA - Production , 应该不会因为 code environment 出现问题。    

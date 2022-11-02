@@ -300,6 +300,31 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 
 ![Aurora Replica](/assets/img/IMG_20220609-145209607.png)  
 
+### Aurora endpoints
+目前 [四种类型 endpoints 可用](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Endpoints.html)，了解对应的功能和场景先  
+Cluster endpoint
+- connects to the current primary DB instance for that DB cluster  
+- the only one that can perform write operations  
+- provides failover support for read/write connections to the DB cluster  
+
+Reader endpoint
+- provides __load-balancing__ support for __read-only__ connections to the Aurora DB cluster  
+- reduces the overhead on the primary instance  
+- each Aurora DB cluster has one reader endpoint  
+- if Aurora DB cluster contains one or more Aurora Replicas, the reader endpoint load-balances each connection request among the Aurora Replicas.  
+
+Custom endpoint
+- you choose a set of DB instances put into custom endpoint  
+- load-balancing and chooses one of the instances in the group  
+- you define which instances, what purpose the endpoint serves
+- LB 自定义程度比较高，不只是 read-only or read/write capability    
+
+Instance endpoint
+- connect to a specify DB instance within an Aurora cluster  
+- each DB instance(primary, Replicas) has its own unique instance endpoint  
+- direct control over connections the the DB cluster, for scenarios where using cluster/reader endpoint might not be appropriate.  
+
+
 ## 非关系型，key-value DynamoDB
 - 按使用情况和 DDB 存储容量收费 (read/write 不收费），并不是 per hour/second  
 - 可以类比 JSON，其中还可以有 key:value pairs，每个记录都可以有只属于它的 key    
