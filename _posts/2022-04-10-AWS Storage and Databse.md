@@ -279,9 +279,9 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
     - 支持 failover & DB read traffic  
 - Aurora 是 AWS 托管，不需要客户配置 Multi-AZ；客户可以为其他 RDS DB 配置 Multi-AZ  
 
-![Multi-AZ DB instance deployment](../assets/img/con-multi-AZ.png)  
+![Multi-AZ DB instance deployment](/assets/img/con-multi-AZ.png)  
 
-![Multi-AZ DB cluster deployment](../assets/img/multi-az-db-cluster.png)  
+![Multi-AZ DB cluster deployment](/assets/img/multi-az-db-cluster.png)  
 
 ### Read Replica 只读副本
 - 如果有一些程序需要经常读取数据，可以把读取的任务放到 Read Replica 去执行  
