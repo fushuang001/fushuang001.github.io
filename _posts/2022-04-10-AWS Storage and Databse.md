@@ -180,6 +180,10 @@ When you define a lifecycle policy configuration for an object or group of objec
 - To learn more about using the AWS CLI to perform multipart uploads, see: [How do I use the AWS CLI to perform a multipart upload of a file to Amazon S3? ](https://aws.amazon.com/premiumsupport/knowledge-center/s3-multipart-upload-cli)  
 ![Multipart upload](/assets/img/IMG_20220519-151902183.png)  
 
+### pricing, S3 vs EFS
+S3 不同存储层级的价格不同，[不过 S3 不只是有存储费用](https://dzone.com/articles/confused-by-aws-storage-options-s3-ebs-amp-efs-explained)，还有其他费用，比如 API 调用、数据传出 S3(Data Transfer Out)  
+EFS 整体定价更便宜一些  
+
 # 数据传输，混合云存储
 AWS 有多个服务可以将本地数据迁移到云端，何时应该选择哪一种服务？  
 
@@ -264,11 +268,20 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 从自动备份或者手动 snapshots 恢复的，是一个新的 RDS db.instance，有一个新的 DNS endpoint/DNS name    
 
 ### Multi-AZ
-- have an exact copy of your production database in another AZ, AWS 托管的 synchronized replication  
-- 如果发生切换，AWS 会把原来主的 DNS endpoint 解析 (A, IP 记录）替换为备份 RDS，不需要客户手动干预；对 application 来说，仍然是访问之前的 DNS endpoint  
+- have an exact copy of your production database in another AZ, AWS 托管的 __synchronized__ replication  
+- 作用主要是 Disaster Recovery，并不是提升性能  
+- 如果发生切换，AWS 会把原来 primary DB instance 的 DNS endpoint 解析 (A, IP 记录）替换为 standby replica，不需要客户手动干预；对 application 来说，仍然是访问之前的 DNS endpoint  
 - 用户可以自己在 AWS console 控制台，手动 failover from one AZ to another by rebooting the RDS instance  
-- multi-az 的作用主要是 Disaster Recovery，并不是提升性能；和 Read Replica 不一样  
+- [Multi-AZ 部署有两种方式](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html)，区别在于 one standby or two standby DB instances  
+  - one standby DB instance(standby repliac), 叫做 __Multi-AZ DB instance deployment__  
+    - 支持 failover 但是 standby repliac 并不支持 DB read  
+  - two standby DB instance(standby repliac)，叫做 __Multi-AZ DB cluster deployment__  
+    - 支持 failover & DB read traffic  
 - Aurora 是 AWS 托管，不需要客户配置 Multi-AZ；客户可以为其他 RDS DB 配置 Multi-AZ  
+
+![Multi-AZ DB instance deployment](../assets/img/con-multi-AZ.png)  
+
+![Multi-AZ DB cluster deployment](../assets/img/multi-az-db-cluster.png)  
 
 ### Read Replica 只读副本
 - 如果有一些程序需要经常读取数据，可以把读取的任务放到 Read Replica 去执行  
@@ -324,7 +337,6 @@ Instance endpoint
 - each DB instance(primary, Replicas) has its own unique instance endpoint  
 - direct control over connections the the DB cluster, for scenarios where using cluster/reader endpoint might not be appropriate.  
 
-
 ## 非关系型，key-value DynamoDB
 - 按使用情况和 DDB 存储容量收费 (read/write 不收费），并不是 per hour/second  
 - 可以类比 JSON，其中还可以有 key:value pairs，每个记录都可以有只属于它的 key    
@@ -365,7 +377,7 @@ Instance endpoint
 ![OLAP](/assets/img/IMG_20220528-202520719.png)  
 
 ## Redshift -- cloud data warehouse
-- used for business intelligence  
+- used for business intelligence, use SWL to analyze    
 - Amazon Redshift 是一种完全托管的企业 PB 级数据仓库服务  
 - fast and powerful, fully managed, petabyte-scale data warehouse service  
 - [Massively Parallel Processing(MPP)](https://docs.aws.amazon.com/zh_cn/redshift/latest/dg/c_challenges_achieving_high_performance_queries.html)/大规模并行处理，Redshift automatically distributes data and query load across all nodes  
@@ -391,9 +403,9 @@ Instance endpoint
   - 和 RDS Read Replica 类似，比如说，都可以用来 increase db and web application performance  
   - 但是 ElastiCache 是 nonrelelational database    
 - 支持两款 open-source in-memory caching engines:  
-  - Memcached  
+  - **Memcached**  
     - if you need a simple solution, to scale horizontally  
-  - Redis  
+  - **Redis**  
     - Redis is Multi-AZ
     - you can do backups and restores of Redis  
     - Redis Cluster supports up to 15 shards and single cluster supports to run workloads up to 6.1 TB of in-memory capacity  
