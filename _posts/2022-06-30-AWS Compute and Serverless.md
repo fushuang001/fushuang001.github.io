@@ -42,18 +42,19 @@ on demand instance，用户自行 terminate，对应 hour 是收费的
 如果未来一段时间的用量可以预期，并且要求 EC2 稳定运行，可以考虑 [Savings Plans](https://docs.aws.amazon.com/zh_cn/whitepapers/latest/cost-optimization-reservation-models/savings-plans.html)，可以节约大概 66% - 72% 的费用，__Saving Plans__ 有两种形式，主要区别是 **Compute Saving Plans** 适用于 AWS account 下 EC2, Fargate, Lambda 等计算资源，可能更加灵活；**EC2 Instance Saving Plans** 只针对 EC2  
 
 稳定使用的 EC2，还可以考虑 __RI__ 预留实例，相比按需实例，预留实例为您提供大幅折扣（最高 72%）  
+convertible RI/可转换 RI，可以在未来转换为其他 instance family  
 
 ## Amazon Compute Optimizer 提出对 EC2 的建议  
 客户自行选择 EC2 types，在使用一段时间之后，可以根据 console 工具 - Compute Optimizer 来查看信息，基于 EC2 使用率、成本优化等的建议  
 ![Compute Optimizer](/assets/img/IMG_20220420-173120029.png)  
 ![EC2-EBS](/assets/img/IMG_20220420-173324986.png)  
 
-## EC2 lifecycle
+## EC2 Lifecycle
 When you stop your instance, the data stored in memory (RAM) is lost.  
 __Hibernate 休眠__，[记录当前状态，类似于当前快照，避免 memory/RAM 当中数据丢失](https://docs.amazonaws.cn/en_us/AWSEC2/latest/UserGuide/Hibernate.html)；  
 - 从 hibernate 恢复，可以避免 1. OS 层面启动的延迟；2. application 启动的延迟。 
 - 最长 hibernate 60 天，适用于 on-demand, RI instances  
-- RAM 最多不能超过 150GB   
+- RAM 最多不能超过 150 GB   
 - 保证 root EBS 有足够空间来存储 RAM 的数据  
 - 创建 EC2 时候，需要勾选“休眠”  
 - root volume 必须启用加密      
@@ -73,6 +74,24 @@ tips 避免数据丢失：
 
 ![EC2 lifecycle](/assets/img/IMG_20220411-213159099.png)  
 
+## Snapshot and AMI
+保存 EC2/VM 当前配置的一种手段  
+
+**Snapshot**
+- Snapshot 是将当前 EC2 状态保存快照，上传到 AWS managed S3  
+- Snapshot 打快照是立刻完成的，但是需要 asynchronously 上传到 S3，
+  - 初次打快照，上传的过程可能持续 minutes to hours  
+  - 后续打快照，__增量更新__，完成速度取决于有多少内容发生了变化   
+- Snapshot 操作并不影响 EC2 使用 (ongoing volumes reads and writes)  
+- 从 Snapshot 恢复 volume，实际上是从 AWS managed S3 拉取数据的过程
+  - replicated volume loads data lazily in background so that you can begin using it immediately.  
+  - 如果所访问的数据还没有从 S3 拉取，将会触发 loading  
+
+**AMI**
+- Amazon machine Image，可以简单理解为 EC2 的 OS/操作系统  
+- 新启动的 EC2，可以根据业务需要做定制化，比如安装一些软件，修改特定配置；之后可以做一个 AMI，从 AMI 启动的后续新的 EC2，将拥有相同的之前修改的配置  
+- 注意导出 AMI 时候，EC2 可以选择 __No Reboot__，默认 EC2 会重启  
+
 ## EC2 SG, ACL
 Security Group is instance(ENI) level firewall. Stateful(Connection track), only allow  
 Network ACL act as Subnet level firewall. Stateless, allow and deny  
@@ -86,19 +105,41 @@ non-Nitro 平台的 EC2（比如 t2.micro) 升级 Nitro 平台（比如 t3.micro
 为了满足特定 workload 需求，可以将 EC2 逻辑上放到同一个 [placement group](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html)，优势可能包括低延迟、高吞吐量  
 >There is no charge for creating a placement group.
 
-Cluster-集群  
+**Cluster-集群** 
 - instances inside same AZ  
 - low-latency network performance
 - HPC  
 
-Partition-分区  
+**Partition-分区**
 - 将实例分布在不同的逻辑分区上，以便一个分区中的实例组不会与不同分区中的实例组使用相同的基础硬件  
 - 该策略通常为大型分布式和重复的工作负载所使用  
 - 例如，Hadoop、Cassandra 和 Kafka  
 
-Spread-分布  
+**Spread-分布** 
 - 将一小组实例严格放置在不同的基础硬件上以减少相关的故障  
 - 可以跨可用区  
+
+## ASG - AutoScaling Group
+- 自动扩展组，可以根据配置，对 EC2 的数量进行扩缩容  
+- 可以和 ELB 配合使用  
+
+### ASG 扩缩容策略
+**simple policy**  
+- 通过设置 minimum/desired/maximum，来指定所需要的 EC2 的数量  
+- 在一些简单的场景适用，比如业务需要 10 台 EC2，可以设置 desired=10  
+
+**scheduled policy**  
+- 周期性的业务变化，比如工作日早晨的流量高峰，月底的流量高峰  
+- 通过设置 minimum/desired/maximum，来指定所需要的 EC2 的数量  
+
+**step policy**  
+
+**target tracking policy**  
+
+### ASG 的一些重要参数
+**scale-in protection**  
+- 如果 EC2 因为故障需要替换，ASG 不会主动 terminate failure EC2，可以登录查看对应日志  
+- 手动加入 ASG 的 EC2，这个选项默认打开  
 
 # Containers
 对比 EC2，containers 启动更快。  
