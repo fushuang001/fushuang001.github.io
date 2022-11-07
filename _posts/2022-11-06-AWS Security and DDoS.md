@@ -311,6 +311,10 @@ Cogntio
 [参考资料](https://www.stormit.cloud/blog/aws-scp-service-control-policy/)  
 ![Organization and SCP](/assets/img/AWS_organizations_SCP.png)
 
+# Control Tower
+对于 initial AWS account setup，[Control Tower](https://aws.amazon.com/controltower/faqs/) 可以提供 best practice  
+![Control Tower](../assets/img/Product-Page-Diagram_AWS-Control-Tower.9281926228bb2900c76b4b6d85b2819efc078978.png)
+
 # Compliance - AWS Artifact
 关于 AWS 合规性文档，以及是否接受特定 agreements
 

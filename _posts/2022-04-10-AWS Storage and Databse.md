@@ -270,12 +270,12 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 从自动备份或者手动 snapshots 恢复的，是一个新的 RDS db.instance，有一个新的 DNS endpoint/DNS name    
 
 ### Multi-AZ
-- have an exact copy of your production database in another AZ, AWS 托管的 __synchronized__ replication  
-- 作用主要是 Disaster Recovery，并不是提升性能  
+- have an exact copy of your production database in another AZ, AWS 托管的 <span style='background:lime;color:black'>synchronized replication</span>   
+- 作用主要是 Disaster Recovery/HA/failover，并不是提升性能  
   - automatic failover 只会在 primary database 出问题时候才会发生，比如
     - Loss of availability in primary AZ  
     - storage failure on primary  
-- 如果发生切换，AWS 会把原来 primary DB instance 的 DNS endpoint 解析 (A, IP 记录）替换为 standby replica，不需要客户手动干预；对 application 来说，仍然是访问之前的 DNS endpoint  
+- 如果发生切换，AWS 会把原来 primary DB instance 的 DNS endpoint 解析 (A, IP 记录）替换为 <span style='background:lime;color:black'>standby replica</span>，不需要客户手动干预；对 application 来说，仍然是访问之前的 DNS endpoint  
 - 用户可以自己在 AWS console 控制台，手动 failover from one AZ to another by rebooting the RDS instance  
 - [Multi-AZ 部署有两种方式](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html)，区别在于 one standby or two standby DB instances  
   - one standby DB instance(standby repliac), 叫做 __Multi-AZ DB instance deployment__  
