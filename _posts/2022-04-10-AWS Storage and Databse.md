@@ -174,7 +174,34 @@ When you define a lifecycle policy configuration for an object or group of objec
 - **Transition actions** define when objects should transition to another storage class.
 - **Expiration actions** define when objects expire and should be permanently deleted.
 
-### S3 objects Encryption
+### S3 Encryption 加密
+支持两种方式：传输到 S3 之前 (before-transmit，client-side) 加密，在 S3 存储的 objects 加密 (at-rest，server-side)  
+
+<span style='background:lime;color:black'>SSE(Server Side Encryption)，S3 服务器端加密</span>
+- [在 S3 将数据保存到 disk 之前加密数据](https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html)，在你下载数据时候解密  
+- 数据加密和密钥保管，都可以托管给 AWS    
+- 用于加密的 key，取决于用户是否需要控制密钥，区分为三种  
+  - SSE-S3  
+    - encrypt key 是 S3 托管，不需要客户负责，客户无法干预  
+  - SSE-KMS  
+    - encrypt key 通过 KMS 管理，客户指定 KMS  
+  - SSE-C  
+    - encrypt key 是客户管理，encrypt/decrypt 是 AWS 管理  
+    - 客户通过 `PutObject` 来上传 object，以及 encrypt key，必须使用 `HTTPS`；  
+    - AWS 通过 `AES-256` 加密 object，保存到 disk，然后 AWS 删除 customer encrypt key   
+    - 客户下载数据时候，必须提供相同的 encrypt key，由 AWS 完成解密  
+    - AWS 并不会存储具体的 encrypt key，而是存储一个 HMAC hash 用于对比   
+
+![SSE](/assets/img/post-S3-SSE.png)  
+
+<span style='background:lime;color:black'>Client Side Encryption，客户端加密</span>
+- [在将数据传递到 S3 之前，client 端加密数据](https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html)  
+- 用于加密的 key，取决于是否托管给 AWS，区分为两种  
+  -  KMS  
+     -  server-side master key storage，将密钥保存在 KMS  
+     -  仅支持同步加密 (symmetric encryption)，不支持异步加密  
+  -  Client provided/managed key  
+     -  客户自己管理密钥，若密钥丢失，就无法解密了  
 
 ### MFA delete 
 - 只有 root 可以删除 objects，提高安全性   
@@ -361,7 +388,7 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
 ### RDS 恢复 Restoring Backups
 从自动备份或者手动 snapshots 恢复的，是一个新的 RDS db.instance，有一个新的 DNS endpoint/DNS name    
 
-### Multi-AZ
+### Multi-AZ, Standby Replica
 - have an exact copy of your production database in another AZ, AWS 托管的 <span style='background:lime;color:black'>synchronized replication</span>   
 - 作用主要是 Disaster Recovery/HA/failover，并不是提升性能  
   - automatic failover 只会在 primary database 出问题时候才会发生，比如
