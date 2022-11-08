@@ -158,17 +158,23 @@ ECS, EKS 都是 containers 的 协调，管理工具/ 容器编排。
 
 A container is a standardized unit that packages your code and its dependencies. This package is designed to run reliably on any platform, because the container creates its own independent environment. With containers, workloads can be carried from one place to another, such as from development to production or from on premises to the cloud.  
 
-## Manage containers with Amazon Elastic Container Service
+## ECS - Elastic Container Service
 Amazon ECS is an end-to-end container orchestration service that helps you spin up new containers and manage them across a cluster of EC2 instances.    
 To run and manage your containers, you need to install the Amazon **ECS container agent** on your EC2 instances. This agent is open source and responsible for communicating to the Amazon ECS service about cluster management details. You can run the agent on both Linux and Windows AMIs. An instance with the container agent installed is often called a **container instance**.  
 
 Once the Amazon ECS container instances are up and running, you can perform actions that include, but are not limited to, launching and stopping containers, getting cluster state, scaling in and out, scheduling the placement of containers across your cluster, assigning permissions, and meeting availability requirements.  
 
+SAA 考试题举个栗子，比如 ECS 需要调用 database 密码，应该怎么设置  
+Use the AWS System Manager Parameter Store to keep the database credentials and then encrypt thme using AWS KMS. Create an IAM Role for your ECS task execution role(taskRoleArn) and reference it with your task defination, which allows access to both KMS and the Parameter Store.
+Within your container defination, specify secrets with the name of the environment variable to set in the container and the full ARN of the SSM Parameter Store containing the sevsitive data to present to the container.
+也可以将敏感数据保存到 AWS Secrets Manager  
+注意 ECS 不支持 resource based policy(example, S3 bucket policy)，ECS task 通过 assume role 的方式来获取权限  
+
 ![ECS Cluster](/assets/img/IMG_20220411-212704829.png)  
 
 To prepare your application to run on Amazon ECS, you create a **task definition**. The task definition is a text file, in JSON format, that describes one or more containers. A task definition is similar to a blueprint that describes the resources you need to run a container, such as CPU, memory, ports, images, storage, and networking information.  
 
-## Use Kubernetes with Amazon Elastic Kubernetes Service
+## EKS - Elastic Kubernetes Service
 Kubernetes is a portable, extensible, open source platform for managing containerized workloads and services.  
 If you already use Kubernetes, you can use Amazon EKS to orchestrate the workloads in the AWS Cloud. If you have containers running on Kubernetes and want an advanced orchestration solution that can provide simplicity, high availability, and fine-grained control over your infrastructure, Amazon EKS could be the tool for you.  
 Amazon EKS is conceptually similar to Amazon ECS, but with the following differences:  

@@ -498,6 +498,7 @@ Instance endpoint
 - 可以类比 JSON，其中还可以有 key:value pairs，每个记录都可以有只属于它的 key    
 - DDB 是 **serveless DB**，用户不需要关系 db.instance 和 HA；fully **managed NoSQL** database service.  
 - 高性能、毫秒级延迟，all of your data is __stored on solid-state disks (SSDs)__ and is automatically replicated across multiple AZs, providing built-in high availability and data durability.  
+- ElastiCache 和 DDB 都比较适合用来存储 HA 的 web application 的 __session data__，高速读取   
 - 默认是 [Eventually consistent](https://aws.amazon.com/dynamodb/faqs/)（写入，1 秒后所有数据一致）；另外还支持 Strongly consistent  
 ![JSON/NoSQL](/assets/img/IMG_20220528-202315635.png)  
 
@@ -560,6 +561,7 @@ Instance endpoint
 # AWS ElastiCache 云缓存
 - ElastiCache is a web service that makes it easy to deploy, operate and scale an in-memory cache in the cloud.  
 - it improves the performance of web applications by allowing you to retrive info from fast, managed, in-memory caches, instead of relaying entirely on slower disk-based database  
+- ElastiCache 和 DDB 都比较适合用来存储 HA 的 web application 的 __session data__，高速读取    
 - ElastiCache to speed up performance of existing databases(frequent identical queries)   
   - 比如网站的 top 50 浏览量，基本上变化不大，那么就没必要把这些数据存储到 disk-based database，可以直接从 __in-memory cache__ 读取  
   - 用于提高现有 DB 的性能（经常访问的相同的内容）    
