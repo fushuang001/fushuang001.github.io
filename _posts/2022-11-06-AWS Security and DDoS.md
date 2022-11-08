@@ -311,12 +311,29 @@ Cogntio
 [参考资料](https://www.stormit.cloud/blog/aws-scp-service-control-policy/)  
 ![Organization and SCP](/assets/img/AWS_organizations_SCP.png)
 
+# Directory Service, AD
+
+## AWS Directory Service AD Connector
+- 本地使用了 Active Directory  
+- AD Connector 可以和 AD 集成   
+- 集成之后，可以将 IAM Role 指定给 AD user/groups  
+
 # Control Tower
 对于 initial AWS account setup，[Control Tower](https://aws.amazon.com/controltower/faqs/) 可以提供 best practice  
 ![Control Tower](/assets/img/Product-Page-Diagram_AWS-Control-Tower.9281926228bb2900c76b4b6d85b2819efc078978.png)
 
-# Compliance - AWS Artifact
-关于 AWS 合规性文档，以及是否接受特定 agreements
+# Compliance 
+关于合规性，以及针对 PII(Personal Identifiable Information), PHI(Protected Health Information) 等的保护  
+
+## AWS Macie
+- ML-powered security service  
+- help you prevent data loss by automatically discovering, classifying, and protecting sevsitive data stored in S3  
+- Macie recognize sensitive data such as PII, PHI, assigns a business value and provide visiblity into where this data is stored and how it is being used in your organization.  
+- Macie continuously monitors data access activity for anomalies/异常监测，and delivers alers when detects risk of unauthorized access    
+- 对比 AWS Rekognition 服务，用来识别人物、text、风景等，不恰当内容检测 in image, videos  
+
+## AWS Artifact
+关于 AWS 合规性文档，以及是否接受特定 agreements  
 
 # Denial-of-service attacks - DDoS
 视频里面只是简单说了一些场景，以及 AWS 如何应对  
@@ -331,8 +348,9 @@ Cogntio
 - ALB，ALB 会和 attacker 建立 TCP 连接，直到完整接收 HTTP request，才转给 backend targets  
 - ALB(regional service) 会随着 requests 数量自动扩缩容，而用户不需要为扩容付费  
 
-## Shiled with WAF
-目前中国区不可用  
+## Shield
+- Shield Standard, layer 4 TCP/UDP 防护   
+- Shield Advanced，DDoS 防护，实时查看攻击，和 WAF 集成  
 
 ## WAF
 [Web Application Firewall](https://www.amazonaws.cn/en/waf/)，OSI 模型中工作在 layer7 的应用层防火墙，可以识别 client IP, HTTP/S headers, body, URI strings 来防范攻击，保护对应的资源。  

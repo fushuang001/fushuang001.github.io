@@ -105,8 +105,8 @@ incremental backups，增量备份到 S3。
 ![EBS & EFS](/assets/img/IMG_20220417-211334691.png)  
 
 ## FSx for Windows, SMB protocol
-- Fully managed file server built on Windows Server that supports the SMB protocol  
-- 比如用于 Sharepoint, Microsoft SQL Server, Workspaces, IIS Web Server 或者任何其他 native Microsoft application  
+- Fully managed file server built on Windows Server that supports the SMB/NTFS protocol, Microsoft Active Directory(AD) integration  
+- 比如用于 Sharepoint, Microsoft SQL Server, Workspaces, IIS Web Server 或者任何其他 native Microsoft application   
 - Migrating Existing Files to Amazon FSx for Windows File Server Using AWS DataSync  
 
 ![FSx for Windows](/assets/img/post-FSx-for-Windowns.png)  
@@ -297,6 +297,9 @@ When you define a lifecycle policy configuration for an object or group of objec
 
 ### S3 bucket policy
 
+### Pre-signed URL
+- all objects private by default, the object owner can optionally share objects with others by pre-signed URL, using their own security credentials, to grant time-limited permission to download the object  
+
 ### pricing, S3 vs EFS
 S3 不同存储层级的价格不同，[不过 S3 不只是有存储费用](https://dzone.com/articles/confused-by-aws-storage-options-s3-ebs-amp-efs-explained)，还有其他费用，比如 API 调用、数据传出 S3(Data Transfer Out)  
 EFS 整体定价更便宜一些  
@@ -440,10 +443,26 @@ Multi-AZ DB cluster deployment
 - applications -- RDS Proxy -- database，RDS Proxy allows applications to pool and share connections established with the db，提高 DB 效率，降低 DB failover 概率  
 ![how it works](/assets/img/product-page-diagram_RDS Proxy_How-it-works@2x.a18916586f49718a16fd11579d168ab08c83d333.png)
 
+### IAM database authenication
+- 不 [使用 DB password 连接，而是借助 authentication token](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html)(generated using AWS Signature V4)，由 IAM 存储 token，每个 token 有效期 15 分钟  
+- 支持 MariaDB, MySQL, and PostgreSQL  
+- 优点是不需要单独管理 DB password，可以通过 IAM 集中管理  
+- For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security.  
+
 ## Aurora
 - MySQL, PostgreSQL-compatible RDS, open source  
-- use Aurora Serverless if you want a simple, cost-effective option for infrequent, intermittent, or unpredictable workloads  
-- 无服务器 DB，按用量付费（不使用就没有费用，参考 lambda)，对于负载/访问量未知的业务，并且希望尽量省钱、高可用，可以考虑 Aurora    
+- capacity type 分为两类  
+  - __Aurora Serverless__   
+    - simple, cost-effective option for infrequent, intermittent, or unpredictable workloads  
+    - 通过指定 minimum、maximum capacity，而不是 instance type，由 Aurora 根据 workload 来扩缩容  
+    - 适合 intermittent, unpredictable workload 场景  
+    - db endpoint --- proxy fleet --- fleet of resources，resources/db 扩缩容；warm resoures，快速扩展    
+    - 存储和 processing 费用分开的，没有 processing 的话，只收取存储的费用  
+  - __provisioned__  
+    - customer  manage the server instance types  
+    - non-serverless DB cluster，用户指定 DB instance type  
+    - 通过调整 replica 数量来提高 read throughput  
+    - 适合 predictable/可预测的 DB workload 场景   
 - Automated backups 是默认且必须 enabled，Backups do not impact database performance  
 
 ![Writer, Reader 有各自 DNS Endpoint](/assets/img/IMG_20220609-153921417.png)  
@@ -498,11 +517,17 @@ Instance endpoint
 - not enabled by default  
 - latest restorable: __5 minutes__ in the past
 
-### DAX Cluster DynamoDB Accelerator 加速器
-- 类似于 RDS Read Replica 只读副本，是为了数据高可用，降低延迟，可以达到微秒级/microseconds 响应  
+### DAX(Cluster DynamoDB Accelerator) 加速器
+- 类似于 RDS Read Replica，数据高可用，降低延迟，可以达到微秒级/microseconds 响应  
 - AWS 托管，in-memory cache，支持 read, write  
 - DAX Cluster 会提供一个 Endpoint 给 client 使用，隐藏后面 scaling 的细节  
 ![DAX_Cluster](/assets/img/IMG_20220420-131351110.png)  
+
+### DDB Stream
+- DDB Stream is an ordered flow of info about changes to items in an DDB table  
+- 如果打开 DDB Stream，就可以获取到 table 中的修改 (create, update, delete)  
+- DDB Stream 会记录发生变化 table item 的 primary key attributes  
+- DDB 与 Lambda 集成，将 DDB Stream 也就是 table 变化信息推送给 Lambda 做处理，比如你关注的人发表了新的动态，DDB Stream --- Lambda --- SNS topic, email update  
 
 # AWS Data Warehouse 数据仓库
 本质上还是数据库，只不过从 architecture，infrastructure 与和 RDS, DynamoDB 都不一样  

@@ -136,6 +136,13 @@ non-Nitro 平台的 EC2（比如 t2.micro) 升级 Nitro 平台（比如 t3.micro
 
 **target tracking policy**  
 
+### ASG 缩容，终止 EC2 的策略
+- [default termination policy](https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-termination-policies.html)  
+- 如果 EC2 在多个 AZ，会尽量保证 AZ 的 EC2 数量平衡  
+- 如果 AZ 的 EC2 数量相同，那么 terminate 没有被 scale in protection 的，使用最老 launch configuration/template 的 EC2  
+- 如果存在多个满足以上条件的 EC2，那么寻找最接近下一个 billing hour 的 EC2，节省费用  
+- 如果多个 EC2 接近 next billing hour，那么随机干掉一个  
+
 ### ASG 的一些重要参数
 **scale-in protection**  
 - 如果 EC2 因为故障需要替换，ASG 不会主动 terminate failure EC2，可以登录查看对应日志  
@@ -219,6 +226,14 @@ ec2 = boto3.client('ec2', region_name=region)
 ec2.start_instances(InstanceIds=instances)
 print 'started your instances: ' + str(instances)
 ```
+
+### Environment variables
+- 环境变量，可能存在有一些敏感信息，比如密钥    
+- 可以通过 KMS 加密，确保 vars 在 AWS mgmt console 不是明文的  
+  - 如果创建 lambda 时候带有 Env vars，lambda & KMS 默认会创建一个 default service key 用于加密；但是如果 user 同时有 default KMS key 权限和 Lambda 权限，就可以看到明文信息  
+  - 推荐自定义
+
+![Env Vars KMS](/assets/img/post-Lambda-Env-Vars-KMS.png)
 
 ## Elastic Beanstalk
 对于 developer 来说，如果不希望关注 infrastructure 比如 EC2, ELB, scaling, health check 等，可以交给 EB 负责；
