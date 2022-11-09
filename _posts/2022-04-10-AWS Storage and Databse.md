@@ -285,6 +285,9 @@ When you define a lifecycle policy configuration for an object or group of objec
 
 ### Replication rules 复制规则
 
+### Transfer Acceleration 传输加速
+多地集中的向 S3 桶上传 GB/TB 数据，用来加速（互联网长距离传输，或者大文件分片(multiple part upload)，加速效果更加明显）  
+
 ### S3 SELECT
 - 支持 SQL 来过滤 S3 objects 的 contents/内容，做筛选  
 - 注意费用  
