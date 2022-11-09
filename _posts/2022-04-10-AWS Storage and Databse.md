@@ -278,7 +278,7 @@ When you define a lifecycle policy configuration for an object or group of objec
 }
 ```
 
-### Event notification
+### Event Notification
 - 针对 S3 objects, object ACL 的一些操作比如 PUT, GET, DELETE，发送通知  
 - 支持 SNS, SQS, Lambda，但是 target 只能是一个   
 - 如果多个 teams 需要收到通知，可以发送通知给 SNS，然后不同 teams 去订阅 SNS topic  
@@ -437,6 +437,10 @@ Multi-AZ DB cluster deployment
 - Enhanced Monitoring 从 EC2 instance 里面一个预先安装的 agent 收集指标信息，以 JSON 格式发送到 CloudWatch Logs，数据更准确    
 - 如果希望 [了解不同进程或线程对 CPU 的使用差异](https://docs.aws.amazon.com/zh_cn/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.html)，增强监测指标非常有用  
 
+### RDS event notification
+- RDS events provide operational events such as SB instance events, DB parameter group events, DB security group events, and snapshot events  
+- not for RDS data event(inject, remove). Could invoke Lambda function from Amazon Aurora MySQL-Compatible Edition DB cluster with a __native function or stored procedure__. 举个栗子，如果你希望在 DB 数据发生变化的时候，联动其他 AWS service，比如用 Lambda 发送消息到 SQS  
+
 ### RDS Proxy
 - [fully managed, HA database proxy for RDS](https://aws.amazon.com/rds/proxy/)  
 - 当很多的 clients 尝试和 DB 建立连接，connection 频繁 open, close 会消耗 DB 的 memory、compute resource，可能会看到 DB 回复"too many connection, retry later"类似问题。可以通过 RDS Proxy 来解决这类问题  
@@ -473,6 +477,7 @@ Multi-AZ DB cluster deployment
 目前 [四种类型 endpoints 可用](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Endpoints.html)，了解对应的功能和场景先  
 Cluster endpoint
 - connects to the current primary DB instance for that DB cluster  
+  - primary instance for DDL(Data Definition Language), DML(Data Manipulation Language)  
 - the only one that can perform write operations  
 - provides failover support for read/write connections to the DB cluster  
 
@@ -486,12 +491,20 @@ Custom endpoint
 - you choose a set of DB instances put into custom endpoint  
 - load-balancing and chooses one of the instances in the group  
 - you define which instances, what purpose the endpoint serves
-- LB 自定义程度比较高，不只是 read-only or read/write capability    
+- LB 自定义程度比较高，不只是 read-only or read/write capability，比如 mission-critical 的业务使用 high-capability db, 一般的查询业务使用 low-capability db；或者将流量引入特定 parameter group 的 db instance        
 
 Instance endpoint
 - connect to a specify DB instance within an Aurora cluster  
 - each DB instance(primary, Replicas) has its own unique instance endpoint  
 - direct control over connections the the DB cluster, for scenarios where using cluster/reader endpoint might not be appropriate.  
+
+### Aurora Global Database
+- designed for globally distibuted applications, single Aurora db to span multiple AWS regions.  
+- replicates data with no impact on db performance, enables fast local reads with low latency in each region  
+- support storage-based replication that has a latency of less than 1 second(RPO, Recovery Point Objective 1s)  
+  - RPO 1s 表示能恢复到上一秒的状态    
+- Cross-Region Disater Recovery, if there is an unplanned outage, one of the secondary region you assigned can be promoted to read and write capabilities in less than 1 minute(RTO, Recovery Time Objective 1 min)  
+  - RTO 1min 表示能在 1 分钟内完成跨 region 故障切换  
 
 ## 非关系型，key-value DynamoDB
 - 按使用情况和 DDB 存储容量收费 (read/write 不收费），并不是 per hour/second  
@@ -508,6 +521,7 @@ Instance endpoint
     - 一个 item 代表一条数据 key & value，比如张三、电话号、住址、兴趣爱好；table 中的 items 理论上可以无限添加  
     - attribute 是 数据/value 的 key，比如电话号、住址  
   - primary keys to uniquely identify each item in a table  
+  - partition key portion of a table's primary key determines the logical partition in which a table's data is stored.  will impact how balance distribut I/O reqeust  
   - secondary indexes to provide more querying flexibility  
 
 ### Backup and Restore

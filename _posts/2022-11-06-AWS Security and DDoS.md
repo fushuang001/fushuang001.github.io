@@ -387,6 +387,12 @@ AWS Key Management Service (AWS KMS)
 you can specify which IAM users and roles are able to manage keys  
 CMK(Customer Managed Keys) 是 per region 的   
 
+## CloudHSM
+- [Hardware Security Module](https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html) in AWS Cloud.  
+- generate, store, import, export and manage cryptographic keys, and KMS key materials  
+- audit the key usage independently of AWS Ctrail  
+- if requere to store the keys that has been validated to FIPS 140-S level 3  
+
 ## GuardDuty
 provides intelligent **threat detection** for your AWS infrastructure and resources. It identifies threats by continuously monitoring the network activity and account behavior within your AWS environment.  
 可以通过 master account 来管理一批账号的设置  
