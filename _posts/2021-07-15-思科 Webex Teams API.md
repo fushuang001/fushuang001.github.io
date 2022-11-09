@@ -3,7 +3,7 @@ layout:         post
 title:          思科 Webex Teams API
 subtitle:		    Webex Teams 的 API 调用举例，仅用于备忘，其实是一些很基础的应用方式。
 date:           2021-07-15
-author:         Forest
+author:         Luke
 cover:          '/assets/img/post-CiscoWebexTeams-bg.png'
 tags:           API, Webex teams, postman
 ---

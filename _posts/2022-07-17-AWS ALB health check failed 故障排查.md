@@ -3,7 +3,7 @@ layout:         post
 title:          AWS ALB health check failed 故障排查
 subtitle:		Windows IIS server 的 HTTP response HSTS header 不符合标准
 date:           2022-07-17
-author:         Forest
+author:         Luke
 cover:          '/assets/img/alb_component_architecture.png'
 tags:           AWS, ALB, health check, HTTP header, HSTS
 ---

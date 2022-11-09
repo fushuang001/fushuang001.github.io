@@ -3,7 +3,7 @@ layout:         post
 title:          AWS 亚马逊云 Storage 和 Database 信息
 subtitle:		    备考 SAA 的笔记
 date:           2022-04-10
-author:         Forest
+author:         Luke
 cover:          '/assets/img/post-aws-storage-db-bg.png'
 tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, ElastiCache
 ---

@@ -3,7 +3,7 @@ layout:         post
 title:          AWS ALB 支持 WebSocket - 场景测试
 subtitle:		    实现 client、server 之间的 双向、实时通信
 date:           2022-07-01
-author:         Forest
+author:         Luke
 cover:          '/assets/img/IMG_20220701-094059445.png'
 tags:           AWS, ALB, WebSocket, ws
 ---

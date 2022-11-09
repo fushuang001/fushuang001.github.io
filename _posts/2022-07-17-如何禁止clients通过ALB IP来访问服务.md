@@ -3,7 +3,7 @@ layout:         post
 title:          如何禁止clients通过ALB IP来访问服务
 subtitle:		要求 clients 必须通过 DNS 域名来访问服务  
 date:           2022-07-17
-author:         Forest
+author:         Luke
 cover:          '/assets/img/http-vs-https.jpg'
 tags:           AWS, ALB, DNS, WAF,regular-expression
 ---

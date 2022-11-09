@@ -3,7 +3,7 @@ layout:         post
 title:          将 Nexus9000 NXOS image 转换为 ACI image
 subtitle:       默认 Nexus9000 预装了 NXOS image，如果是 ACI 环境，需要手动转换 image.
 date:           2020-04-10
-author:         黄福森
+author:         Luke
 cover:          '/assets/img/bg-post-aci.png'
 tags:           Cisco, ACI-Fabric-Discovery
 ---

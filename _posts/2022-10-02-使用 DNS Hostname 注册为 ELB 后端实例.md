@@ -3,7 +3,7 @@ layout:         post
 title:          使用 DNS Hostname 注册为 ELB 后端实例
 subtitle:		可以做，但是可能存在一些问题
 date:           2022-10-02
-author:         Forest
+author:         Luke
 cover:          '/assets/img/post-NLB-DNS-target.png'
 tags:           AWS, ELB, target, DNS, RDS
 ---

@@ -3,7 +3,7 @@ layout:         post
 title:          AWS Security and DDoS
 subtitle:		    备考 SAA 的笔记，Cloud Security
 date:           2022-11-06
-author:         Forest
+author:         Luke
 cover:          '/assets/img/cloud-security.jpg'
 tags:           AWS, SAA, IAM, STS, KMS, SecurityHub, GuardDuty, Organization, WAF, Shiled
 ---

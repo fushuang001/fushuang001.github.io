@@ -3,7 +3,7 @@ layout:         post
 title:          Linux 网卡 mode4 LACP 模式 failover 测试
 subtitle:		    双网卡可以通过合理的设置和 failover 测试，来保障业务的高可用性。
 date:           2021-07-18
-author:         Forest
+author:         Luke
 cover:          '/assets/img/post-Linux_bond_LACP-bg.png'
 tags:           Linux, LACP, 802.3ad, Nexus VPC
 ---
