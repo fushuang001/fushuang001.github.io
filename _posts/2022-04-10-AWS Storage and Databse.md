@@ -281,7 +281,7 @@ When you define a lifecycle policy configuration for an object or group of objec
 ### Event Notification
 - 针对 S3 objects, object ACL 的一些操作比如 PUT, GET, DELETE，发送通知  
 - 支持 SNS, SQS, Lambda，但是 target 只能是一个   
-- 如果多个 teams 需要收到通知，可以发送通知给 SNS，然后不同 teams 去订阅 SNS topic  
+- 如果多个 teams 需要收到通知 (parallel asynchronous processing)，可以发送通知给 SNS，然后不同 teams 去订阅 SNS topic  
 
 ### Replication rules 复制规则
 
@@ -571,6 +571,11 @@ Instance endpoint
 - 默认打开，保留期 1 天，最长保留期 35 天  
 - 至少三份 copies of your data(original, replica on compute node, backup in S3)  
 - 支持 asynchronously 复制 snapshots 到另一个 region S3，做 DR  
+
+### Redshift Spectrum
+- enables you to query and analyze all of your data in S3 using the open data formats you already use, with no data loading or transformations needed  
+- [Redshift Spectrum](https://docs.aws.amazon.com/redshift/latest/dg/c-using-spectrum.html) queries employ massive parallelism to run very fast against large datasets.  
+- Much of the processing occurs in the Redshift Spectrum layer, and most of the data remains in Amazon S3  
 
 # AWS ElastiCache 云缓存
 - ElastiCache is a web service that makes it easy to deploy, operate and scale an in-memory cache in the cloud.  

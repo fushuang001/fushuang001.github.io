@@ -199,8 +199,9 @@ Fargate scales and manages the infrastructure, allowing developers to work on wh
 ## Lambda
 适合场景：  
   - 既不想维护 EC2，也不想维护 Container   
-  - 特定事件触发代码，短时间运行。  
-  - 比如不需要部署 EC2 来 7x24 小时监控是否有 file upload to S3  
+  - 特定事件触发代码，短时间运行  
+    - 比如不需要部署 EC2 来 7x24 小时监控是否有 file upload to S3  
+    - Lambda 更加 lightweight，扩容比 EC2 ASG, ECS, EB 都要快一些  
   
 有丰富的 trigger，比如 HTTP request，upload files to S3 bucket  
 代码运行时收费，最长运行 15 分钟。  
