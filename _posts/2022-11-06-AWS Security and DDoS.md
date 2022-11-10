@@ -335,6 +335,20 @@ Cogntio
 ## AWS Artifact
 关于 AWS 合规性文档，以及是否接受特定 agreements  
 
+## AWS Textract
+[基于机器学习，可以从各种 PDF, 表单来识别、提取文本](https://aws.amazon.com/cn/textract/)  
+
+## AWS Comprehend Medical
+[可以从非结构化医学文本当中提取、处理信息](https://aws.amazon.com/cn/comprehend/medical/)  
+
+A hospital recently deployed a RESTful API with Amazon API Gateway and AWS Lambda The hospital uses API Gateway and Lambda to upload reports that are in PDF format and JPEG format The hospital needs to modify the Lambda code to identify protected health information (PHI) in the reports  
+
+<details>
+	<summary> Which solution will meet these requirements with the LEAST operational overhead?  
+ </summary>
+	Use Amazon Textract to extract the text from the reports Use Amazon Comprehend Medical to identify the PHI from the extracted text 
+</details>
+
 # Denial-of-service attacks - DDoS
 视频里面只是简单说了一些场景，以及 AWS 如何应对  
 

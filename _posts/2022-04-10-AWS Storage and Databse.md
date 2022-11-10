@@ -228,6 +228,18 @@ aws s3api put-bucket-versioning --bucket testbucket --versioning-configuration S
 - 启用之后，无法关闭  
 - store objects using a write-once-read-many (WORM) model to help you prevent objects from being deleted or overwritten for a fixed amount of time or indefinitely  
 
+### Object Lock legal hold 对象锁定依法保留
+- [确保 objects 被锁定](https://docs.aws.amazon.com/AmazonS3/latest/userguide/batch-ops-legal-hold.html)，不被修改、删除；没有设置期限，直到客户手动移除对应 policy  
+- Versioning and S3 Object Lock must be configured on the bucket where the job is performed.  
+- `s3:PutObjectLegalHold` permission is required in your IAM role to add or remove legal hold from objects.  
+
+A company needs to store data in Amazon S3 and must prevent the data from being changed. The company wants new objects that are uploaded to Amazon S3 to remain unchangeable for a nonspecific amount of time until the company decides to modify the objects. Only specific users in the company’s AWS account can have the ability to delete the objects.   
+
+<details>
+	<summary> What should a solutions architect do to meet these requirements? </summary>
+Create an S3 bucket with S3 Object Lock enabled. Enable versioning. Add a legal hold to the objects. Add the s3 PutObjectLegalHold permission to the IAM policies of users who need to delete the objects
+</details>
+
 ### Glacier Vault Lock 文件库锁定
 - 为了满足合规性要求，比如 objects 在五年内不应该删除  
 - write-once-read-many (WORM) model，一次写入，多次读取 
@@ -359,6 +371,16 @@ Gateway Virtual Tape Library 磁带网关
   - 可以直接迁移数据到 S3 Glacier, S3 Glacier Deep Archive, or S3 Inteligent-Tiering  
 - 适用于初次将本地所有数据迁移到 cloud，后续可以使用 SGW 保持本地、cloud 混合存储、同步   
 - 也可以在 AWS services 之间传输数据      
+
+## Snowball
+A business's backup data totals 700 terabytes (TB) and is kept in network attached storage (NAS) at its data center. This backup data must be available in the event of occasional regulatory inquiries and preserved for a period of seven years. The organization has chosen to relocate its backup data from its on-premises data center to Amazon Web Services (AWS). Within one month, the migration must be completed. The company's public internet connection provides 500 Mbps of dedicated capacity for data transport.
+
+What should a solutions architect do to ensure that data is migrated and stored at the LOWEST possible cost?
+保证数据在一个月可以传输完成，然后尽量低的费用
+
+Order AWS Snowball devices to transfer the data. Use a lifecycle policy to transition the files to Amazon S3 Glacier Deep Archive.
+
+500Mbps means it tansfers 500/8 = 62.5MB/s. In one day, it transfers (62.5 x 60 x 60 x 24) = 5.4TB. Overall it takes 130 days to finish 700TB.
 
 # AWS Databases 数据库
 [架构师 blog-选择正确的 DB](https://aws.amazon.com/cn/blogs/architecture/selecting-the-right-database-and-database-migration-plan-for-your-workloads/)
