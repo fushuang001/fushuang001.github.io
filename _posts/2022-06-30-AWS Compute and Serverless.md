@@ -148,6 +148,25 @@ non-Nitro 平台的 EC2（比如 t2.micro) 升级 Nitro 平台（比如 t3.micro
 - 如果 EC2 因为故障需要替换，ASG 不会主动 terminate failure EC2，可以登录查看对应日志  
 - 手动加入 ASG 的 EC2，这个选项默认打开  
 
+**Lifecycle hooks**  
+- Use lifecycle hooks to put instances into a wait state and perform custom actions on the instances.   
+- Custom actions are performed as the instances launch or before they terminate.   
+- Instances remain in a wait state until you either complete the lifecycle action, or the timeout period ends(default 1 hour).  
+- To create lifecycle hooks for scaling out (instances launching) and scaling in (instances terminating), you must create two separate hooks.  
+- 如果希望在 ASG 启动、终止 EC2 时候，执行一些脚本/custom script，比如发送通知，或者收集日志  
+
+**Activity Notification**
+- EC2 launch, terminate, fail to launch, fail to terminate 时候，发送 SNS 通知  
+- 相当于开箱即用的 Lifecycle hooks，不需要自己写 custom script 来发送通知  
+
+![Activity notification](/assets/img/post-ASG-Activity-Notification.png)  
+
+**Warm Pool**  
+- A warm pool helps you balance performance and cost for applications with long first boot times.  
+- A warm pool is a pool of pre-initialized EC2 instances.   
+- When there is an increase in traffic to your application, an Auto Scaling group can draw on the warm pool to meet increases to its desired capacity.   
+- The goal of a warm pool is to ensure that instances are ready to quickly start serving application traffic, accelerating the response to a scale-out event.  
+
 # Containers
 对比 EC2，containers 启动更快。  
 **一次编译，在任意位置运行**。Development -  QA - Production , 应该不会因为 code environment 出现问题。    

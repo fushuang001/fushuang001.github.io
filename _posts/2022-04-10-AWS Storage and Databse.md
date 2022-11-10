@@ -141,7 +141,7 @@ incremental backups，增量备份到 S3。
 不同生命周期不同场景，[为 objects 找到合适的存储层级](https://aws.amazon.com/cn/s3/storage-classes/?nc1=h_ls)，来节省费用  
 ![S3 Storage Class](/assets/img/IMG_20220504-193742380.png)  
 
-||Standard 标准|Intelligent-Tiering 智能分层|Standard-IA 标准-IA|One Zone-IA 单区-IA|Glacier Instant Retrieval 即时检索|Glacier Flexible Retrieval 灵活检索|Deep Archive 深层归档|
+||Standard 标准|Intelligent-Tiering 智能分层|Standard-IA 标准-IA|One Zone-IA 单区-IA|Glacier Instant Retrieval 即时检索|Glacier Flexible Retrieval(formerly S3 Glacier) 灵活检索|Deep Archive 深层归档|
 |----|----|----|----|----|----|----|----|
 |场景|频繁访问的数据，比如云应用程序、动态网站、内容分配、移动和游戏应用程序以及大数据分析|未知或变化的访问，根据访问频率自动将数据移至最经济实惠的访问层|不频繁访问，毫秒级检索；适合长期存储、备份|同左，单区|很少访问/per 季度，毫秒级检索；长期存储，比 Standard-IA 更经济，如医学图像、新闻媒体资产或用户生成的内容归档|很少访问/per half year，不需要立即访问但需要灵活地免费检索大量数据的归档数据|成本最低，监管严格的行业，如金融服务、医疗保健和公共部门 – 为了满足监管合规要求，将数据集保留 7—10 年或更长时间|
 |检索时间，首字节延迟|ms|ms|ms|ms|ms|minutes or hours|within 12 hours|
@@ -183,16 +183,22 @@ When you define a lifecycle policy configuration for an object or group of objec
 - 用于加密的 key，取决于用户是否需要控制密钥，区分为三种  
   - SSE-S3  
     - encrypt key 是 S3 托管，不需要客户负责，客户无法干预  
-  - SSE-KMS  
+    - AWS manages both data key and master key  
+  - SSE-KMS(you manage the CMK)  
     - encrypt key 通过 KMS 管理，客户指定 KMS  
+    - SSE-KMS requires that AWS manage the data key but you manage the customer master key (CMK) in AWS KMS.  
   - SSE-C  
+    - enables S3 to encrypt objects on the server side using an encryption key provided in the `PUT` method. the same key must be provided in the `GET` requests for S3 to decrypt the object  
     - encrypt key 是客户管理，encrypt/decrypt 是 AWS 管理  
+    - You manage both data key and master key  
     - 客户通过 `PutObject` 来上传 object，以及 encrypt key，必须使用 `HTTPS`；  
     - AWS 通过 `AES-256` 加密 object，保存到 disk，然后 AWS 删除 customer encrypt key   
     - 客户下载数据时候，必须提供相同的 encrypt key，由 AWS 完成解密  
     - AWS 并不会存储具体的 encrypt key，而是存储一个 HMAC hash 用于对比   
 
-![SSE](/assets/img/post-S3-SSE.png)  
+![SSE-S3](/assets/img/post-CMK-AWS-mgmt.png)  
+![SSE](/assets/img/post-S3-SSE.png)   
+![SSE-KMS(you manage the CMK)](/assets/img/post-KMS-CMK.png)  
 
 <span style='background:lime;color:black'>Client Side Encryption，客户端加密</span>
 - [在将数据传递到 S3 之前，client 端加密数据](https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html)  
@@ -204,12 +210,16 @@ When you define a lifecycle policy configuration for an object or group of objec
      -  客户自己管理密钥，若密钥丢失，就无法解密了  
 
 ### MFA delete 
+- MFA delete requires additional authentication for either of the following operations:  
+  - Changing the versioning state of your bucket  
+  - Permanently deleting an object version 
 - 只有 root 可以删除 objects，提高安全性   
 - 只能够通过 CLI, SDK 来 enable  
+- 通过 MFA Delete 和 Versioning 来避免文件误删除，以及恢复   
 - AWS 中国区没有 root account 所以不支持对应 feature  
 ```
-	 aws s3api put-bucket-versioning --bucket testbucket --versioning-configuration Status=Enabled,MFADelete=Enabled --mfa "SERIAL 959521"
-		An error occurred (NotDeviceOwnerError) when calling the PutBucketVersioning operation: The device with serial number SERIAL that generated token 959521 is not owned by the authenticated user
+aws s3api put-bucket-versioning --bucket testbucket --versioning-configuration Status=Enabled,MFADelete=Enabled --mfa "SERIAL 959521"
+	An error occurred (NotDeviceOwnerError) when calling the PutBucketVersioning operation: The device with serial number SERIAL that generated token 959521 is not owned by the authenticated user
 ```
 
 ### Object Lock 对象锁定
@@ -284,9 +294,13 @@ When you define a lifecycle policy configuration for an object or group of objec
 - 如果多个 teams 需要收到通知 (parallel asynchronous processing)，可以发送通知给 SNS，然后不同 teams 去订阅 SNS topic  
 
 ### Replication rules 复制规则
+- Replication requires versioning to be enabled for the source bucket.  
+- You can replicate objects that are encrypted with Amazon KMS keys.  
+- for cross region replication, could use AWS KMS Multi-Region keys(SSE-KMS) for encryption  
+- 创建 replication rules 之前已经存在的 objects，不会被复制  
 
 ### Transfer Acceleration 传输加速
-多地集中的向 S3 桶上传 GB/TB 数据，用来加速（互联网长距离传输，或者大文件分片(multiple part upload)，加速效果更加明显）  
+多地集中的向 S3 桶上传 GB/TB 数据，用来加速（互联网长距离传输，或者大文件分片 (multiple part upload)，加速效果更加明显）  
 
 ### S3 SELECT
 - 支持 SQL 来过滤 S3 objects 的 contents/内容，做筛选  
@@ -342,6 +356,7 @@ Gateway Virtual Tape Library 磁带网关
 
 ## DataSync
 - end-to-end/端到端将本地 NFS, SMB, HDFS 数据迁移到 AWS S3, FSx, EFS；支持指定 sub-folder 增量移动数据  
+  - 可以直接迁移数据到 S3 Glacier, S3 Glacier Deep Archive, or S3 Inteligent-Tiering  
 - 适用于初次将本地所有数据迁移到 cloud，后续可以使用 SGW 保持本地、cloud 混合存储、同步   
 - 也可以在 AWS services 之间传输数据      
 
@@ -389,14 +404,14 @@ client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参�
   
   - __手动 snapshots__  
     - 比如需要保持 35 days 以上的 backup；类似于 EBS snapshots  
-    - snapshots are stored even after you deleted the original RDS instance, unlike automated backups  
+    - snapshots are stored even after you deleted the original RDS instance, unlike automated backups    
 
 ### RDS 恢复 Restoring Backups
 从自动备份或者手动 snapshots 恢复的，是一个新的 RDS db.instance，有一个新的 DNS endpoint/DNS name    
 
 ### Multi-AZ, Standby Replica
 - have an exact copy of your production database in another AZ, AWS 托管的 <span style='background:lime;color:black'>synchronized replication</span>   
-- 作用主要是 Disaster Recovery/HA/failover，并不是提升性能  
+- 作用主要是 Disaster Recovery/HA/failover，并不是提升性能（考点）    
   - automatic failover 只会在 primary database 出问题时候才会发生，比如
     - Loss of availability in primary AZ  
     - storage failure on primary  
