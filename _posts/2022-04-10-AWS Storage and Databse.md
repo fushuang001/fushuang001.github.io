@@ -439,9 +439,8 @@ A company is migrating its on-premises PostgreSQL database to Amazon Aurora Post
 
 <details>
   <summary>Which combination of actions must a solutions architect take to meet these requirements? (Choose two.)</summary>
-Create an AWS Database Migration Service (AWS DMS) replication server  
-
-Convert the database schema by using the AWS Schema Conversion Tool (AWS SCT).  
+<p>Create an AWS Database Migration Service (AWS DMS) replication server</p>
+<p>Convert the database schema by using the AWS Schema Conversion Tool (AWS SCT)</p>
 </details>
 
 # AWS Databases 数据库
@@ -571,12 +570,7 @@ Multi-AZ DB cluster deployment
     - 适合 predictable/可预测的 DB workload 场景   
 - Automated backups 是默认且必须 enabled，Backups do not impact database performance  
 
-A company has an application that runs on Amazon EC2 instances and uses an Amazon Aurora database. The EC2 instances connect to the database by using user names and passwords that are stored locally in a file. The company wants to minimize the operational overhead of credential management.
-   
-<details>
-  <summary>What should a solutions architect do to accomplish this goal?</summary>
-Use AWS Systems Manager Parameter Store. Turn on automatic rotation.
-</details>  
+![Aurora SAA example](/assets/img/post-Aurora-SAA.png)  
   
 ![Writer, Reader 有各自 DNS Endpoint](/assets/img/IMG_20220609-153921417.png)  
 
@@ -669,6 +663,8 @@ Instance endpoint
 - fast and powerful, fully managed, petabyte-scale data warehouse service  
 - [Massively Parallel Processing(MPP)](https://docs.aws.amazon.com/zh_cn/redshift/latest/dg/c_challenges_achieving_high_performance_queries.html)/大规模并行处理，Redshift automatically distributes data and query load across all nodes  
 - available in only 1 AZ  
+
+![Redshift SAA example](/assets/img/post-Redshift-SAA.png)  
 
 ### Redshift cfg
 - Single Node(160Gb)  
