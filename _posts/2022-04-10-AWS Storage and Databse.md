@@ -315,56 +315,12 @@ Save the logs in an Amazon Glacier vault and use the Vault Lock feature.
 <span style='background:lime;color:black'>Glacier Vault Lock Policies 文件库锁定策略</span>
 - 配合 Glacier Vault Lock，实现合规性要求  
 - 比如下面的 [Vault Lock Policy](https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock-policy.html)，禁止删除 < 365 天的 archives  
-```
-{
-     "Version":"2012-10-17",
-     "Statement":[
-      {
-         "Sid": "deny-based-on-archive-age",
-         "Principal": "*",
-         "Effect": "Deny",
-         "Action": "glacier:DeleteArchive",
-         "Resource": [
-            "arn:aws:glacier:us-west-2:123456789012:vaults/examplevault"
-         ],
-         "Condition": {
-             "NumericLessThan" : {
-                  "glacier:ArchiveAgeInDays" : "365"
-             }
-         }
-      }
-   ]
-}
-```
+![Glacier-Vault-Lock-policy](assets/img/post-Glacier-Vault-Lock-policy.png)
+
 <span style='background:lime;color:black'>Glacier Vault access Policies 文件库访问策略</span>
 - [与合规性要求无关](https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-access-policy.html)，指定谁可以访问对应 vault 的 archives/objects  
 - resource-based policy，任何时候都可以修改（对比 Vault Lock Policy，买定离手，无法修改）  
-```
-{
-    "Version":"2012-10-17",
-    "Statement":[
-       {
-          "Sid":"cross-account-upload",
-          "Principal": {
-             "AWS": [
-                "arn:aws:iam::123456789012:root",
-                "arn:aws:iam::444455556666:root"
-             ]
-          },
-          "Effect":"Allow",
-          "Action": [
-             "glacier:UploadArchive",
-             "glacier:InitiateMultipartUpload",
-             "glacier:AbortMultipartUpload",
-             "glacier:CompleteMultipartUpload"
-          ],
-          "Resource": [
-             "arn:aws:glacier:us-west-2:999999999999:vaults/examplevault"                                           
-          ]
-       }
-    ]
-}
-```
+
 ![Glacier-Vault-access-policy](/assets/img/post-Glacier-Vault-access-policy.png)
 
 ### Event Notification
