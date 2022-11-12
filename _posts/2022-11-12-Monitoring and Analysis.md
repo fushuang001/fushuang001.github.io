@@ -39,6 +39,7 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 - service 在所有 AWS region 可用  
 - global service 相关的 API call 的 Cloudtrail 会记录到 US EAST(N.Virginia, us-east-1)  
 - regional service 的 API call，Cloudtrail 都在本 region  
+
 IAM  
 Route 53  
 WAF  
