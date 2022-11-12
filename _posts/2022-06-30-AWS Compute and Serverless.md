@@ -69,14 +69,19 @@ Spot instance 在被 AWS terminate 后，对应的 hour 不收费
 on demand instance，用户自行 terminate，对应 hour 是收费的 
 
 ## EC2 Pricing
-如果 application 可以适应随时中断，__spot instance__ 竞价实例类型可能比较便宜，[最高可享受按需价格 90％ 的折扣](https://www.amazonaws.cn/ec2/pricing/?nc1=h_ls)  
+- 如果 application 可以适应随时中断，__spot instance__ 竞价实例类型可能比较便宜，[最高可享受按需价格 90％ 的折扣](https://www.amazonaws.cn/ec2/pricing/?nc1=h_ls)  
+![EC2 pricing SAA example](/assets/img/post-EC2-pricing-spot.png)  
 
-如果未来一段时间的用量可以预期，并且要求 EC2 稳定运行，可以考虑 [Savings Plans](https://docs.aws.amazon.com/zh_cn/whitepapers/latest/cost-optimization-reservation-models/savings-plans.html)，可以节约大概 66% - 72% 的费用，__Saving Plans__ 有两种形式，主要区别是 **Compute Saving Plans** 适用于 AWS account 下 EC2, Fargate, Lambda 等计算资源，可能更加灵活；**EC2 Instance Saving Plans** 只针对 EC2  
-![EC2 pricing SAA example](/assets/img/post-EC2-pricing-SAA)  
+- 如果未来一段时间的用量可以预期，并且要求 EC2 稳定运行，可以考虑 [Savings Plans](https://docs.aws.amazon.com/zh_cn/whitepapers/latest/cost-optimization-reservation-models/savings-plans.html)，可以节约大概 66% - 72% 的费用  
+- __Saving Plans__ 有两种形式，主要区别是 **Compute Saving Plans** 适用于 AWS account 下 EC2, Fargate, Lambda 等计算资源，可能更加灵活；**EC2 Instance Saving Plans** 只针对 EC2  
+![EC2 pricing SAA example](/assets/img/post-EC2-pricing-SAA.png)  
 
-稳定使用的 EC2，还可以考虑 __RI__ 预留实例，相比按需实例，预留实例为您提供大幅折扣（最高 72%）  
-convertible RI/可转换 RI，可以在未来转换为其他 instance family  
-![EC2 pricing SAA example](/assets/img/post-EC2-pricing-RI)  
+- 稳定使用的 EC2，还可以考虑 __RI__ 预留实例，相比按需实例，预留实例为您提供大幅折扣（最高 72%）  
+- convertible RI/可转换 RI，可以在未来转换为其他 instance family  
+- __Scheduled Reserved Instances (Scheduled Instances)__ enable you to purchase capacity reservations that recur on a daily, weekly, or monthly basis, with a specified start time and duration, for a one-year term.   
+- You reserve the capacity in advance, so that you know it is available when you need it. You pay for the time that the instances are scheduled, even if you do not use them.    
+- You can’t stop or reboot Scheduled Instances, but you can terminate them manually as needed. If you terminate a Scheduled Instance before its current scheduled time period ends, you can launch it again after a few minutes. Otherwise, you must wait until the next scheduled time period.  
+![EC2 pricing SAA example](/assets/img/post-EC2-pricing-RI.png)  
 
 ## Amazon Compute Optimizer 提出对 EC2 的建议  
 客户自行选择 EC2 types，在使用一段时间之后，可以根据 console 工具 - Compute Optimizer 来查看信息，基于 EC2 使用率、成本优化等的建议  
@@ -245,7 +250,7 @@ Amazon EKS is conceptually similar to Amazon ECS, but with the following differe
   - An ECS container is called a task. In Amazon EKS, it is called a **pod**.  
   - While Amazon ECS runs on AWS native technology, Amazon EKS runs on top of Kubernetes.  
 
-![EKS SAA example](/assets/img/post-EKS-SAA)  
+![EKS SAA example](/assets/img/post-EKS-SAA.png)  
 
 # Serveless
 合适的才是最好的，关注业务本身即可  
@@ -278,8 +283,9 @@ Access Permissions: Define which events can invoke the functin and what services
 
 ### How AWS Lambda works
 [参考链接](https://explore.skillbuilder.aws/learn/course/99/play/497/aws-lambda-foundations)  
-A Lambda function has three primary components – **trigger, code, and configuration**。  
-**code** 决定了 Lambda 的功能，以及使用什么 runtime 比如 Python  
+- A Lambda function has three primary components – **trigger, code, and configuration**    
+- **code** 决定了 Lambda 的功能，以及使用什么 runtime 比如 Python  
+- 如果 Lambda 需要调用 VPC 内资源，需要将 Lambda 放到对应 VPC，并且按需配置 security group  
 
 The **configuration** of a Lambda function consists of information that describes how the function should run. In the configuration, you specify network placement, environment variables, memory, invocation type, permission sets, and other configurations  
 
@@ -289,15 +295,7 @@ trigger 实际上应该和 Event Sources 相似
 ### AWS Lambda function handler
 The AWS Lambda function handler is **the method in your function code that processes events**. When your function is invoked, Lambda runs the handler method. When the handler exits or returns a response, it becomes available to handle another event.   
 You can use the following general syntax when creating a function handler in Python.  
-```
-import boto3
-region = 'cn-north-1' 
-instances = ['i-12345cb6d1111', 'i-08c2222222'] 
-def lambda_handler(event, context):
-ec2 = boto3.client('ec2', region_name=region)
-ec2.start_instances(InstanceIds=instances)
-print 'started your instances: ' + str(instances)
-```
+![lambda handler example](/assets/img/post-Lambda-handler.png)  
 
 ### Environment variables
 - 环境变量，可能存在有一些敏感信息，比如密钥    

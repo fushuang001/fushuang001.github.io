@@ -10,6 +10,7 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 - [CloudWatch](#cloudwatch)
 - [Cloudtrail](#cloudtrail)
   - [AWS Global Services](#aws-global-services)
+- [AWS Config](#aws-config)
 - [EventBridge](#eventbridge)
 - [Trusted Advisor](#trusted-advisor)
 - [Cost Explore](#cost-explore)
@@ -55,6 +56,12 @@ EC2
 ELB  
 S3(data is regional)  
 DynamoDb  
+
+# AWS Config
+- [AWS Config](https://aws.amazon.com/cn/config/faq/) 是AWS托管服务，提供 AWS 资源库存、配置历史记录和配置更改通知，以确保安全性和方便管理  
+- 借助 AWS Config，您可以找到现有的 AWS 资源，导出 AWS 资源的完整库存清单与所有配置详细信息，并确定在任何时间点上配置资源的方式  
+- 这些功能提供了合规性审计、安全分析、资源更改跟踪和故障排除  
+![AWS Config SAA example](/assets/img/post-AWS-Config-SAA.png)  
 
 # EventBridge
 - 根据特定 event，触发后续的联动操作  

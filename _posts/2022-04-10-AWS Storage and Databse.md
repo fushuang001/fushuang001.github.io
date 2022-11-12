@@ -608,6 +608,7 @@ Instance endpoint
   - RPO 1s 表示能恢复到上一秒的状态    
 - Cross-Region Disater Recovery, if there is an unplanned outage, one of the secondary region you assigned can be promoted to read and write capabilities in less than 1 minute(RTO, Recovery Time Objective 1 min)  
   - RTO 1min 表示能在 1 分钟内完成跨 region 故障切换  
+![Aurora global db SAA example](/assets/img/post-Aurora-global-db-SAA.png)  
 
 ## 非关系型，key-value DynamoDB
 - 按使用情况和 DDB 存储容量收费 (read/write 不收费），并不是 per hour/second  
