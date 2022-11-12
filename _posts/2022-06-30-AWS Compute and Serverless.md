@@ -110,11 +110,21 @@ non-Nitro 平台的 EC2（比如 t2.micro) 升级 Nitro 平台（比如 t3.micro
 - low-latency network performance
 - HPC  
 
+A company runs a high performance computing (HPC) workload on AWS. The workload required low-latency network performance and high network throughput with tightly coupled node-to-node communication. The Amazon EC2 instances are properly sized for compute and storage capacity, and are launched using default options.
+
+<details>
+  <summary>What should a solutions architect propose to improve the performance of the workload?</summary>
+  Choose a cluster placement group while launching Amazon EC2 instances.
+</details>
+
+  
+---
+
 **Partition-分区**
 - 将实例分布在不同的逻辑分区上，以便一个分区中的实例组不会与不同分区中的实例组使用相同的基础硬件  
 - 该策略通常为大型分布式和重复的工作负载所使用  
 - 例如，Hadoop、Cassandra 和 Kafka  
-
+---
 **Spread-分布** 
 - 将一小组实例严格放置在不同的基础硬件上以减少相关的故障  
 - 可以跨可用区  

@@ -259,6 +259,7 @@ When you define a lifecycle policy configuration for an object or group of objec
 ![SSE](/assets/img/post-S3-SSE.png)   
 ![SSE-KMS(you manage the CMK)](/assets/img/post-KMS-CMK.png)  
 
+---
 <span style='background:lime;color:black'>Client Side Encryption，客户端加密</span>
 - [在将数据传递到 S3 之前，client 端加密数据](https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html)  
 - 用于加密的 key，取决于是否托管给 AWS，区分为两种  
@@ -312,12 +313,14 @@ An application generates audit logs of operational activities. Compliance requir
 Save the logs in an Amazon Glacier vault and use the Vault Lock feature.
 </details>
 
+---
 <span style='background:lime;color:black'>Glacier Vault Lock Policies 文件库锁定策略</span>
 - 配合 Glacier Vault Lock，实现合规性要求  
 - 比如下面的 [Vault Lock Policy](https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock-policy.html)，禁止删除 < 365 天的 archives  
   
 ![Glacier-Vault-Lock-policy](/assets/img/post-Glacier-Vault-Lock-policy.png)
 
+---
 <span style='background:lime;color:black'>Glacier Vault access Policies 文件库访问策略</span>
 - [与合规性要求无关](https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-access-policy.html)，指定谁可以访问对应 vault 的 archives/objects  
 - resource-based policy，任何时候都可以修改（对比 Vault Lock Policy，买定离手，无法修改）  
