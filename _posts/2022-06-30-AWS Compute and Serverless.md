@@ -72,9 +72,11 @@ on demand instance，用户自行 terminate，对应 hour 是收费的
 如果 application 可以适应随时中断，__spot instance__ 竞价实例类型可能比较便宜，[最高可享受按需价格 90％ 的折扣](https://www.amazonaws.cn/ec2/pricing/?nc1=h_ls)  
 
 如果未来一段时间的用量可以预期，并且要求 EC2 稳定运行，可以考虑 [Savings Plans](https://docs.aws.amazon.com/zh_cn/whitepapers/latest/cost-optimization-reservation-models/savings-plans.html)，可以节约大概 66% - 72% 的费用，__Saving Plans__ 有两种形式，主要区别是 **Compute Saving Plans** 适用于 AWS account 下 EC2, Fargate, Lambda 等计算资源，可能更加灵活；**EC2 Instance Saving Plans** 只针对 EC2  
+![EC2 pricing SAA example](/assets/img/post-EC2-pricing-SAA)  
 
 稳定使用的 EC2，还可以考虑 __RI__ 预留实例，相比按需实例，预留实例为您提供大幅折扣（最高 72%）  
 convertible RI/可转换 RI，可以在未来转换为其他 instance family  
+![EC2 pricing SAA example](/assets/img/post-EC2-pricing-RI)  
 
 ## Amazon Compute Optimizer 提出对 EC2 的建议  
 客户自行选择 EC2 types，在使用一段时间之后，可以根据 console 工具 - Compute Optimizer 来查看信息，基于 EC2 使用率、成本优化等的建议  
@@ -242,6 +244,8 @@ Amazon EKS is conceptually similar to Amazon ECS, but with the following differe
   - An EC2 instance with the ECS agent installed and configured is called a container instance. In Amazon EKS, it is called a **worker node**.  
   - An ECS container is called a task. In Amazon EKS, it is called a **pod**.  
   - While Amazon ECS runs on AWS native technology, Amazon EKS runs on top of Kubernetes.  
+
+![EKS SAA example](/assets/img/post-EKS-SAA)  
 
 # Serveless
 合适的才是最好的，关注业务本身即可  
