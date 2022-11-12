@@ -293,6 +293,10 @@ Buckets:
 ```
 
 ## Permission boundary
+- 相当于一个笼子，即使是 admin，也可以被关进笼子里，比如不允许 admin terminate EC2  
+- AWS support permission boundaries for IAM entities(users or roles)    
+- use a managed policy to set the maximum permissions that an identity-based policy can grant to an IAM entity  
+- An entity's permissions boundary allows it to perform only the actions that are allowed by both its identity-based policies and its permissions boundaries  
 
 ## Identity Federation 联合身份认证
 AWS 外部 (eg. facebook, google) 用户可以通过联合认证，结合 STS，获取临时 credentials  
