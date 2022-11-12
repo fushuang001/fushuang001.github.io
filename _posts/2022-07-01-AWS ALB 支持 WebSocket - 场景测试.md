@@ -7,14 +7,18 @@ author:         Luke
 cover:          '/assets/img/IMG_20220701-094059445.png'
 tags:           AWS, ALB, WebSocket, ws
 ---
+- [简单介绍](#简单介绍)
+- [环境准备](#环境准备)
+- [测试 WebSocket，双向连接](#测试-websocket双向连接)
+  - [抓包结果](#抓包结果)
 
-
+# 简单介绍
 - ALB 支持 WebSocket，不需要为 ALB Listener, target group 做特殊配置；ALB Listener 选择 http or https，client 访问 ws:// 或者 wss:// 即可
 - 需要注意 ALB idle timeout 60s，WebSocket client-server 之间交互必须在 60 秒内有 keepalive(ping-pong)，不然就会被 ALB disconnect
 - WebSocket 是基于 TCP 的协议，通过 HTTP header 中携带 Connection: Upgrade, Upgrade: websocket 来升级 WebSocket，报文细节参考文章结尾的抓包。
 - WebSocket 实现了浏览器与服务器全双工通信，能更好的节省服务器资源和带宽并达到实时通讯效果。
 
-**环境准备：**
+# 环境准备
 
 - curl 无法直接访问 ws:// 或者 wss://，需要比较长的一串指令才可以；如果需要简单测试，可以安装 npm, wscat
 - [安装 npm 可以参考](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node-on-ec2-instance.html)
@@ -23,40 +27,11 @@ tags:           AWS, ALB, WebSocket, ws
     wscat -c wss://ws.postman-echo.com/raw  
         Connected (press CTRL+C to quit)
 
-**测试 WebSocket，双向连接：**
+# 测试 WebSocket，双向连接
+使用 wscat 直接做 server 和 client 测试  
+![websocket](/assets/img/post-websocket.png)  
 
-- 使用 wscat 直接做 server 和 client 测试
-
-
-        [ec2-user@elb-target-az1c-WebScoket ~]$ wscat -l 8123  // 作为 server，监听 WebSocket on port 8123  
-        Listening on port 8123 (press CTRL+C to quit)  
-        Client connected  
-        < hello world // 接收到来自 client msg  
-        > hi nice to meet U      // 主动给 client 发送 msg  
-        Disconnected (code: 1005, reason: "")   // client 端按下 Ctrl C 中断连接
-
-        [ec2-user@Bastion-ConsumerVPC-ZHY ~]$ wscat -c ws://172.31.46.123:8123 // 作为 client，访问 ws 资源  
-        Connected (press CTRL+C to quit)  
-        > hello world  
-        < hi nice to meet U
-
-- client 是 VPC 内 EC2，在 R53 创建了 private hosted zone，为 ALB 添加一条 alias 记录，就可以实现 VPC 内自定义域名访问了
-
-
-        [ec2-user@elb-target-az1c-WebScoket ~]$ wscat -l 8123
-        Listening on port 8123 (press CTRL+C to quit)
-        Client connected
-        < hello server, this is a connection via the ALB
-        > hi client, yes ALB support WebSocket natively
-        Disconnected (code: 1006, reason: "")        // 被 ALB 中断的 ws connection
-
-        [ec2-user@Bastion-ConsumerVPC-ZHY ~]$ wscat -c ws://mynxalb.com:8123
-        Connected (press CTRL+C to quit)
-        > hello server, this is a connection via the ALB
-        < hi client, yes ALB support WebSocket natively
-        Disconnected (code: 1006, reason: "")
-
-抓包结果：
+## 抓包结果
 
 
     [ec2-user@Bastion-ConsumerVPC-ZHY ~]$ tshark -r websocket.pcap -V -O websocket,http
