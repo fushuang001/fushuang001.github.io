@@ -84,6 +84,13 @@ Kinesis Streams 数据流
 - 大量数据，IOT 场景  
 - client/data producers -- `Kinesis Streams`(store in Shard, 24 hours - 7 days retention) ---> Consumers --> DDB, S3, EMR, Redshift  
 
+A Solutions Architect designed a system based on Amazon Kinesis Data Streams. After the workflow was put into production, the company noticed it performed slowly and identified Kinesis Data Streams as the problem. One of the streams has a total of 10 Mb/s throughput. 
+
+<details> 
+  <summary>What should the Solutions Architect recommend to improve performance?</summary>
+Run the `UpdateShardCount` command to increase the number of shards in the stream 
+</details>
+
 ---
 
 Kinesis Firehose 数据流接收、处理  

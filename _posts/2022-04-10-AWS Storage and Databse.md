@@ -38,6 +38,7 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
     - [SGW 分类](#sgw-分类)
   - [DataSync](#datasync)
   - [Snowball](#snowball)
+  - [DMS - Database Migration Service](#dms---database-migration-service)
 - [AWS Databases 数据库](#aws-databases-数据库)
   - [关系型数据库 RDS](#关系型数据库-rds)
     - [RDS 备份](#rds-备份)
@@ -164,7 +165,8 @@ incremental backups，增量备份到 S3。
 ![EBS & EFS](/assets/img/IMG_20220417-211334691.png)  
 
 ## FSx for Windows, SMB protocol
-- Fully managed file server built on Windows Server that supports the SMB/NTFS protocol, Microsoft Active Directory(AD) integration  
+- Fully managed file server built on Windows Server that supports the SMB/NTFS protocol  
+- support Microsoft Active Directory(AD) integration, authentication  
 - 比如用于 Sharepoint, Microsoft SQL Server, Workspaces, IIS Web Server 或者任何其他 native Microsoft application   
 - Migrating Existing Files to Amazon FSx for Windows File Server Using AWS DataSync  
 
@@ -426,6 +428,20 @@ A business's backup data totals 700 terabytes (TB) and is kept in network attach
 Order AWS Snowball devices to transfer the data. Use a lifecycle policy to transition the files to Amazon S3 Glacier Deep Archive.
 
 500Mbps means it tansfers 500/8 = 62.5MB/s. In one day, it transfers (62.5 x 60 x 60 x 24) = 5.4TB. Overall it takes 130 days to finish 700TB.
+</details>
+
+## DMS - Database Migration Service
+- [DMS 主要作用是将本地数据库迁移上云](https://aws.amazon.com/cn/dms/)  
+- 保持迁移过程中高可用，最大限度缩短停机时间  
+- SCT(Schema Conoversion Tool) 在异构数据库迁移  
+
+A company is migrating its on-premises PostgreSQL database to Amazon Aurora PostgreSQL. The on-premises database must remain online and accessible during the migration. The Aurora database must remain synchronized with the on-premises database.
+
+<details>
+  <summary>Which combination of actions must a solutions architect take to meet these requirements? (Choose two.)</summary>
+Create an AWS Database Migration Service (AWS DMS) replication server  
+
+Convert the database schema by using the AWS Schema Conversion Tool (AWS SCT).  
 </details>
 
 # AWS Databases 数据库
