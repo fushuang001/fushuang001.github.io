@@ -4,7 +4,7 @@ title:          AWS 监控、分析，以及数据分析
 subtitle:		    备考 SAA 的笔记
 date:           2022-11-12
 author:         Luke
-cover:          '/assets/img/post-aws-storage-db-bg.png'
+cover:          '/assets/img/bg-monitor-and-analysis.png'
 tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, Athena, Kinesis
 ---
 - [CloudWatch](#cloudwatch)
@@ -12,6 +12,7 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
   - [AWS Global Services](#aws-global-services)
 - [EventBridge](#eventbridge)
 - [Trusted Advisor](#trusted-advisor)
+- [Cost Explore](#cost-explore)
 - [Athena](#athena)
 - [Kinesis](#kinesis)
   - [Kinesis 三种分类](#kinesis-三种分类)
@@ -66,6 +67,9 @@ Optimize Performance and Security, monitor Fault tolerance, cost, Service limits
 优化性能、安全、成本、容错、服务限额  
 [需要购买 support plan 才能解锁](https://aws.amazon.com/premiumsupport/plans/?nc1=h_ls),developer plan 解锁一部分，business 解锁全部  
 ![Trusted_Advisor_Dashboard](assets/Monitoring%20and%20Analysis/IMG_20220414-154646933.png)  
+
+# Cost Explore
+- 费用相关  
 
 # Athena
 
