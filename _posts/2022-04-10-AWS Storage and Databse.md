@@ -292,7 +292,7 @@ aws s3api put-bucket-versioning --bucket testbucket --versioning-configuration S
 - Versioning and S3 Object Lock must be configured on the bucket where the job is performed.  
 - `s3:PutObjectLegalHold` permission is required in your IAM role to add or remove legal hold from objects.  
 
-A company needs to store data in Amazon S3 and must prevent the data from being changed. The company wants new objects that are uploaded to Amazon S3 to remain unchangeable for a nonspecific amount of time until the company decides to modify the objects. Only specific users in the company’s AWS account can have the ability to delete the objects.   
+A company needs to store data in Amazon S3 and must prevent the data from being changed. The company wants new objects that are uploaded to Amazon S3 to remain unchangeable for a **nonspecific amount of time** until the company decides to modify the objects. Only specific users in the company’s AWS account can have the ability to delete the objects.   
 
 <details>
 	<summary> What should a solutions architect do to meet these requirements? </summary>
@@ -300,10 +300,17 @@ Create an S3 bucket with S3 Object Lock enabled. Enable versioning. Add a legal 
 </details>
 
 ### Glacier Vault Lock 文件库锁定
-- 为了满足合规性要求，比如 objects 在五年内不应该删除  
+- 为了满足合规性要求，比如 objects **在规定时间比如 5 年**内不能删除  
 - write-once-read-many (WORM) model，一次写入，多次读取 
 - [文件库锁定](https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock.html) 策略在锁定后不能再更改或删除策略   
 - 建议先创建文件库，完成文件库锁定策略，然后将档案上传到文件库，以便将该策略应用于它们  
+
+An application generates audit logs of operational activities. Compliance requirements mandate that the application retain the logs for 5 years.  
+
+<details>
+  <summary>How can these requirements be met?  </summary>
+Save the logs in an Amazon Glacier vault and use the Vault Lock feature.
+</details>
 
 <span style='background:lime;color:black'>Glacier Vault Lock Policies 文件库锁定策略</span>
 - 配合 Glacier Vault Lock，实现合规性要求  
@@ -358,6 +365,7 @@ Create an S3 bucket with S3 Object Lock enabled. Enable versioning. Add a legal 
     ]
 }
 ```
+![Glacier-Vault-access-policy](/assets/img/post-Glacier-Vault-access-policy.png)
 
 ### Event Notification
 - 针对 S3 objects, object ACL 的一些操作比如 PUT, GET, DELETE，发送通知  
@@ -451,13 +459,14 @@ Gateway Virtual Tape Library 磁带网关
 
 ## Snowball
 A business's backup data totals 700 terabytes (TB) and is kept in network attached storage (NAS) at its data center. This backup data must be available in the event of occasional regulatory inquiries and preserved for a period of seven years. The organization has chosen to relocate its backup data from its on-premises data center to Amazon Web Services (AWS). Within one month, the migration must be completed. The company's public internet connection provides 500 Mbps of dedicated capacity for data transport.
-
-What should a solutions architect do to ensure that data is migrated and stored at the LOWEST possible cost?
+<details>
+  <summary>What should a solutions architect do to ensure that data is migrated and stored at the LOWEST possible cost?</summary>
 保证数据在一个月可以传输完成，然后尽量低的费用
 
 Order AWS Snowball devices to transfer the data. Use a lifecycle policy to transition the files to Amazon S3 Glacier Deep Archive.
 
 500Mbps means it tansfers 500/8 = 62.5MB/s. In one day, it transfers (62.5 x 60 x 60 x 24) = 5.4TB. Overall it takes 130 days to finish 700TB.
+</details>
 
 # AWS Databases 数据库
 [架构师 blog-选择正确的 DB](https://aws.amazon.com/cn/blogs/architecture/selecting-the-right-database-and-database-migration-plan-for-your-workloads/)
@@ -565,7 +574,7 @@ Multi-AZ DB cluster deployment
 ![how it works](/assets/img/product-page-diagram_RDS Proxy_How-it-works@2x.a18916586f49718a16fd11579d168ab08c83d333.png)
 
 ### IAM database authenication
-- 不 [使用 DB password 连接，而是借助 authentication token](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html)(generated using AWS Signature V4)，由 IAM 存储 token，每个 token 有效期 15 分钟  
+- [不使用 DB password 连接，而是借助 authentication token](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html)(generated using AWS Signature V4)，由 IAM 存储 token，每个 token 有效期 15 分钟  
 - 支持 MariaDB, MySQL, and PostgreSQL  
 - 优点是不需要单独管理 DB password，可以通过 IAM 集中管理  
 - For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security.  
@@ -586,6 +595,13 @@ Multi-AZ DB cluster deployment
     - 适合 predictable/可预测的 DB workload 场景   
 - Automated backups 是默认且必须 enabled，Backups do not impact database performance  
 
+A company has an application that runs on Amazon EC2 instances and uses an Amazon Aurora database. The EC2 instances connect to the database by using user names and passwords that are stored locally in a file. The company wants to minimize the operational overhead of credential management.
+   
+<details>
+  <summary>What should a solutions architect do to accomplish this goal?</summary>
+Use AWS Systems Manager Parameter Store. Turn on automatic rotation.
+</details>  
+  
 ![Writer, Reader 有各自 DNS Endpoint](/assets/img/IMG_20220609-153921417.png)  
 
 ![Aurora Replica](/assets/img/IMG_20220609-145209607.png)  
