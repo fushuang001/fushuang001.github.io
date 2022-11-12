@@ -67,7 +67,7 @@ DynamoDb
 Optimize Performance and Security, monitor Fault tolerance, cost, Service limits, **based on AWS best practice**  
 优化性能、安全、成本、容错、服务限额  
 [需要购买 support plan 才能解锁](https://aws.amazon.com/premiumsupport/plans/?nc1=h_ls),developer plan 解锁一部分，business 解锁全部  
-![Trusted_Advisor_Dashboard](assets/Monitoring%20and%20Analysis/IMG_20220414-154646933.png)  
+![Trusted_Advisor_Dashboard](/assets/img/IMG_20220414-154646933.png)  
 
 # Cost Explore
 - 费用相关  
