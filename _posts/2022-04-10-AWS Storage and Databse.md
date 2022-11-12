@@ -7,6 +7,65 @@ author:         Luke
 cover:          '/assets/img/post-aws-storage-db-bg.png'
 tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, ElastiCache
 ---
+- [AWS Storage 存储](#aws-storage-存储)
+  - [instance store - Block storage](#instance-store---block-storage)
+  - [EBS - Block storage](#ebs---block-storage)
+    - [EBS use case](#ebs-use-case)
+    - [EBS volume types](#ebs-volume-types)
+    - [EBS Snapshots](#ebs-snapshots)
+  - [EFS for linux, NFS file system](#efs-for-linux-nfs-file-system)
+  - [FSx for Windows, SMB protocol](#fsx-for-windows-smb-protocol)
+  - [FSx for Lustre](#fsx-for-lustre)
+  - [S3 - Object storage](#s3---object-storage)
+    - [S3 不同层级的存储类型](#s3-不同层级的存储类型)
+    - [S3 use cases](#s3-use-cases)
+    - [S3 Versioning 版本](#s3-versioning-版本)
+    - [S3 Encryption 加密](#s3-encryption-加密)
+    - [MFA delete](#mfa-delete)
+    - [Object Lock 对象锁定](#object-lock-对象锁定)
+    - [Object Lock legal hold 对象锁定依法保留](#object-lock-legal-hold-对象锁定依法保留)
+    - [Glacier Vault Lock 文件库锁定](#glacier-vault-lock-文件库锁定)
+    - [Event Notification](#event-notification)
+    - [Replication rules 复制规则](#replication-rules-复制规则)
+    - [Transfer Acceleration 传输加速](#transfer-acceleration-传输加速)
+    - [S3 SELECT](#s3-select)
+    - [AWS S3 CLI](#aws-s3-cli)
+    - [S3 bucket policy](#s3-bucket-policy)
+    - [Pre-signed URL](#pre-signed-url)
+    - [pricing, S3 vs EFS](#pricing-s3-vs-efs)
+- [数据传输服务，混合云存储](#数据传输服务混合云存储)
+  - [S3 Storage Gateway](#s3-storage-gateway)
+    - [SGW 分类](#sgw-分类)
+  - [DataSync](#datasync)
+  - [Snowball](#snowball)
+- [AWS Databases 数据库](#aws-databases-数据库)
+  - [关系型数据库 RDS](#关系型数据库-rds)
+    - [RDS 备份](#rds-备份)
+    - [RDS 恢复 Restoring Backups](#rds-恢复-restoring-backups)
+    - [Multi-AZ, Standby Replica](#multi-az-standby-replica)
+    - [Read Replica 只读副本](#read-replica-只读副本)
+    - [when to use EC2 自建数据库](#when-to-use-ec2-自建数据库)
+    - [Storage AutoScaling](#storage-autoscaling)
+    - [RDS Enhanced Monitoring](#rds-enhanced-monitoring)
+    - [RDS event notification](#rds-event-notification)
+    - [RDS Proxy](#rds-proxy)
+    - [IAM database authenication](#iam-database-authenication)
+  - [Aurora](#aurora)
+    - [Aurora endpoints](#aurora-endpoints)
+    - [Aurora Global Database](#aurora-global-database)
+  - [非关系型，key-value DynamoDB](#非关系型key-value-dynamodb)
+    - [Components 组件](#components-组件)
+    - [Backup and Restore](#backup-and-restore)
+    - [DAX(Cluster DynamoDB Accelerator) 加速器](#daxcluster-dynamodb-accelerator-加速器)
+    - [DDB Stream](#ddb-stream)
+- [AWS Data Warehouse 数据仓库](#aws-data-warehouse-数据仓库)
+  - [OLTP vs OLAP](#oltp-vs-olap)
+  - [Redshift -- cloud data warehouse](#redshift----cloud-data-warehouse)
+    - [Redshift cfg](#redshift-cfg)
+    - [Backups](#backups)
+    - [Redshift Spectrum](#redshift-spectrum)
+- [AWS ElastiCache 云缓存](#aws-elasticache-云缓存)
+- [Lake Formation 数据湖](#lake-formation-数据湖)
 
 # AWS Storage 存储
 [AWS technical essenticals](https://explore.skillbuilder.aws/learn/course/1851/play/45289/aws-technical-essentials-104)
@@ -141,14 +200,14 @@ incremental backups，增量备份到 S3。
 不同生命周期不同场景，[为 objects 找到合适的存储层级](https://aws.amazon.com/cn/s3/storage-classes/?nc1=h_ls)，来节省费用  
 ![S3 Storage Class](/assets/img/IMG_20220504-193742380.png)  
 
-||Standard 标准|Intelligent-Tiering 智能分层|Standard-IA 标准-IA|One Zone-IA 单区-IA|Glacier Instant Retrieval 即时检索|Glacier Flexible Retrieval(formerly S3 Glacier) 灵活检索|Deep Archive 深层归档|
-|----|----|----|----|----|----|----|----|
-|场景|频繁访问的数据，比如云应用程序、动态网站、内容分配、移动和游戏应用程序以及大数据分析|未知或变化的访问，根据访问频率自动将数据移至最经济实惠的访问层|不频繁访问，毫秒级检索；适合长期存储、备份|同左，单区|很少访问/per 季度，毫秒级检索；长期存储，比 Standard-IA 更经济，如医学图像、新闻媒体资产或用户生成的内容归档|很少访问/per half year，不需要立即访问但需要灵活地免费检索大量数据的归档数据|成本最低，监管严格的行业，如金融服务、医疗保健和公共部门 – 为了满足监管合规要求，将数据集保留 7—10 年或更长时间|
-|检索时间，首字节延迟|ms|ms|ms|ms|ms|minutes or hours|within 12 hours|
-|每个 object 最低容量费用|NA|NA|128KB|128KB|128KB|40KB|40KB|
-|最低存储持续时间费用|NA|NA，但是收取监控和自动化费用|30 天|30 天|90 天|90 天|180 天|
-|检索费用|NA|NA|每检索 1GB|每检索 1GB|每检索 1GB|每检索 1GB|每检索 1GB|
-|生命周期转换|Y|Y|Y|Y|Y|Y|Y|
+|                          | Standard 标准                                                                    | Intelligent-Tiering 智能分层                                  | Standard-IA 标准-IA                     | One Zone-IA 单区-IA | Glacier Instant Retrieval 即时检索                                                                      | Glacier Flexible Retrieval(formerly S3 Glacier) 灵活检索                    | Deep Archive 深层归档                                                                                       |
+|--------------------------|----------------------------------------------------------------------------------|---------------------------------------------------------------|-----------------------------------------|---------------------|---------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| 场景                     | 频繁访问的数据，比如云应用程序、动态网站、内容分配、移动和游戏应用程序以及大数据分析 | 未知或变化的访问，根据访问频率自动将数据移至最经济实惠的访问层 | 不频繁访问，毫秒级检索；适合长期存储、备份 | 同左，单区           | 很少访问/per 季度，毫秒级检索；长期存储，比 Standard-IA 更经济，如医学图像、新闻媒体资产或用户生成的内容归档 | 很少访问/per half year，不需要立即访问但需要灵活地免费检索大量数据的归档数据 | 成本最低，监管严格的行业，如金融服务、医疗保健和公共部门 – 为了满足监管合规要求，将数据集保留 7—10 年或更长时间 |
+| 检索时间，首字节延迟      | ms                                                                               | ms                                                            | ms                                      | ms                  | ms                                                                                                      | minutes or hours                                                            | within 12 hours                                                                                             |
+| 每个 object 最低容量费用 | NA                                                                               | NA                                                            | 128KB                                   | 128KB               | 128KB                                                                                                   | 40KB                                                                        | 40KB                                                                                                        |
+| 最低存储持续时间费用     | NA                                                                               | NA，但是收取监控和自动化费用                                   | 30 天                                   | 30 天               | 90 天                                                                                                   | 90 天                                                                       | 180 天                                                                                                      |
+| 检索费用                 | NA                                                                               | NA                                                            | 每检索 1GB                              | 每检索 1GB          | 每检索 1GB                                                                                              | 每检索 1GB                                                                  | 每检索 1GB                                                                                                  |
+| 生命周期转换             | Y                                                                                | Y                                                             | Y                                       | Y                   | Y                                                                                                       | Y                                                                           | Y                                                                                                           |
 
 >S3 Intelligent-Tiering 可监控访问模式，并将连续 30 天未访问的对象移动到不频繁访问层，并在 90 天未访问之后，移动到归档即时访问层。对于不需要即时检索的数据，您可以设置 S3 Intelligent-Tiering，以监控对象并在 180 天以上未访问后将其则移至深度归档访问层，从而实现高达 95% 的存储成本节省。
 
@@ -305,11 +364,29 @@ Create an S3 bucket with S3 Object Lock enabled. Enable versioning. Add a legal 
 - 支持 SNS, SQS, Lambda，但是 target 只能是一个   
 - 如果多个 teams 需要收到通知 (parallel asynchronous processing)，可以发送通知给 SNS，然后不同 teams 去订阅 SNS topic  
 
+A social media company allows users to upload images to its website. The website runs on Amazon EC2 instances. During upload requests, the website resizes the images to a standard size and stores the resized images in Amazon S3. Users are experiencing slow upload requests to the website.
+
+The company needs to reduce coupling within the application and improve website performance. A solutions architect must design the most operationally efficient process for image uploads.
+
+<details>
+  <summary>Which combination of actions should the solutions architect take to meet these requirements? (Choose two.)</summary>
+
+Configure the web server to upload the original images to Amazon S3.  
+Configure S3 Event Notifications to invoke an AWS Lambda function when an image is uploaded. Use the function to resize the image
+</details>
+
 ### Replication rules 复制规则
 - Replication requires versioning to be enabled for the source bucket.  
 - You can replicate objects that are encrypted with Amazon KMS keys.  
 - for cross region replication, could use AWS KMS Multi-Region keys(SSE-KMS) for encryption  
 - 创建 replication rules 之前已经存在的 objects，不会被复制  
+
+A company wants to move its application to a serverless solution. The serverless solution needs to analyze existing and new data by using SQL. The company stores the data in an Amazon S3 bucket. The data requires encryption and must be replicated to a different AWS Region.
+
+<details>
+	<summary> Which solution will meet these requirements with the LEAST operational overhead? </summary>
+Create a new S3 bucket. Load the data into the new S3 bucket. Use S3 Cross-Region Replication (CRR) to replicate encrypted objects to an S3 bucket in another Region. Use server-side encryption with AWS KMS multi-Region keys (SSE-KMS). Use Amazon Athena to query the data.
+</details>
 
 ### Transfer Acceleration 传输加速
 多地集中的向 S3 桶上传 GB/TB 数据，用来加速（互联网长距离传输，或者大文件分片 (multiple part upload)，加速效果更加明显）  
