@@ -7,6 +7,12 @@ author:         Luke
 cover:          '/assets/img/post-NLB-DNS-target.png'
 tags:           AWS, ELB, target, DNS, RDS
 ---
+- [相关的需求，架构](#相关的需求架构)
+- [实现方式](#实现方式)
+- [以上方式存在的问题](#以上方式存在的问题)
+- [引申的需求](#引申的需求)
+- [实现方式](#实现方式-1)
+- [存在的问题](#存在的问题)
 
 # 相关的需求，架构
 RDS 部署在 private subnets，正常情况下只能从 AWS VPC 内部访问；客户希望 RDS 可以被 public Internet 访问，  

@@ -7,6 +7,9 @@ author:         Luke
 cover:          '/assets/img/alb_component_architecture.png'
 tags:           AWS, ALB, health check, HTTP header, HSTS
 ---
+- [相关的问题描述](#相关的问题描述)
+- [分析过程](#分析过程)
+- [解决方法](#解决方法)
 
 # 相关的问题描述
 ALB 与后端实例健康检查失败，提示 state: unhealthy, reason: Target.FailedHealthChecks   
