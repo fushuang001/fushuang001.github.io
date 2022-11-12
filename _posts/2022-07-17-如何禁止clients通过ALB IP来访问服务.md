@@ -51,5 +51,4 @@ mynxalb.com 是一个 Route 53 alias 记录，指向我自己的 ALB；通过配
 ![not block Host Header for 172.31](/assets/img/post-not-block-Host-172.png)  
 
 ## WAF 相关规则  
-`RegexString": "(\\b25[0-5]|\\b2[0-4][0-9]|\\b[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}"`
 ![WAF rules](/assets/img/post-WAF-refuse-connect-ALB-via-IP.png)  
