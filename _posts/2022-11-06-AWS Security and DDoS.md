@@ -292,6 +292,8 @@ Buckets:
         "externalId": "dev"
 ```
 
+## Permission boundary
+
 ## Identity Federation 联合身份认证
 AWS 外部 (eg. facebook, google) 用户可以通过联合认证，结合 STS，获取临时 credentials  
 外部用户有特定的 username，可以基于这个特性来设置 IAM policy  

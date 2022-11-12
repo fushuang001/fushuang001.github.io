@@ -315,7 +315,8 @@ Save the logs in an Amazon Glacier vault and use the Vault Lock feature.
 <span style='background:lime;color:black'>Glacier Vault Lock Policies 文件库锁定策略</span>
 - 配合 Glacier Vault Lock，实现合规性要求  
 - 比如下面的 [Vault Lock Policy](https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock-policy.html)，禁止删除 < 365 天的 archives  
-![Glacier-Vault-Lock-policy](assets/img/post-Glacier-Vault-Lock-policy.png)
+  
+![Glacier-Vault-Lock-policy](/assets/img/post-Glacier-Vault-Lock-policy.png)
 
 <span style='background:lime;color:black'>Glacier Vault access Policies 文件库访问策略</span>
 - [与合规性要求无关](https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-access-policy.html)，指定谁可以访问对应 vault 的 archives/objects  
