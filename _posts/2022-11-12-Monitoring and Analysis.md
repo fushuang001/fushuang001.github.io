@@ -91,12 +91,7 @@ Kinesis Streams 数据流
 - 大量数据，IOT 场景  
 - client/data producers -- `Kinesis Streams`(store in Shard, 24 hours - 7 days retention) ---> Consumers --> DDB, S3, EMR, Redshift  
 
-A Solutions Architect designed a system based on Amazon Kinesis Data Streams. After the workflow was put into production, the company noticed it performed slowly and identified Kinesis Data Streams as the problem. One of the streams has a total of 10 Mb/s throughput. 
-
-<details> 
-  <summary>What should the Solutions Architect recommend to improve performance?</summary>
-Run the `UpdateShardCount` command to increase the number of shards in the stream 
-</details>
+![Kinesis Streams SAA example](/assets/img/post-Kinesis-Streams-SAA.png)  
 
 ---
 
@@ -106,12 +101,8 @@ Kinesis Firehose 数据流接收、处理
 
 ![Kinesis Firehose](/assets/img/post-Kinesis Firehose.png)   
 
-A manufacturing company wants to implement predictive maintenance on its machinery equipment. The company will install thousands of IoT sensors that will send data to AWS in real time. A solutions architect is tasked with implementing a solution that will receive events in an ordered manner for each machinery asset and ensure that data is saved for further processing at a later time.
-<details>
-  <summary>Which solution would be MOST efficient?</summary>
-
-Use Amazon Kinesis Data Streams for real-time events with a partition for each equipment asset. Use Amazon Kinesis Data Firehose to save data to Amazon S3.
-</details>
+![Kinesis Firehose SAA example](/assets/img/post-Kinesis-SAA.png)  
+![Kinesis Firehose SAA example](/assets/img/post-Kinesis-Firehose-SAA.png)  
 
 ---
 
