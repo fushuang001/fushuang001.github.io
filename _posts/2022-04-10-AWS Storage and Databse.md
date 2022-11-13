@@ -365,12 +365,8 @@ Configure S3 Event Notifications to invoke an AWS Lambda function when an image 
 - for cross region replication, could use AWS KMS Multi-Region keys(SSE-KMS) for encryption  
 - 创建 replication rules 之前已经存在的 objects，不会被复制  
 
-A company wants to move its application to a serverless solution. The serverless solution needs to analyze existing and new data by using SQL. The company stores the data in an Amazon S3 bucket. The data requires encryption and must be replicated to a different AWS Region.
-
-<details>
-	<summary> Which solution will meet these requirements with the LEAST operational overhead? </summary>
-Create a new S3 bucket. Load the data into the new S3 bucket. Use S3 Cross-Region Replication (CRR) to replicate encrypted objects to an S3 bucket in another Region. Use server-side encryption with AWS KMS multi-Region keys (SSE-KMS). Use Amazon Athena to query the data.
-</details>
+![post-S3-CRR-SSE-KMS](/assets/img/post-S3-CRR-SSE-KMS.png)  
+![post-S3-cross-region-replication](/assets/img/post-S3-cross-region-replication.png)  
 
 ### Transfer Acceleration 传输加速
 多地集中的向 S3 桶上传 GB/TB 数据，用来加速（互联网长距离传输，或者大文件分片 (multiple part upload)，加速效果更加明显）  
@@ -394,6 +390,7 @@ Create a new S3 bucket. Load the data into the new S3 bucket. Use S3 Cross-Regio
 - static content    
 - not support HTTPS  
 - bucket name should be same with domain name  
+![post-S3-static-website](/assets/img/post-S3-static-website.png)  
 
 ### pricing, S3 vs EFS
 S3 不同存储层级的价格不同，[不过 S3 不只是有存储费用](https://dzone.com/articles/confused-by-aws-storage-options-s3-ebs-amp-efs-explained)，还有其他费用，比如 API 调用、数据传出 S3(Data Transfer Out)  
@@ -639,6 +636,7 @@ Instance endpoint
 - ElastiCache 和 DDB 都比较适合用来存储 HA 的 web application 的 __session data__，高速读取   
 - 默认是 [Eventually consistent](https://aws.amazon.com/dynamodb/faqs/)（写入，1 秒后所有数据一致）；另外还支持 Strongly consistent  
 ![JSON/NoSQL](/assets/img/IMG_20220528-202315635.png)  
+![post-DDB-SAA](/assets/img/post-DDB-SAA.png)  
 
 ### Components 组件
   - table -- items -- attributes  

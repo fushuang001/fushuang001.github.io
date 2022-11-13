@@ -281,6 +281,8 @@ AWS rounds up duration to the nearest millisecond with no minimum execution time
 ![build Lambda Functions](/assets/img/IMG_20220513-173152878.png)  
 Access Permissions: Define which events can invoke the functin and what services Lambda is permitted to interact with.  
 
+![post-Lambda-SAA](/assets/img/post-Lambda-SAA.png)  
+
 ### How AWS Lambda works
 [参考链接](https://explore.skillbuilder.aws/learn/course/99/play/497/aws-lambda-foundations)  
 - A Lambda function has three primary components – **trigger, code, and configuration**    
