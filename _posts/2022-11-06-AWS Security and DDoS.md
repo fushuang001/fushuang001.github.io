@@ -328,6 +328,7 @@ Buckets:
 - AWS support permission boundaries for IAM entities(users or roles)    
 - use a managed policy to set the maximum permissions that an identity-based policy can grant to an IAM entity  
 - An entity's permissions boundary allows it to perform only the actions that are allowed by both its identity-based policies and its permissions boundaries  
+![post-IAM-permission-boundary-example](/assets/img/post-IAM-permission-boundary-example.png)  
 
 ## Identity Federation 联合身份认证
 AWS 外部 (eg. facebook, google) 用户可以通过联合认证，结合 STS，获取临时 credentials  
@@ -350,7 +351,6 @@ Cogntio
 [参考资料](https://www.stormit.cloud/blog/aws-scp-service-control-policy/)  
 ![Organization and SCP](/assets/img/AWS_organizations_SCP.png)
 ![post-Organization-SCP-SAA-example](/assets/img/post-Organization-SCP-SAA-example.png)  
-
 
 # Directory Service, AD
 - AWS Directory Service lets you run Microsoft Active Directory (AD) as a managed service.   

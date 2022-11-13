@@ -148,15 +148,8 @@ non-Nitro 平台的 EC2（比如 t2.micro) 升级 Nitro 平台（比如 t3.micro
 - instances inside same AZ  
 - low-latency network performance
 - HPC  
+![post-EC2-placement-example](/assets/img/post-EC2-placement-example.png)  
 
-A company runs a high performance computing (HPC) workload on AWS. The workload required low-latency network performance and high network throughput with tightly coupled node-to-node communication. The Amazon EC2 instances are properly sized for compute and storage capacity, and are launched using default options.
-
-<details>
-  <summary>What should a solutions architect propose to improve the performance of the workload?</summary>
-  Choose a cluster placement group while launching Amazon EC2 instances.
-</details>
-
-  
 ---
 
 **Partition-分区**
@@ -186,7 +179,7 @@ A company runs a high performance computing (HPC) workload on AWS. The workload 
 **step policy**  
 
 **target tracking policy**  
-- 根据监控设置，比如CPU 40%，将EC2资源利用率维持在一个相对稳定的水平  
+- 根据监控设置，比如 CPU 40%，将 EC2 资源利用率维持在一个相对稳定的水平  
 
 ![post-ASG-target-tracking-SAA](/assets/img/post-ASG-target-tracking-SAA.png)   
 

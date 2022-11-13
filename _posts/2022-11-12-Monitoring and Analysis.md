@@ -103,6 +103,7 @@ Kinesis Firehose 数据流接收、处理
 
 ![Kinesis Firehose SAA example](/assets/img/post-Kinesis-SAA.png)  
 ![Kinesis Firehose SAA example](/assets/img/post-Kinesis-Firehose-SAA.png)  
+![post-Kinesis-Firehose-example1](/assets/img/post-Kinesis-Firehose-example1.png)  
 
 ---
 

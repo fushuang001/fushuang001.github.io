@@ -144,6 +144,8 @@ Amazon EBS is useful when you must **retrieve data quickly(EBS provides sub-mill
 
 ![HDD](/assets/img/IMG_20220528-182517779.png)  
 
+![post-EBS-types-SAA-example1](/assets/img/post-EBS-types-SAA-example1.png)  
+
 ### EBS Snapshots
 incremental backups，增量备份到 S3。  
 
@@ -178,14 +180,13 @@ incremental backups，增量备份到 S3。
 ![EBS & EFS](/assets/img/IMG_20220417-211334691.png)  
 
 ## FSx for Windows, SMB protocol
-- Fully managed file server built on Windows Server that supports the SMB/NTFS protocol  
+- [Fully managed file server built on Windows Server](https://aws.amazon.com/fsx/windows/faqs/?nc=sn&loc=8) that supports the SMB/NTFS protocol  
 - support Microsoft Active Directory(AD) integration, authentication  
 - 比如用于 Sharepoint, Microsoft SQL Server, Workspaces, IIS Web Server 或者任何其他 native Microsoft application   
 - Migrating Existing Files to Amazon FSx for Windows File Server Using AWS DataSync  
 
 ![FSx for Windows](/assets/img/post-FSx-for-Windowns.png)  
-
-[FSx for Windows file server FAQs](https://aws.amazon.com/fsx/windows/faqs/?nc=sn&loc=8)
+![post-FSx-for-windows-AD-example](/assets/img/post-FSx-for-windows-AD-example.png)  
 
 ## FSx for Lustre
 - [FSx for Lustre](https://aws.amazon.com/cn/fsx/lustre/?nc=sn&loc=1) is a fully managed service that provides cost-effective, high-performance, scalable storage for compute workloads.  
@@ -280,6 +281,7 @@ When you define a lifecycle policy configuration for an object or group of objec
 ![SSE-S3](/assets/img/post-CMK-AWS-mgmt.png)  
 ![SSE](/assets/img/post-S3-SSE.png)   
 ![SSE-KMS(you manage the CMK)](/assets/img/post-KMS-CMK.png)  
+![post-SSE-KMS-SAA-example1](/assets/img/post-SSE-KMS-SAA-example1.png)  
 
 ---
 <span style='background:lime;color:black'>Client Side Encryption，客户端加密</span>
@@ -314,26 +316,14 @@ aws s3api put-bucket-versioning --bucket testbucket --versioning-configuration S
 - [确保 objects 被锁定](https://docs.aws.amazon.com/AmazonS3/latest/userguide/batch-ops-legal-hold.html)，不被修改、删除；没有设置期限，直到客户手动移除对应 policy  
 - Versioning and S3 Object Lock must be configured on the bucket where the job is performed.  
 - `s3:PutObjectLegalHold` permission is required in your IAM role to add or remove legal hold from objects.  
-
-A company needs to store data in Amazon S3 and must prevent the data from being changed. The company wants new objects that are uploaded to Amazon S3 to remain unchangeable for a **nonspecific amount of time** until the company decides to modify the objects. Only specific users in the company’s AWS account can have the ability to delete the objects.   
-
-<details>
-	<summary> What should a solutions architect do to meet these requirements? </summary>
-Create an S3 bucket with S3 Object Lock enabled. Enable versioning. Add a legal hold to the objects. Add the s3 PutObjectLegalHold permission to the IAM policies of users who need to delete the objects
-</details>
+![post-S3-object-lock-legal-hold-example](/assets/img/post-S3-object-lock-legal-hold-example.png)  
 
 ### Glacier Vault Lock 文件库锁定
 - 为了满足合规性要求，比如 objects **在规定时间比如 5 年**内不能删除  
 - write-once-read-many (WORM) model，一次写入，多次读取 
 - [文件库锁定](https://docs.aws.amazon.com/amazonglacier/latest/dev/vault-lock.html) 策略在锁定后不能再更改或删除策略   
 - 建议先创建文件库，完成文件库锁定策略，然后将档案上传到文件库，以便将该策略应用于它们  
-
-An application generates audit logs of operational activities. Compliance requirements mandate that the application retain the logs for 5 years.  
-
-<details>
-  <summary>How can these requirements be met?  </summary>
-Save the logs in an Amazon Glacier vault and use the Vault Lock feature.
-</details>
+![post-S3-Glacier-Vault-example](/assets/img/post-S3-Glacier-Vault-example.png)  
 
 ---
 <span style='background:lime;color:black'>Glacier Vault Lock Policies 文件库锁定策略</span>
@@ -354,16 +344,7 @@ Save the logs in an Amazon Glacier vault and use the Vault Lock feature.
 - 支持 SNS, SQS, Lambda，但是 target 只能是一个   
 - 如果多个 teams 需要收到通知 (parallel asynchronous processing)，可以发送通知给 SNS，然后不同 teams 去订阅 SNS topic  
 
-A social media company allows users to upload images to its website. The website runs on Amazon EC2 instances. During upload requests, the website resizes the images to a standard size and stores the resized images in Amazon S3. Users are experiencing slow upload requests to the website.
-
-The company needs to reduce coupling within the application and improve website performance. A solutions architect must design the most operationally efficient process for image uploads.
-
-<details>
-  <summary>Which combination of actions should the solutions architect take to meet these requirements? (Choose two.)</summary>
-
-Configure the web server to upload the original images to Amazon S3.  
-Configure S3 Event Notifications to invoke an AWS Lambda function when an image is uploaded. Use the function to resize the image
-</details>
+![post-S3-event-notification-example1](/assets/img/post-S3-event-notification-example1.png)  
 
 ### Replication rules 复制规则
 - Replication requires versioning to be enabled for the source bucket.  
@@ -391,6 +372,7 @@ Configure S3 Event Notifications to invoke an AWS Lambda function when an image 
 
 ### Pre-signed URL
 - all objects private by default, the object owner can optionally share objects with others by pre-signed URL, using their own security credentials, to grant time-limited permission to download the object  
+![post-S3-pre-signed-url-example1](/assets/img/post-S3-pre-signed-url-example1.png)  
 
 ### Static Website
 - static content    
@@ -460,14 +442,7 @@ Gateway Virtual Tape Library 磁带网关
 - [DMS 主要作用是将本地数据库迁移上云](https://aws.amazon.com/cn/dms/)  
 - 保持迁移过程中高可用，最大限度缩短停机时间  
 - SCT(Schema Conoversion Tool) 在异构数据库迁移  
-
-A company is migrating its on-premises PostgreSQL database to Amazon Aurora PostgreSQL. The on-premises database must remain online and accessible during the migration. The Aurora database must remain synchronized with the on-premises database.
-
-<details>
-  <summary>Which combination of actions must a solutions architect take to meet these requirements? (Choose two.)</summary>
-<p>Create an AWS Database Migration Service (AWS DMS) replication server</p>
-<p>Convert the database schema by using the AWS Schema Conversion Tool (AWS SCT)</p>
-</details>
+![post-database-migration-example](/assets/img/post-database-migration-example.png)  
 
 # AWS Databases 数据库
 [架构师 blog-选择正确的 DB](https://aws.amazon.com/cn/blogs/architecture/selecting-the-right-database-and-database-migration-plan-for-your-workloads/)
@@ -589,6 +564,8 @@ Multi-AZ DB cluster deployment
 - 支持 MariaDB, MySQL, and PostgreSQL  
 - 优点是不需要单独管理 DB password，可以通过 IAM 集中管理  
 - For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security.  
+
+![post-DB-authentication-SAA-example1](/assets/img/post-DB-authentication-SAA-example1.png)  
 
 ## Aurora
 - MySQL, PostgreSQL-compatible RDS, open source  

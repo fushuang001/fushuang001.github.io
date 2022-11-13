@@ -29,6 +29,7 @@ queuing 的一个重要概念是解耦 **decouple**
 - __pull-based__, not pushed-based.  
 
 ![post-SQS-SAA-example](/assets/img/post-SQS-SAA-example1.png)  
+![post-SQS-SAA-example2](/assets/img/post-SQS-SAA-example2.png)  
 
 ## retention period
 - messages can be kept in the queue from 1 minute to 14 days; default __retention period__ is 4 days. 
@@ -88,3 +89,4 @@ __SNS 并不是 queue，所以并不保证送达__；即使送达，比如接收
 - 适用于将 on-prem 已经有的 messaging application 向 cloud 迁移，迁移过程中不希望改动代码  
 - Amazon MQ 是适用于 Apache ActiveMQ 和 RabbitMQ 的托管消息代理服务  
 - 如果是在 cloud 新建 messaging 服务，可以考虑 SNS, SQS, to decouple and scale microservices, distributed systems and serverless applications    
+![post-AmazonMQ-example](/assets/img/post-AmazonMQ-example.png)  
