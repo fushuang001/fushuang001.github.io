@@ -60,19 +60,13 @@ __pull-based__, not pushed-based.
 - limited to 300 transactions per second(TPS)  
 - designed to guarantee that messages are processed __exactly once__, in the __exact order__ that they are sent.  
 
-A company has an ecommerce checkout workflow that writes an order to a database and calls a service to process the payment. Users are experiencing timeouts during the checkout process. When users resubmit the checkout form, multiple unique orders are created for the same desired transaction.
-
-<details>
-    <summary>How should a solutions architect refactor this workflow to prevent the creation of multiple orders?</summary>
-
-Store the order in the database. Send a message that includes the order number to an Amazon SQS FIFO queue. Set the payment service to retrieve the message and process the order. Delete the message from the queue.
-</details>
+![SQS FIFO SAA example](/assets/img/post-SQS-FIFO-SAA.png)  
 
 ## payload
 data contains in a msg, 比如点餐餐桌号，菜品，下单时间  
 protected until delivery  
 
-![SQS](assets/Messaging%20and%20Queuing/IMG_20220416-175550611.png)  
+![SQS](/assets/img/IMG_20220416-175550611.png)  
 
 # SNS - Notifications
 Amazon SNS is a managed messaging service that lets you **decouple** publishers from subscribers. This is useful for **application-to-application** messaging for microservices, distributed systems, and serverless applications
