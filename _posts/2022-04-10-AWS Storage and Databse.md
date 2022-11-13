@@ -175,12 +175,15 @@ incremental backups，增量备份到 S3。
 [FSx for Windows file server FAQs](https://aws.amazon.com/fsx/windows/faqs/?nc=sn&loc=8)
 
 ## FSx for Lustre
+- [FSx for Lustre](https://aws.amazon.com/cn/fsx/lustre/?nc=sn&loc=1) is a fully managed service that provides cost-effective, high-performance, scalable storage for compute workloads.  
 - AWS 托管服务，为计算负载提供可靠高效的 **shared storage**    
 - 高性能文件系统，可扩展  
 - 通过创建 Lustre filesystem 然后关联 S3 bucket，创建 filesystem 时候，Lustre 查看 objects 并且保存一些信息到 metadata  
 - 适用的场景，比如 machine learning, high performance computing (HPC), video rendering, EDA  
-- [Mounting FSx for Lustre on an Amazon Fargate launch type isn't supported](https://docs.amazonaws.cn/en_us/fsx/latest/LustreGuide/mounting-ecs.html). 有一道类似 SAA-C03 考试题   
+- [Mounting FSx for Lustre on an Amazon Fargate launch type isn't supported](https://docs.amazonaws.cn/en_us/fsx/latest/LustreGuide/mounting-ecs.html)   
 ![FSx for Lustre](/assets/img/post-FSx-forLustre.png)  
+![FSx for Lustre SAA example](/assets/img/post-FSx-for-Lustre-SAA.png)  
+![EFS vs FSx for Lustre](/assets/img/post-efs-vs-FSx-forLustre.png)  
 
 ## S3 - Object storage  
 - 自动在三个 AZ 备份数据，提供灾备恢复能力；相对于 EBS 来说，S3 属于 Serverless  
