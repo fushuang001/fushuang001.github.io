@@ -227,6 +227,9 @@ incremental backups，增量备份到 S3。
 
 >S3 Intelligent-Tiering 可监控访问模式，并将连续 30 天未访问的对象移动到不频繁访问层，并在 90 天未访问之后，移动到归档即时访问层。对于不需要即时检索的数据，您可以设置 S3 Intelligent-Tiering，以监控对象并在 180 天以上未访问后将其则移至深度归档访问层，从而实现高达 95% 的存储成本节省。
 
+![S3-Intelligent-Tiering-SAA](/assets/img/S3-Intelligent-Tiering-SAA.png)  
+![post-S3-storage-class-SAA](/assets/img/post-S3-storage-class-SAA.png)  
+
 ### S3 use cases
 The following list summarizes some of the most common ways you can use Amazon S3:  
 - **Backup and storage:** Amazon S3 is a natural place to back up files because it is highly redundant. As mentioned in the last unit, AWS stores your EBS snapshots in S3 to take advantage of its high availability.  

@@ -24,9 +24,11 @@ queuing 的一个重要概念是解耦 **decouple**
 ![SQS-SAA-example](/assets/img/post-SQS-SAA-example.png)  
 
 # SQS -  Queue
-fully managed message queuing service that enables you to __decouple and scale__ microservices, __distributed__ systems, and serverless applications  
-send msg, store msg, receive ms, between software components, without losing messages or requiring other services to be available, at any scale  
-__pull-based__, not pushed-based.  
+- fully managed message queuing service that enables you to __decouple and scale__ microservices, __distributed__ systems, and serverless applications  
+- send msg, store msg, receive ms, between software components, without losing messages or requiring other services to be available, at any scale, 解耦，异步推送、接收消息   
+- __pull-based__, not pushed-based.  
+
+![post-SQS-SAA-example](/assets/img/post-SQS-SAA-example1.png)  
 
 ## retention period
 - messages can be kept in the queue from 1 minute to 14 days; default __retention period__ is 4 days. 
@@ -75,6 +77,9 @@ Amazon SNS is a managed messaging service that lets you **decouple** publishers 
 publish/subscribe 或者说 producers/consumers 模式，简称 **pub/sub**，用户订阅 topic，收到特定 event 通知。  
 __SNS 并不是 queue，所以并不保证送达__；即使送达，比如接收者不查看，接收的 EC2/application crash/down，也并不会有什么用。  
 对比 SQS，__SQS 可以保证消息 durably stored__，即使 application crash，app 重启后，还是可以从 SQS 读取之前的消息；要么 retention period 到期删除，要么 application 处理完成主动删除，要么正在处理，处于 visiblity timeout 不可见   
+
+![post-sns-sqs-SAA](/assets/img/post-sns-sqs-SAA.png)  
+![post-sns-SAA-example](/assets/img/post-sns-SAA-example.png)
 
 # Amazon MQ
 - [managed msg broker service](https://aws.amazon.com/amazon-mq/), support industary-standard APIs and protocols, including JMS, NMS, AMQP, STOMP, MQTT, Websocket  
