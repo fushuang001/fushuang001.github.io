@@ -70,6 +70,7 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
     - [Backups](#backups)
     - [Redshift Spectrum](#redshift-spectrum)
 - [AWS ElastiCache 云缓存](#aws-elasticache-云缓存)
+  - [支持两款 open-source in-memory caching engines:](#支持两款-open-source-in-memory-caching-engines)
 - [Lake Formation 数据湖](#lake-formation-数据湖)
 
 # AWS Storage 存储
@@ -104,6 +105,7 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
 - 只能在 launch EC2 时候选择特定的 type，比如 c5d.large，其中 d 表示带有 instance store。  
   
 ![instance_store_volumes](/assets/img/post-instance_store_volumes.png)  
+![post-block-storage-instance-store-SAA](/assets/img/post-block-storage-instance-store-SAA.png)  
 
 ## EBS - Block storage  
 - 类比 SAN(storage area network)  
@@ -229,6 +231,7 @@ incremental backups，增量备份到 S3。
 
 ![S3-Intelligent-Tiering-SAA](/assets/img/S3-Intelligent-Tiering-SAA.png)  
 ![post-S3-storage-class-SAA](/assets/img/post-S3-storage-class-SAA.png)  
+![post-S3-storage-class-SAa-example1](/assets/img/post-S3-storage-class-SAa-example1.png)  
 
 ### S3 use cases
 The following list summarizes some of the most common ways you can use Amazon S3:  
@@ -444,16 +447,14 @@ Gateway Virtual Tape Library 磁带网关
 - 适用于初次将本地所有数据迁移到 cloud，后续可以使用 SGW 保持本地、cloud 混合存储、同步   
 - 也可以在 AWS services 之间传输数据      
 
+![post-DataSync-SAA-example1](/assets/img/post-DataSync-SAA-example1.png)  
+
 ## Snowball
-A business's backup data totals 700 terabytes (TB) and is kept in network attached storage (NAS) at its data center. This backup data must be available in the event of occasional regulatory inquiries and preserved for a period of seven years. The organization has chosen to relocate its backup data from its on-premises data center to Amazon Web Services (AWS). Within one month, the migration must be completed. The company's public internet connection provides 500 Mbps of dedicated capacity for data transport.
-<details>
-  <summary>What should a solutions architect do to ensure that data is migrated and stored at the LOWEST possible cost?</summary>
-保证数据在一个月可以传输完成，然后尽量低的费用
+- 将大规模数据导入到S3  
+- [Currently, there is no way of uploading objects directly to S3 Glacier using a Snowball Edge](https://aws.amazon.com/cn/blogs/storage/using-aws-snowball-to-migrate-data-to-amazon-s3-glacier-for-long-term-storage/). Thus, you first have to upload your objects into S3 Standard, and then use S3 lifecycle policies to transition the files to S3 Glacier  
 
-Order AWS Snowball devices to transfer the data. Use a lifecycle policy to transition the files to Amazon S3 Glacier Deep Archive.
-
-500Mbps means it tansfers 500/8 = 62.5MB/s. In one day, it transfers (62.5 x 60 x 60 x 24) = 5.4TB. Overall it takes 130 days to finish 700TB.
-</details>
+![post-snowball-SAA-example1](/assets/img/post-snowball-SAA-example1.png)  
+![post-snowball-SAA-example2](/assets/img/post-snowball-SAA-example2.png)  
 
 ## DMS - Database Migration Service
 - [DMS 主要作用是将本地数据库迁移上云](https://aws.amazon.com/cn/dms/)  
@@ -678,6 +679,8 @@ Instance endpoint
 - DAX Cluster 会提供一个 Endpoint 给 client 使用，隐藏后面 scaling 的细节  
 ![DAX_Cluster](/assets/img/IMG_20220420-131351110.png)  
 
+![post-DDB-DAX-example](/assets/img/post-DDB-DAX-example.png)  
+
 ### DDB Stream
 - DDB Stream is an ordered flow of info about changes to items in an DDB table  
 - 如果打开 DDB Stream，就可以获取到 table 中的修改 (create, update, delete)  
@@ -728,13 +731,18 @@ Instance endpoint
   - 用于提高现有 DB 的性能（经常访问的相同的内容）    
   - 和 RDS Read Replica 类似，比如说，都可以用来 increase db and web application performance  
   - 但是 ElastiCache 是 nonrelelational database    
-- 支持两款 open-source in-memory caching engines:  
-  - **Memcached**  
-    - if you need a simple solution, to scale horizontally  
-  - **Redis**  
-    - Redis is Multi-AZ
-    - you can do backups and restores of Redis  
-    - Redis Cluster supports up to 15 shards and single cluster supports to run workloads up to 6.1 TB of in-memory capacity  
+
+![post-ElastiCache-SAA-example1](/assets/img/post-ElastiCache-SAA-example1.png)  
+
+## 支持两款 open-source in-memory caching engines:  
+- **Memcached**  
+  - if you need a simple solution, to scale horizontally  
+- **Redis**  
+  - Redis is Multi-AZ
+  - you can do backups and restores of Redis  
+  - Redis Cluster supports up to 15 shards and single cluster supports to run workloads up to 6.1 TB of in-memory capacity  
+
+![post-ElastiCache-Redis-SAA-example1](/assets/img/post-ElastiCache-Redis-SAA-example1.png)  
 
 # Lake Formation 数据湖
 在数天内建立安全的 [数据湖](https://aws.amazon.com/lake-formation/?nc1=h_ls)，从 S3, DDB, RDS 当中获得源数据，放到目标 S3 桶用于分析  

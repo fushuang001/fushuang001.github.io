@@ -342,11 +342,15 @@ Cogntio
 [目前 organizations 在中国区的支持并不完善](https://docs.amazonaws.cn/en_us/aws/latest/userguide/organizations.html)  
 [如果需要更换 AWS account 所属 organization，网络层面需要注意什么](https://aws.amazon.com/blogs/networking-and-content-delivery/migrating-accounts-between-aws-organizations-from-a-network-perspective/)  
 
+![post-Organization-SAA-example2](post-Organization-SAA-example2.png)  
+
 ## Service Control Policy - SCP
 在 Organization 当中，通过类似 IAM policy 的形式来定义 OU(organization unit) 当中的 AWS account 的 permission boundary  
 如果 organization SCP 定义了 deny action，那么即使 OU 当中 IAM user/role 定义 allow，也会被干掉  
 [参考资料](https://www.stormit.cloud/blog/aws-scp-service-control-policy/)  
 ![Organization and SCP](/assets/img/AWS_organizations_SCP.png)
+![post-Organization-SCP-SAA-example](/assets/img/post-Organization-SCP-SAA-example.png)  
+
 
 # Directory Service, AD
 - AWS Directory Service lets you run Microsoft Active Directory (AD) as a managed service.   

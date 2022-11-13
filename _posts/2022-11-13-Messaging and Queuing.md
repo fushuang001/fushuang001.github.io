@@ -45,6 +45,8 @@ queuing 的一个重要概念是解耦 **decouple**
 - if the job is not processed within visibility timeout interval, the message will become visible again and another reader will process it. this could result in the same msg being delivered twice. (application process time is longer than the invisible time), could increase the visibility timeout interval(maximum 12 hours, default 30s)  
 - 如果发现有的 msg 被处理两次，可以考虑 Use the ChangeMessageVisibility API call to increase the visibility timeout.  
 
+![post-SQS-visibility-SAA](/assets/img/post-SQS-visibility-SAA.png)  
+
 ## long polling
 - __long polling__ is a way to save cost  
 - regular short polling(WaitTimeSeconds by default 0s) returns immediately even if the msg queue being polled is empty  
