@@ -44,7 +44,8 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
   - [DMS - Database Migration Service](#dms---database-migration-service)
 - [AWS Databases 数据库](#aws-databases-数据库)
   - [关系型数据库 RDS](#关系型数据库-rds)
-    - [RDS 备份](#rds-备份)
+    - [RDS Snapshot 备份](#rds-snapshot-备份)
+    - [RDS db encryption](#rds-db-encryption)
     - [RDS 恢复 Restoring Backups](#rds-恢复-restoring-backups)
     - [Multi-AZ, Standby Replica](#multi-az-standby-replica)
     - [Read Replica 只读副本](#read-replica-只读副本)
@@ -155,7 +156,6 @@ incremental backups，增量备份到 S3。
 [Amazon EFS: How it works](https://docs.aws.amazon.com/efs/latest/ug/how-it-works.html)  
 ![how-it-works](/assets/img/post-efs-ec2-how-it-works-Regional.png)  
 ![EFS-SAA](/assets/img/EFS-SAA.png)  
-![post-EFS-S3-SAA](/assets/img/post-EFS-S3-SAA.png)  
 ![post-EFS-S3-SAA](/assets/img/post-EFS-S3-SAA.png)  
 
 ### 对比 EFS, S3
@@ -490,20 +490,28 @@ A company is migrating its on-premises PostgreSQL database to Amazon Aurora Post
 **简单的 demo：**  
 client -- EC2/WordPress 前端 --- db.instance/RDS 后端数据库，[可以参考](https://www.bilibili.com/video/BV1fV41127vz?p=58&t=7.9)  
 
-### RDS 备份
+### RDS Snapshot 备份
 > 分为两类，automated backups & datebase snapshots  
 > 推荐是两种方式都使用，automated backups 可以有 point in time recovery，manual snapshots 可以保存超过 35 days  
 
-  - __自动备份__ 
-    - entire DB & transaction logs，默认打开，创建 RDS 时候选择 backup window（备份期间会有 latency, downtime)    
-      - backup data is stored in S3 and you get free storage space equal to the size of your db.  
-    - backup retention period/保留期 0 - 35 天  
-      - 0 days setting disables automatic backups, will also delete all existing automated backups  
-    - Point-in-time recovery 会创建一个新 db.instance，可以 restore full backup 或者根据 transactions 恢复到特定时间（within retention period） 
-  
-  - __手动 snapshots__  
-    - 比如需要保持 35 days 以上的 backup；类似于 EBS snapshots  
-    - snapshots are stored even after you deleted the original RDS instance, unlike automated backups    
+- __自动备份__ 
+  - entire DB & transaction logs，默认打开，创建 RDS 时候选择 backup window（备份期间会有 latency, downtime)    
+    - backup data is stored in S3 and you get free storage space equal to the size of your db.  
+  - backup retention period/保留期 0 - 35 天  
+    - 0 days setting disables automatic backups, will also delete all existing automated backups  
+  - Point-in-time recovery 会创建一个新 db.instance，可以 restore full backup 或者根据 transactions 恢复到特定时间（within retention period） 
+
+- __手动 snapshots__  
+  - 比如需要保持 35 days 以上的 backup；类似于 EBS snapshots  
+  - snapshots are stored even after you deleted the original RDS instance, unlike automated backups    
+
+### RDS db encryption
+- 未加密的 DB instance，无法做 encrypted snapshot  
+- 可以给 RDS instance 做 snapshot，[启用 "Enable Encryption"](https://aws.amazon.com/premiumsupport/knowledge-center/encrypt-rds-snapshots/)，然后 copy snapshot；从 encrypted snapshot 恢复一份加密的 RDS instance  
+- To copy an encrypted snapshot from one AWS Region to another, you must specify the __KMS key identifier of the destination AWS Region__. This is because KMS encryption keys are specific to the AWS Region that they are created in.  
+- read replica 不支持类似 snapshot 时候加密；read replica 的加解密状态，和 source DB 一样，不能修改  
+
+![post-RDS encryption](/assets/img/post-RDS encryption.png)  
 
 ### RDS 恢复 Restoring Backups
 从自动备份或者手动 snapshots 恢复的，是一个新的 RDS db.instance，有一个新的 DNS endpoint/DNS name    
