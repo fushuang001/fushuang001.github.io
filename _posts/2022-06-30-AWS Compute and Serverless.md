@@ -181,9 +181,14 @@ A company runs a high performance computing (HPC) workload on AWS. The workload 
 - 周期性的业务变化，比如工作日早晨的流量高峰，月底的流量高峰  
 - 通过设置 minimum/desired/maximum，来指定所需要的 EC2 的数量  
 
+![post-ASG-scheduled-policy-SAA](/assets/img/post-ASG-scheduled-policy-SAA.png)  
+
 **step policy**  
 
 **target tracking policy**  
+- 根据监控设置，比如CPU 40%，将EC2资源利用率维持在一个相对稳定的水平  
+
+![post-ASG-target-tracking-SAA](/assets/img/post-ASG-target-tracking-SAA.png)   
 
 ### ASG 缩容，终止 EC2 的策略
 - [default termination policy](https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-termination-policies.html)  

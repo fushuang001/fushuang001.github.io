@@ -349,6 +349,13 @@ Cogntio
 ![Organization and SCP](/assets/img/AWS_organizations_SCP.png)
 
 # Directory Service, AD
+- AWS Directory Service lets you run Microsoft Active Directory (AD) as a managed service.   
+- AWS Directory Service for Microsoft Active Directory, also referred to as AWS Managed Microsoft AD, is powered by Windows Server 2012 R2.   
+- When you select and launch this directory type, it is created as a highly available pair of domain controllers connected to your virtual private cloud (VPC).   
+- The domain controllers run in different Availability Zones in a region of your choice.   
+- Host monitoring and recovery, data replication, snapshots, and software updates are automatically configured and managed for you.  
+
+![post-directory-service-AD-SAA](/assets/img/post-directory-service-AD-SAA.png)  
 
 ## AWS Directory Service AD Connector
 - 本地使用了 Active Directory  

@@ -416,20 +416,26 @@ File Gateway
 - 直接存储到 S3  
 - 支持 SMB, NFS-based 文件系统  
 
+![post-SGW-file-GW-SAA](/assets/img/post-SGW-file-GW-SAA.png)  
+![post-SGW-file-GW-SAA-example](/assets/img/post-SGW-file-GW-SAA-example.png)  
+
 FSx File Gateway  
 - store and retrieve files in FSx for Windows File Server  
 - SMB protocol  
 - 通过 FSx File Gateway 写入的数据，可以直接被 FSx for Windows File Server 读取  
 
-Volume Gateway  
+Volume Gateway，两种分类都是从 on-prem 的角度去看    
 - Stored Volumes  
   - 所有数据保存在本地，异步备份到 S3  
-  - Entire dataset is stored on site and is asynchronously backed up to S3  
+  - Entire dataset is stored on site and is __asynchronously__ backed up to S3  
 - Cached Volumes  
   - 所有数据保存在 S3，本地有经常访问数据的缓存  
   - Entire dataset is stored on S3 and the most frequently accessed data is cached on site.  
   - 节省本地存储空间  
   
+![post-SGW-volume-GW-cached-SAA](/assets/img/post-SGW-volume-GW-cached-SAA.png)  
+![post-SGW-volume-GW-cached-SAA](/assets/img/post-SGW-volume-GW-cached-SAA.png)  
+
 Gateway Virtual Tape Library 磁带网关  
 
 ## DataSync
