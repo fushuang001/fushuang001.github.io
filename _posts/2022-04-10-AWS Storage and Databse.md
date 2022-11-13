@@ -14,6 +14,8 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
     - [EBS volume types](#ebs-volume-types)
     - [EBS Snapshots](#ebs-snapshots)
   - [EFS for linux, NFS file system](#efs-for-linux-nfs-file-system)
+    - [对比 EFS, S3](#对比-efs-s3)
+    - [对比 EFS，EBS](#对比-efsebs)
   - [FSx for Windows, SMB protocol](#fsx-for-windows-smb-protocol)
   - [FSx for Lustre](#fsx-for-lustre)
   - [S3 - Object storage](#s3---object-storage)
@@ -32,6 +34,7 @@ tags:           AWS, SAA, Storage, EBS, S3, Database, RDS, DynamoDB, RedShift, E
     - [AWS S3 CLI](#aws-s3-cli)
     - [S3 bucket policy](#s3-bucket-policy)
     - [Pre-signed URL](#pre-signed-url)
+    - [Static Website](#static-website)
     - [pricing, S3 vs EFS](#pricing-s3-vs-efs)
 - [数据传输服务，混合云存储](#数据传输服务混合云存储)
   - [S3 Storage Gateway](#s3-storage-gateway)
@@ -151,8 +154,16 @@ incremental backups，增量备份到 S3。
 
 [Amazon EFS: How it works](https://docs.aws.amazon.com/efs/latest/ug/how-it-works.html)  
 ![how-it-works](/assets/img/post-efs-ec2-how-it-works-Regional.png)  
+![EFS-SAA](/assets/img/EFS-SAA.png)  
+![post-EFS-S3-SAA](/assets/img/post-EFS-S3-SAA.png)  
+![post-EFS-S3-SAA](/assets/img/post-EFS-S3-SAA.png)  
 
-**对比 EBS：**    
+### 对比 EFS, S3
+- 有一些共性，比如 concurrently access by multiple EC2/clients，接近无限大的存储空间    
+- 有一些区别，比如 NFS & object，使用场景（数据分析、存储/备份），价格  
+[可以参考](https://dzone.com/articles/confused-by-aws-storage-options-s3-ebs-amp-efs-explained)  
+
+### 对比 EFS，EBS
 - EBS 只能够单次 attach 到单独 EC2  
 - EBS 与 EC2 需要在相同 AZ  
 - EBS 支持扩容，[扩容以后需要在 OS 层面做操作来识别新的容量](https://aws.amazon.com/premiumsupport/knowledge-center/ebs-volume-increase-os/)  
@@ -379,6 +390,11 @@ Create a new S3 bucket. Load the data into the new S3 bucket. Use S3 Cross-Regio
 ### Pre-signed URL
 - all objects private by default, the object owner can optionally share objects with others by pre-signed URL, using their own security credentials, to grant time-limited permission to download the object  
 
+### Static Website
+- static content    
+- not support HTTPS  
+- bucket name should be same with domain name  
+
 ### pricing, S3 vs EFS
 S3 不同存储层级的价格不同，[不过 S3 不只是有存储费用](https://dzone.com/articles/confused-by-aws-storage-options-s3-ebs-amp-efs-explained)，还有其他费用，比如 API 调用、数据传出 S3(Data Transfer Out)  
 EFS 整体定价更便宜一些  
@@ -524,9 +540,11 @@ Multi-AZ DB cluster deployment
   - 假如说 db.instance 的负载过高，而且有大量 read 操作，与其扩容 db.instance，不如使用 Read Replica 更经济实惠。  
   - 另一个可以提升性能的方式，是考虑 ElastiCache  
   - 指定 source DB，然后 RDS 会创建 snapshot of the source DB，创建 read-only instance from the snapshot  
-  - Asynchronous replication，是用于提升性能，并不是 Disaster Recovery  
+  - <span style='background:lime;color:black'>asynchronized replication</span>，是用于提升性能，并不是 Disaster Recovery  
+  - Because read replicas can be promoted to master status, they are useful as part of a sharding implementation.  
   - To further maximize read performance, Amazon RDS for MySQL allows you to add table indexes directly to Read Replicas, without those indexes being present on the master.  
 - 需要打开 automatic backups 才能使用 read replica  
+- When you create a read replica, you first specify an existing DB instance as the source. Then Amazon RDS takes a snapshot of the source instance and creates a read-only instance from the snapshot. Amazon RDS then uses the asynchronous replication method for the DB engine to update the read replica whenever there is a change to the source DB instance.  
 ![Read_Replica](/assets/img/IMG_20220420-131050551.png)  
 
 ### when to use EC2 自建数据库
