@@ -434,7 +434,7 @@ Volume Gateway，两种分类都是从 on-prem 的角度去看
   - 节省本地存储空间  
   
 ![post-SGW-volume-GW-cached-SAA](/assets/img/post-SGW-volume-GW-cached-SAA.png)  
-![post-SGW-volume-GW-cached-SAA](/assets/img/post-SGW-volume-GW-cached-SAA.png)  
+![post-SGW-volume-GW-stored-SAA](/assets/img/post-SGW-volume-GW-stored-SAA.png)  
 
 Gateway Virtual Tape Library 磁带网关  
 
