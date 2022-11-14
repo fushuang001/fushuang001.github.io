@@ -365,6 +365,7 @@ Cogntio
 - 本地使用了 Active Directory  
 - AD Connector 可以和 AD 集成   
 - 集成之后，可以将 IAM Role 指定给 AD user/groups  
+- AD Connector can redirect directory requests to your on-premises Microsoft AD  
 
 # Control Tower
 对于 initial AWS account setup，[Control Tower](https://aws.amazon.com/controltower/faqs/) 可以提供 best practice  

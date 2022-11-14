@@ -426,14 +426,16 @@ Gateway Virtual Tape Library 磁带网关
 ## DataSync
 - end-to-end/端到端将本地 NFS, SMB, HDFS 数据迁移到 AWS S3, FSx, EFS；支持指定 sub-folder 增量移动数据  
   - 可以直接迁移数据到 S3 Glacier, S3 Glacier Deep Archive, or S3 Inteligent-Tiering  
+  - 对比 Snowball，目前不支持直接把 S3 Glacier 作为目标  
 - 适用于初次将本地所有数据迁移到 cloud，后续可以使用 SGW 保持本地、cloud 混合存储、同步   
 - 也可以在 AWS services 之间传输数据      
 
 ![post-DataSync-SAA-example1](/assets/img/post-DataSync-SAA-example1.png)  
 
 ## Snowball
-- 将大规模数据导入到S3  
+- 将大规模数据导入到 S3  
 - [Currently, there is no way of uploading objects directly to S3 Glacier using a Snowball Edge](https://aws.amazon.com/cn/blogs/storage/using-aws-snowball-to-migrate-data-to-amazon-s3-glacier-for-long-term-storage/). Thus, you first have to upload your objects into S3 Standard, and then use S3 lifecycle policies to transition the files to S3 Glacier  
+- 对比 DataSync，可以直接将数据 copy 到 S3 Glacier Deep Archive，记住啦，要考的  
 
 ![post-snowball-SAA-example1](/assets/img/post-snowball-SAA-example1.png)  
 ![post-snowball-SAA-example2](/assets/img/post-snowball-SAA-example2.png)  
@@ -550,7 +552,7 @@ Multi-AZ DB cluster deployment
 - 如果希望 [了解不同进程或线程对 CPU 的使用差异](https://docs.aws.amazon.com/zh_cn/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.html)，增强监测指标非常有用  
 
 ### RDS event notification
-- RDS events provide operational events such as SB instance events, DB parameter group events, DB security group events, and snapshot events  
+- RDS events provide operational events such as DB instance events, DB parameter group events, DB security group events, and snapshot events  
 - not for RDS data event(inject, remove). Could invoke Lambda function from Amazon Aurora MySQL-Compatible Edition DB cluster with a __native function or stored procedure__. 举个栗子，如果你希望在 DB 数据发生变化的时候，联动其他 AWS service，比如用 Lambda 发送消息到 SQS  
 
 ### RDS Proxy
