@@ -4,14 +4,14 @@ title:          AWS Networking and Content Delivery
 subtitle:		    备考 ANS(Advanced Networking - Specialty) 的笔记
 date:           2022-11-15
 author:         Luke
-cover:          '/assets/img/bg-AWS-Networking-CDN'
+cover:          '/assets/img/bg-AWS-Networking-CDN.png'
 tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, ELB
 ---
 [AWS 考试预约、培训等资料](https://aws.amazon.com/certification/certified-advanced-networking-specialty/)  
 [考试大纲，查漏补缺](https://d1.awsstatic.com/training-and-certification/docs-advnetworking-spec/AWS-Certified-Advanced-Networking-Specialty_Exam-Guide.pdf)  
 
 # VPC
-![VPC Sharing](assets/Networking%20and%20Content%20Delivery/IMG_20220504-212047378.png)  
+![VPC Sharing](/assets/img/IMG_20220504-212047378.png)  
 ![post-VPC-pricing-SAA](/assets/img/post-VPC-pricing-SAA.png)  
 
 ## VPC Endpoint, Endpoint Services, PrivateLink
@@ -86,7 +86,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ## Global Accelerator vs Cloudfront
 |            | Global Accelerator                                                                                                                                         | Cloudfront                                                                                                                                                                                                                     |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 共性       | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                     |
+| 共性       | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                     |                                                                                                                                                                                                                                |
 | 场景       | networking service to improve application's performance and availability(Regional failover, 多个 Endpoint 分布） for global users 低延迟、高可用，eg. game | cloud distributed networking service for web applications that provides low latency and speed 用户分布广泛，访问内容有重复所以可以被 Pop 节点缓存，CF 可以缓存、压缩文件，降低 origin 压力；Lambda@Edge 提供一定的边缘计算能力 |
 | 实现方式   | client - GA --寻找最近的 endpoint；GA -- Endpoint 走 AWS backbone network；提供两个 static IP                                                              | client -- CF Pop 缓存，miss cache then refer Origin；根据 clients 地理位置不同，Pop public IP 不同                                                                                                                             |
 | 支持的协议 | TCP, UDP, HTTP, HTTPS, gRPC；通常用于 non-HTTP 场景比如 gaming, IoT, VoIP                                                                                  | static & dynamic content, HTTP, HTTPS, WebSocket                                                                                                                                                                               |
@@ -123,7 +123,6 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - request authorization  
 
 ![post-CF-edge-CF-Functions](/assets/img/post-CF-edge-CF-Functions.png)  
-![post-CF-edge-Lambda-at-Edge-ANS-example](/assets/img/post-CF-edge-Lambda-at-Edge-ANS-example.png)  
 
 ### Lambda@Edge
 - Lambda 需要部署在 us-east-1 region，Node.js, Python  
@@ -133,6 +132,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   -  检查 User-Agent header 来基于 viewer 使用设备 (mobile phone, computer) 来提供适合尺寸、大小的 object  
 
 ![post-CF-edge-LambdaEdge](/assets/img/post-CF-edge-LambdaEdge.png)  
+![post-CF-edge-Lambda-at-Edge-ANS-example](/assets/img/post-CF-edge-Lambda-at-Edge-ANS-example.png)  
 
 # API Gateway
 
