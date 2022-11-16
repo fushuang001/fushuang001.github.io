@@ -8,6 +8,8 @@ cover:          '/assets/img/bg-AWS-Networking-CDN.png'
 tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, ELB
 ---
 - [VPC](#vpc)
+  - [EC2 bandwidth](#ec2-bandwidth)
+    - [Enhanced networking - ENA](#enhanced-networking---ena)
   - [prefix-list](#prefix-list)
   - [VPC Endpoint, Endpoint Services, PrivateLink](#vpc-endpoint-endpoint-services-privatelink)
   - [VPN](#vpn)
@@ -16,8 +18,9 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [ALB](#alb)
 - [NLB](#nlb)
 - [GWLB](#gwlb)
-- [Direct Connect 专线](#direct-connect-专线)
+- [Direct Connect DX 专线](#direct-connect-dx-专线)
   - [VIF 分类和使用场景](#vif-分类和使用场景)
+  - [one DX access to multiple US regions](#one-dx-access-to-multiple-us-regions)
   - [路由控制](#路由控制)
 - [Route53 DNS](#route53-dns)
   - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
@@ -51,6 +54,26 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)  
 ![post-VPC-pricing-SAA](/assets/img/post-VPC-pricing-SAA.png)  
 
+## EC2 bandwidth
+- [network bandwidth available to an EC2 instance depends on several factors](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-network-bandwidth.html)  
+- 同 region 内，Traffic can utilize the full network bandwidth available to the instance  
+- 跨 region，或者去 IGW, DX 等，当前一代实例 with a minimum of 32 vCPUs 可以用 50% of the network bandwidth；如果不足 32 vCPUs，limited to 5 Gpbs.  
+- 相同五元组的流量，若 EC2 不在相同 cluster placement group，limited to 5 Gpbs; 若在相同 cluster placement group，up to 10 Gbps.  
+
+### Enhanced networking - ENA
+- 借助 `single root I/O virtualization (SR-IOV)` 来提供高性能网络，没有额外费用  
+  - 当前一代 Nitro 实例支持 enhanced networking  
+    - 需要 Kernel module (ena) 支持，查看`modinfo ena`  
+    - 需要 Instance attribute (enaSupport)  
+    - 需要 Image attribute (enaSupport)  
+    - 需要特定 Network interface driver，查看`ethtool -i eth0`  
+      - 若输出 driver: ena，表示`ena` module is loaded  
+      - 若输出 driver: vif，表示`ena` module is not loaded  
+  - 可以通过`Elastic Network Adapter (ENA)`或者`Intel 82599 Virtual Function (VF) interface`两种方式启用 enhanced networking  
+- high-performance networking, higer bandwidth, higer packet per second(PPS), consistently lower inter-instance lateny  
+
+![post-EC2-bandwidth-ENA](/assets/img/post-EC2-bandwidth-ENA.png)  
+
 ## prefix-list
 - 通过 prefix-list 来包含多个 IP 地址/段，可以被 security-group，route-table 引用  
 - prefix-list 的 Max entries 大小，占用 security-group 的空间；比如 Max entries = 10 但是只写了两个 entries，也会占用 10 个 SG 容量；Max entries 可以修改变大，不能变小  
@@ -75,9 +98,14 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 # GWLB
 
-# Direct Connect 专线
+# Direct Connect DX 专线
 
 ## VIF 分类和使用场景
+
+## one DX access to multiple US regions
+- on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability     
+- on-prem -- Direct Connect -- US region 1 -- AWS network -- US region 2，跨 region 的流量由 AWS 负责，路由表由 AWS 负责 (BGP 路由通告）    
+![post-Direct-Connect-inter-region-capability](/assets/img/post-Direct-Connect-inter-region-capability.png)  
 
 ## 路由控制
 

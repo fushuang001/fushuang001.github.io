@@ -1,6 +1,6 @@
 ---
 layout:         post
-title:          AWS 监控、分析，以及数据分析
+title:          AWS 监控、管理、分析，以及数据分析
 subtitle:		    备考 SAA, SAP 的笔记
 date:           2022-11-12
 author:         Luke
@@ -67,6 +67,7 @@ DynamoDb
 - 借助 AWS Config，您可以找到现有的 AWS 资源，导出 AWS 资源的完整库存清单与所有配置详细信息，并确定在任何时间点上配置资源的方式  
 - 这些功能提供了合规性审计、安全分析、资源更改跟踪和故障排除  
 ![AWS Config SAA example](/assets/img/post-AWS-Config-SAA.png)  
+![post-AWS-Config-automate-audit-cfg-changes](/assets/img/post-AWS-Config-automate-audit-cfg-changes.png)  
 
 # CloudFormation CFN
 
