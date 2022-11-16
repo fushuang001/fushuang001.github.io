@@ -13,6 +13,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [prefix-list](#prefix-list)
   - [VPC Endpoint, Endpoint Services, PrivateLink](#vpc-endpoint-endpoint-services-privatelink)
   - [VPN](#vpn)
+  - [Transit VPC](#transit-vpc)
 - [Transit Gateway](#transit-gateway)
 - [ELB 对比](#elb-对比)
 - [ALB](#alb)
@@ -51,6 +52,9 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 [考试大纲，查漏补缺](https://d1.awsstatic.com/training-and-certification/docs-advnetworking-spec/AWS-Certified-Advanced-Networking-Specialty_Exam-Guide.pdf)  
 
 # VPC
+[Building a Scalable and Secure Multi-VPC AWS Network Infrastructure](https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html)  
+[AWS VPC Connectivity Options](https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/welcome.html)  
+
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)  
 ![post-VPC-pricing-SAA](/assets/img/post-VPC-pricing-SAA.png)  
 
@@ -85,6 +89,17 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ## VPN
 
+## Transit VPC
+- on-prem 与 [Transit VPC](https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/transit-vpc-option.html) 打通 VPN 连接，之后通过 Transit VPC，打通 on-prem 与其他 VPC 之间的连接  
+- hub-spoke 模型提供 inter-VPC connectivity, hub/central VPC 通常使用`BGP over IPsec VPN` 连接 spoke VPC  
+- Transit/hub/central VPC 使用 EC2 virtual Router 借助第三方 software appliances that route incoming traffic to their destinations using the VPN overlay    
+- 优点是 hub/central 的 EC2 virtual router 可以提供 IPS/WAF 等功能；hub-spoke 设计相对简单，transitive routing enabled using the overlay VPN network  
+- 缺点是 third-party vendor virtual appliances on EC2 费用高（实际上 TGW 费用也不低啊），VPN connection 吞吐量有限 (up to 1.25 Gbps per VPN tunnel)，手动配置、管理等   
+- 所以 AWS 是比较推荐使用 TGW，[表格里面提供了 VPC peering(year 2014)、transit VPC(year 2016)，TGW(year 2018) 的对比](https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/transit-vpc-solution.html)  
+
+![post-transit-vpc-how-it-design](/assets/img/post-transit-vpc-how-it-design.png)  
+![post-transmit-VPC-ANS-example](/assets/img/post-transmit-VPC-ANS-example.png)  
+
 # Transit Gateway
 
 # ELB 对比
@@ -100,7 +115,49 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 # Direct Connect DX 专线
 
+**申请步骤：**
+- 提交申请 connection request
+- 下载证书 LoA, Letter of Authorization
+- 将 LoA 提供给 APN，拉线，物理层 UP（打环测试）
+- 配置 VIF(virtual intf) 建立连接，只能使用单模光纤/SMF
+- 在 on-premise，VPC 添加路由
+- [如果 public VIF 状态卡在 verifying](https://aws.amazon.com/cn/premiumsupport/knowledge-center/public-vif-stuck-verifying/)  
+
+**单模光纤/SMF(Physical, layer1)：**
+- 用来传输信号的载体应该是激光，适合长距离、单模式 light 光信号
+- 线缆的颜色一般是黄色、橙色
+- 型号，举个例子
+  - 1000BASE-LX transceiver/SFP for 1Gb
+  - 10GBASE-LR transfer/SFP for 10Gb
+
 ## VIF 分类和使用场景
+
+|                        | public VIF                     | private VIF     | transmit VIF                   |
+| ---------------------- | ------------------------------ | --------------- | ------------------------------ |
+| Connection Speed       | any                            | any             | speed >= 1G                    |
+| Gateway type           | n/a                            | VGW/DXGW        | DXGW                           |
+| Prefix limit(inbound)  | 1000                           | 100             | 100                            |
+| Prefix limit(outbound) | n/a                            | n/a             | 20 per TGW-DXGW association    |
+| Peer IPs minimum CIDR  | /31                            | /30             | /30                            |
+| Support Jumbo Frames   | no                             | yes(9001)       | yes(8500)                      |
+| Use case               | to AWS public services, eg. S3 | to VPC(1/10)    | to multiple VPCs(1000) via TGW |
+| uRPF check             | enabled                        | disabled        | disabled                       |
+| Technical requirement  | vlan id, IP prefix             | vlan id, VGW id |                                |
+| BGP ASN                | public/private                 | public/private  |
+
+![post-Diirect-Connect-private-VIF-ANS-example](/assets/img/post-Diirect-Connect-private-VIF-ANS-example.png)  
+
+**一些注意事项：**
+- VIF default MTU 1500，如果 private VIF, transmit VIF 需要开启 Jumbo Frames，需要手动配置
+  - this can cause an update to the underlying physical connection if it wasn't updated to support jumbo frames  
+  - updating the connection disrupts network connectivity for all VIF associated with the connection for up to 30 seconds    
+- transmit VIF 最小 bandwidth 要求 1G，如果客户只需要 300M 带宽那么可以向 APN/ISP 订购 1G dedicate 专线，借助 QoS 在 ISP 限速  
+- private VIF，VGW 只能关联 1 个 VPC，DXGW 可以关联不同 region 最多 10 个 VGW(VGW -- VPC)  
+- DXGW 只是用来打通 on-premise & VPC 之间通信链路，并不负责 VPC 之间互相通信    
+- DXGW 是 global 的，不区分 region；VGW 是 regional 的  
+- on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接    
+- 默认情况下，public VIF 会将 AWS global public IP prefix 通过 BGP 通告给 on-prem；用户可以联系 AWS 来通告 customer-owned IP prefix  
+- public VIF, private VIF 都可以使用 public(customer must own it) or private(64512-65535) ASN  
 
 ## one DX access to multiple US regions
 - on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability     
@@ -159,14 +216,14 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ## Global Accelerator vs Cloudfront
                                                                                                                                                                                                    
-|     | Global Accelerator    |Cloudfront|
-| --- | --- |---|
-|  共性   | 用户分布广泛，服务端希望提供低延迟服务    |用户分布广泛，服务端希望提供低延迟服务|
-| 场景    |networking service to improve application's performance and availability(Regional failover, 多个 Endpoint 分布） for global users 低延迟、高可用，eg. game     |cloud distributed networking service for web applications that provides low latency and speed 用户分布广泛，访问内容有重复所以可以被 Pop 节点缓存，CF 可以缓存、压缩文件，降低 origin 压力；Edge Functions 提供一定的边缘计算能力|
-| 实现方式    |client - GA --寻找最近的 endpoint；GA -- Endpoint 走 AWS backbone network；提供两个 static IP     |client -- CF Pop 缓存，miss cache then refer Origin；根据 clients 地理位置不同，Pop public IP 不同|
-| 支持的协议    | TCP, UDP, HTTP, HTTPS, gRPC；通常用于 non-HTTP 场景比如 gaming, IoT, VoIP    |static & dynamic content, HTTP, HTTPS, WebSocket|
-| security    |AWS Shield to prevent DDoS; if Endpoint is ALB then could integrate with WAF     |AWS Shield to prevent DDoS, WAF for additional protection against malicious traffic|
-| 价格    |fixed hourly fee, Data Transfer-Premium     |Data Transfer Out, HTTP requests|
+|            | Global Accelerator                                                                                                                                         | Cloudfront                                                                                                                                                                                                                        |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 共性       | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                     | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                                                                                            |
+| 场景       | networking service to improve application's performance and availability(Regional failover, 多个 Endpoint 分布） for global users 低延迟、高可用，eg. game | cloud distributed networking service for web applications that provides low latency and speed 用户分布广泛，访问内容有重复所以可以被 Pop 节点缓存，CF 可以缓存、压缩文件，降低 origin 压力；Edge Functions 提供一定的边缘计算能力 |
+| 实现方式   | client - GA --寻找最近的 endpoint；GA -- Endpoint 走 AWS backbone network；提供两个 static IP                                                              | client -- CF Pop 缓存，miss cache then refer Origin；根据 clients 地理位置不同，Pop public IP 不同                                                                                                                                |
+| 支持的协议 | TCP, UDP, HTTP, HTTPS, gRPC；通常用于 non-HTTP 场景比如 gaming, IoT, VoIP                                                                                  | static & dynamic content, HTTP, HTTPS, WebSocket                                                                                                                                                                                  |
+| security   | AWS Shield to prevent DDoS; if Endpoint is ALB then could integrate with WAF                                                                               | AWS Shield to prevent DDoS, WAF for additional protection against malicious traffic                                                                                                                                               |
+| 价格       | fixed hourly fee, Data Transfer-Premium                                                                                                                    | Data Transfer Out, HTTP requests                                                                                                                                                                                                  |
 
 # Cloudfront
 
