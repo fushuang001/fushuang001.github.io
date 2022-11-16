@@ -49,13 +49,10 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Connections](#connections)
   - [performance, concurrent requests](#performance-concurrent-requests)
 
-[AWS 考试预约、培训等资料](https://aws.amazon.com/certification/certified-advanced-networking-specialty/)  
+[AWS 考试预约、培训视频、白皮书](https://aws.amazon.com/certification/certified-advanced-networking-specialty/)  
 [考试大纲，查漏补缺](https://d1.awsstatic.com/training-and-certification/docs-advnetworking-spec/AWS-Certified-Advanced-Networking-Specialty_Exam-Guide.pdf)  
 
 # VPC
-[Building a Scalable and Secure Multi-VPC AWS Network Infrastructure](https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/welcome.html)  
-[AWS VPC Connectivity Options](https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/welcome.html)  
-
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)  
 ![post-VPC-pricing-SAA](/assets/img/post-VPC-pricing-SAA.png)  
 
@@ -115,7 +112,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - application based // 基于应用程序  
     - cookie name per target group 不同  
 - 如果 forward action 里面比如基于 weight，转发到多个 target group，而 target group 启用了 sticky，那么 ALB 层面必须启用 target group sticky，cookie name `AWSALBTG`  
-- 以上针对 HTTP/HTTPS listener；WebSocket 天使具有 sticky 属性；client 请求协议升级，返回 HTTP 101 来接受协议升级的 target，在后续 WebSocket 中会被使用；WebSocket 升级后，不再参考基于 cookie 的 sticky  
+- 以上针对 HTTP/HTTPS listener；WebSocket 天生具有 sticky 属性；client 请求协议升级，返回 HTTP 101 来接受协议升级的 target，在后续 WebSocket 中会被使用；WebSocket 升级后，不再参考基于 cookie 的 sticky  
 
 ![post-ALB-sticky-session-ALWALB-ANS-example](/assets/img/post-ALB-sticky-session-ALWALB-ANS-example.png)  
 
