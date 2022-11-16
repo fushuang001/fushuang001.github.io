@@ -86,7 +86,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ## Global Accelerator vs Cloudfront
 |            | Global Accelerator                                                                                                                                         | Cloudfront                                                                                                                                                                                                                     |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 共性       | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                     |                                                                                                                                                                                                                                |
+| 共性       | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                     |           低延迟                                                                                                                                                                                                                     |
 | 场景       | networking service to improve application's performance and availability(Regional failover, 多个 Endpoint 分布） for global users 低延迟、高可用，eg. game | cloud distributed networking service for web applications that provides low latency and speed 用户分布广泛，访问内容有重复所以可以被 Pop 节点缓存，CF 可以缓存、压缩文件，降低 origin 压力；Lambda@Edge 提供一定的边缘计算能力 |
 | 实现方式   | client - GA --寻找最近的 endpoint；GA -- Endpoint 走 AWS backbone network；提供两个 static IP                                                              | client -- CF Pop 缓存，miss cache then refer Origin；根据 clients 地理位置不同，Pop public IP 不同                                                                                                                             |
 | 支持的协议 | TCP, UDP, HTTP, HTTPS, gRPC；通常用于 non-HTTP 场景比如 gaming, IoT, VoIP                                                                                  | static & dynamic content, HTTP, HTTPS, WebSocket                                                                                                                                                                               |
@@ -125,7 +125,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-CF-edge-CF-Functions](/assets/img/post-CF-edge-CF-Functions.png)  
 
 ### Lambda@Edge
-- Lambda 需要部署在 us-east-1 region，Node.js, Python  
+- [Lambda 需要部署在 us-east-1 region](https://www.stormit.cloud/blog/lambda-at-edge/)，Node.js, Python  
 - 在接近 viewer 的 edge location 执行，[实际上是 REC(Regional Edge Cache)](https://aws.amazon.com/cn/blogs/aws/introducing-cloudfront-functions-run-your-code-at-the-edge-with-low-latency-at-any-scale/)，并不是 Pop 节点  
 - 适用场景
   -  inspect cookie and rewrite URLs so users see different versions of a site for A/B testing；检查 cookie 并且重写 URL，对用户提供不同测试版本  
