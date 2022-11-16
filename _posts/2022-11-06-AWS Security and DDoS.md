@@ -11,6 +11,7 @@ tags:           AWS, SAA, IAM, STS, KMS, SecurityHub, GuardDuty, Organization, W
 - [AWS Identity and Access Management (IAM)](#aws-identity-and-access-management-iam)
   - [Security Best Practice：](#security-best-practice)
   - [IAM user 和 role 有什么不同](#iam-user-和-role-有什么不同)
+    - [granting cross-account access bw two accounts](#granting-cross-account-access-bw-two-accounts)
   - [IAM Policy](#iam-policy)
   - [IAM Role 和 Resource based policy 有什么不同](#iam-role-和-resource-based-policy-有什么不同)
   - [STS to assume a role](#sts-to-assume-a-role)
@@ -37,6 +38,8 @@ tags:           AWS, SAA, IAM, STS, KMS, SecurityHub, GuardDuty, Organization, W
   - [CloudHSM](#cloudhsm)
   - [GuardDuty](#guardduty)
   - [SecurityHub](#securityhub)
+- [ACM - Certification](#acm---certification)
+- [KMS - Key mgmt service](#kms---key-mgmt-service)
 - [参考文档](#参考文档)
 
 # Shared responsibility model
@@ -63,6 +66,9 @@ AWS 负责 DC 的安全 (security 'of' the Cloud), AWS operates, manages, and co
     - 如果同时需要 origin policy & assume role 的 policy 才能执行完整操作，这个场景会遇到问题  
     - 参考 IAM role 和 Resource based policy 有什么不同来解决  
 ![assume_role](/assets/img/IMG_20220412-205830230.png)  
+
+### granting cross-account access bw two accounts
+[docs link](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_aws-accounts.html)  
 
 ## IAM Policy
 - A JSON format document that grants or denies permissions to AWS services and resources.  
@@ -463,6 +469,10 @@ provides intelligent **threat detection** for your AWS infrastructure and resour
 
 ## SecurityHub
 provides a consolidated view of your security status in AWS. Automate security checks, manage security findings, and identify the highest priority security issues across your Amazon Web Services environment.  
+
+# ACM - Certification
+
+# KMS - Key mgmt service
 
 # 参考文档
 [AWS Security WhitePaper](https://docs.aws.amazon.com/whitepapers/latest/introduction-aws-security/welcome.html)  

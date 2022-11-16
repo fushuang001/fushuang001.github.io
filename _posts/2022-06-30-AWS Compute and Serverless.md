@@ -19,7 +19,6 @@ tags:           AWS, SAA, EC2, Lambda, Serverless, ECS, EKS, Container
   - [EC2 SG, ACL](#ec2-sg-acl)
   - [ENI, ENA, EFA](#eni-ena-efa)
   - [EC2 Placement Group 置放群组](#ec2-placement-group-置放群组)
-  - [- 例如，Hadoop、Cassandra 和 Kafka](#--例如hadoopcassandra-和-kafka)
   - [ASG - AutoScaling Group](#asg---autoscaling-group)
     - [ASG 扩缩容策略](#asg-扩缩容策略)
     - [ASG 缩容，终止 EC2 的策略](#asg-缩容终止-ec2-的策略)
@@ -156,7 +155,9 @@ non-Nitro 平台的 EC2（比如 t2.micro) 升级 Nitro 平台（比如 t3.micro
 - 将实例分布在不同的逻辑分区上，以便一个分区中的实例组不会与不同分区中的实例组使用相同的基础硬件  
 - 该策略通常为大型分布式和重复的工作负载所使用  
 - 例如，Hadoop、Cassandra 和 Kafka  
+
 ---
+
 **Spread-分布** 
 - 将一小组实例严格放置在不同的基础硬件上以减少相关的故障  
 - 可以跨可用区  
@@ -357,6 +358,7 @@ client -- API GW -- Lambda/EC2/DDB
 - when use Javascript/AJAX that uses multiple domains with API GW, ensure you have enabled CORS on API GW
 
 ![CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/cors_principle.png)  
+![post-APIGW-CORS-SAP-example1](/assets/img/post-APIGW-CORS-SAP-example1.png)  
 
 # SAM - Serverless Application Model
 类似于 EB，借助 CloudFormation 来部署 serverless 应用的一种方式  

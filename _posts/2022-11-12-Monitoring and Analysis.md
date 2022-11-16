@@ -1,16 +1,19 @@
 ---
 layout:         post
 title:          AWS 监控、分析，以及数据分析
-subtitle:		    备考 SAA 的笔记
+subtitle:		    备考 SAA, SAP 的笔记
 date:           2022-11-12
 author:         Luke
 cover:          '/assets/img/bg-monitor-and-analysis.png'
 tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, Athena, Kinesis
 ---
 - [CloudWatch](#cloudwatch)
+- [Cost Explorer](#cost-explorer)
 - [Cloudtrail](#cloudtrail)
   - [AWS Global Services](#aws-global-services)
 - [AWS Config](#aws-config)
+- [CloudFormation CFN](#cloudformation-cfn)
+  - [CloudFormation StackSets 堆栈集](#cloudformation-stacksets-堆栈集)
 - [EventBridge](#eventbridge)
 - [Trusted Advisor](#trusted-advisor)
 - [Cost Explore](#cost-explore)
@@ -23,6 +26,8 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 - 通过创建 CloudWatch Alert，在特定情况下（比如 EC2 CPU 利用率 5 分钟内持续 80%) 获得 SNS 告警，然后采取行动  
 - CloudWatch 默认采集 EC2 的 CPU 利用率，NetworkIn/Out 情况，不采集 EC2 memory usage, disk swap 信息  
 - 可以通过安装 CloudWatch Agent 来采集对应信息  
+
+# Cost Explorer
 
 # Cloudtrail
 - AWS 的资源操作，实际上都是 API call，或者通过 SDK, mgmt console, AWS CLI 执行的操作   
@@ -58,10 +63,18 @@ S3(data is regional)
 DynamoDb  
 
 # AWS Config
-- [AWS Config](https://aws.amazon.com/cn/config/faq/) 是AWS托管服务，提供 AWS 资源库存、配置历史记录和配置更改通知，以确保安全性和方便管理  
+- [AWS Config](https://aws.amazon.com/cn/config/faq/) 是 AWS 托管服务，提供 AWS 资源库存、配置历史记录和配置更改通知，以确保安全性和方便管理  
 - 借助 AWS Config，您可以找到现有的 AWS 资源，导出 AWS 资源的完整库存清单与所有配置详细信息，并确定在任何时间点上配置资源的方式  
 - 这些功能提供了合规性审计、安全分析、资源更改跟踪和故障排除  
 ![AWS Config SAA example](/assets/img/post-AWS-Config-SAA.png)  
+
+# CloudFormation CFN
+
+## CloudFormation StackSets 堆栈集
+- AWS [CloudFormation StackSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/what-is-cfnstacksets.html) extends the capability of stacks by enabling you to create, update, or delete stacks across multiple accounts and AWS Regions with a single operation.  
+- 在单次操作中跨多个账户、region 场景、更新、删除 stack；通过 admin account，定义 CFN template，用模板来定义具体操作（比如创建 IAM role），应用到指定 target accounts  
+![post-CFN-StackSets-how-it-works](/assets/img/post-CFN-StackSets-how-it-works.png)  
+![post-CFN-StackSets-SAP-example](/assets/img/post-CFN-StackSets-SAP-example.png)  
 
 # EventBridge
 - 根据特定 event，触发后续的联动操作  
