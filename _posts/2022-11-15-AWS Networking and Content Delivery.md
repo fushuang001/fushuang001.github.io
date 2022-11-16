@@ -8,6 +8,7 @@ cover:          '/assets/img/bg-AWS-Networking-CDN.png'
 tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, ELB
 ---
 - [VPC](#vpc)
+  - [prefix-list](#prefix-list)
   - [VPC Endpoint, Endpoint Services, PrivateLink](#vpc-endpoint-endpoint-services-privatelink)
   - [VPN](#vpn)
 - [Transit Gateway](#transit-gateway)
@@ -50,6 +51,12 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)  
 ![post-VPC-pricing-SAA](/assets/img/post-VPC-pricing-SAA.png)  
 
+## prefix-list
+- 通过 prefix-list 来包含多个 IP 地址/段，可以被 security-group，route-table 引用  
+- prefix-list 的 Max entries 大小，占用 security-group 的空间；比如 Max entries = 10 但是只写了两个 entries，也会占用 10 个 SG 容量；Max entries 可以修改变大，不能变小  
+- 可以通过 [AWS-managed prefix-list](https://docs.aws.amazon.com/vpc/latest/userguide/working-with-aws-managed-prefix-lists.html)，比如`com.amazonaws.region.s3` 动态获取 AWS service IP ranges 最新地址范围，目前支持 CF, DDB, S3, Ground Station  
+![post-AWS-managed-prefix-list](/assets/img/post-AWS-managed-prefix-list.png)  
+
 ## VPC Endpoint, Endpoint Services, PrivateLink
 S3 intf 走的是 private subnet/ip；gw 是 public ip
 
@@ -64,6 +71,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 # NLB
 ![post-NLB-tcp-443-ssl-cert-target-ANS-example](/assets/img/post-NLB-tcp-443-ssl-cert-target-ANS-example.png)  
+![post-NLB-register-IP-targets-PPv2-client-IP](/assets/img/post-NLB-register-IP-targets-PPv2-client-IP.png)  
 
 # GWLB
 
