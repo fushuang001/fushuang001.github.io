@@ -109,7 +109,9 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ### Outbound Resolver Endpoint
 
 ### Query logging 
- 
+- public and private DNS query logging  
+- [中国区暂时不支持 public DNS query logs](https://docs.amazonaws.cn/en_us/aws/latest/userguide/route53.html)  
+
 # Global Accelerator 
 - [Global Accelerator](https://aws.amazon.com/global-accelerator/?nc1=h_ls) 使用 AWS 全球骨干网，加速用户的访问  
 - 降低延迟、抖动、丢包  
@@ -120,14 +122,15 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![GA SAA example](/assets/img/post-GA-SAA.png)  
 
 ## Global Accelerator vs Cloudfront
-|            | Global Accelerator                                                                                                                                         | Cloudfront                                                                                                                                                                                                                     |
-| --- | --- |--- |
-| 共性       | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                     |           低延迟                                                                                                                                                                                                                     |
-| 场景       | networking service to improve application's performance and availability(Regional failover, 多个 Endpoint 分布） for global users 低延迟、高可用，eg. game | cloud distributed networking service for web applications that provides low latency and speed 用户分布广泛，访问内容有重复所以可以被 Pop 节点缓存，CF 可以缓存、压缩文件，降低 origin 压力；Lambda@Edge 提供一定的边缘计算能力 |
-| 实现方式   | client - GA --寻找最近的 endpoint；GA -- Endpoint 走 AWS backbone network；提供两个 static IP                                                              | client -- CF Pop 缓存，miss cache then refer Origin；根据 clients 地理位置不同，Pop public IP 不同                                                                                                                             |
-| 支持的协议 | TCP, UDP, HTTP, HTTPS, gRPC；通常用于 non-HTTP 场景比如 gaming, IoT, VoIP                                                                                  | static & dynamic content, HTTP, HTTPS, WebSocket                                                                                                                                                                               |
-| Security   | AWS Shield to prevent DDoS; if Endpoint is ALB then could integrate with WAF                                                                               | AWS Shield to prevent DDoS, WAF for additional protection against malicious traffic                                                                                                                                            |
-| 价格       | fixed hourly fee, Data Transfer-Premium                                                                                                                    | Data Transfer Out, HTTP requests                                                                                                                                                                                               |
+                                                                                                                                                                                                   
+|     | Global Accelerator    |Cloudfront|
+| --- | --- |---|
+|  共性   | 用户分布广泛，服务端希望提供低延迟服务    |用户分布广泛，服务端希望提供低延迟服务|
+| 场景    |networking service to improve application's performance and availability(Regional failover, 多个 Endpoint 分布） for global users 低延迟、高可用，eg. game     |cloud distributed networking service for web applications that provides low latency and speed 用户分布广泛，访问内容有重复所以可以被 Pop 节点缓存，CF 可以缓存、压缩文件，降低 origin 压力；Edge Functions 提供一定的边缘计算能力|
+| 实现方式    |client - GA --寻找最近的 endpoint；GA -- Endpoint 走 AWS backbone network；提供两个 static IP     |client -- CF Pop 缓存，miss cache then refer Origin；根据 clients 地理位置不同，Pop public IP 不同|
+| 支持的协议    | TCP, UDP, HTTP, HTTPS, gRPC；通常用于 non-HTTP 场景比如 gaming, IoT, VoIP    |static & dynamic content, HTTP, HTTPS, WebSocket|
+| security    |AWS Shield to prevent DDoS; if Endpoint is ALB then could integrate with WAF     |AWS Shield to prevent DDoS, WAF for additional protection against malicious traffic|
+| 价格    |fixed hourly fee, Data Transfer-Premium     |Data Transfer Out, HTTP requests|
 
 # Cloudfront
 
