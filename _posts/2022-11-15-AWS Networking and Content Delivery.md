@@ -17,6 +17,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [Transit Gateway](#transit-gateway)
 - [ELB 对比](#elb-对比)
 - [ALB](#alb)
+  - [Stick session](#stick-session)
 - [NLB](#nlb)
 - [GWLB](#gwlb)
 - [Direct Connect DX 专线](#direct-connect-dx-专线)
@@ -106,6 +107,17 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 把之前做的表格添加过来  
 
 # ALB
+
+## Stick session
+- [stickiness session 支持两种类型](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/sticky-sessions.html)，duration based 和 application based  
+  - duration based // 基于持续时间   
+    - cookie name `AWSALB`，无法修改；所以说，多层 ALB 场景，只有一层可以启用 duration based cookie  
+  - application based // 基于应用程序  
+    - cookie name per target group 不同  
+- 如果 forward action 里面比如基于 weight，转发到多个 target group，而 target group 启用了 sticky，那么 ALB 层面必须启用 target group sticky，cookie name `AWSALBTG`  
+- 以上针对 HTTP/HTTPS listener；WebSocket 天使具有 sticky 属性；client 请求协议升级，返回 HTTP 101 来接受协议升级的 target，在后续 WebSocket 中会被使用；WebSocket 升级后，不再参考基于 cookie 的 sticky  
+
+![post-ALB-sticky-session-ALWALB-ANS-example](/assets/img/post-ALB-sticky-session-ALWALB-ANS-example.png)  
 
 # NLB
 ![post-NLB-tcp-443-ssl-cert-target-ANS-example](/assets/img/post-NLB-tcp-443-ssl-cert-target-ANS-example.png)  
