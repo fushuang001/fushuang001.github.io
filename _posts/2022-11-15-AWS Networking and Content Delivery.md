@@ -7,6 +7,42 @@ author:         Luke
 cover:          '/assets/img/bg-AWS-Networking-CDN.png'
 tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, ELB
 ---
+- [VPC](#vpc)
+  - [VPC Endpoint, Endpoint Services, PrivateLink](#vpc-endpoint-endpoint-services-privatelink)
+  - [VPN](#vpn)
+- [Transit Gateway](#transit-gateway)
+- [ELB 对比](#elb-对比)
+- [ALB](#alb)
+- [NLB](#nlb)
+- [GWLB](#gwlb)
+- [Direct Connect 专线](#direct-connect-专线)
+  - [VIF 分类和使用场景](#vif-分类和使用场景)
+  - [路由控制](#路由控制)
+- [Route53 DNS](#route53-dns)
+  - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
+  - [DNSSEC DNS 安全扩展](#dnssec-dns-安全扩展)
+  - [R53 Resolver DNS Firewall](#r53-resolver-dns-firewall)
+  - [Split-view DNS，对内对外提供不同服务](#split-view-dns对内对外提供不同服务)
+  - [R53 Resolver](#r53-resolver)
+    - [Inbound Resolver Endpoint](#inbound-resolver-endpoint)
+    - [Outbound Resolver Endpoint](#outbound-resolver-endpoint)
+    - [Query logging](#query-logging)
+- [Global Accelerator](#global-accelerator)
+  - [Global Accelerator vs Cloudfront](#global-accelerator-vs-cloudfront)
+- [Cloudfront](#cloudfront)
+  - [Versioning](#versioning)
+  - [Customing with edge functions 边缘函数](#customing-with-edge-functions-边缘函数)
+    - [Cloudfront Functions](#cloudfront-functions)
+    - [Lambda@Edge](#lambdaedge)
+- [API Gateway](#api-gateway)
+- [Troubleshooting Tools](#troubleshooting-tools)
+  - [DNS](#dns)
+  - [packets capture & analysis](#packets-capture--analysis)
+  - [SSL/TLS](#ssltls)
+  - [trace forwarding path](#trace-forwarding-path)
+  - [Connections](#connections)
+  - [performance, concurrent requests](#performance-concurrent-requests)
+
 [AWS 考试预约、培训等资料](https://aws.amazon.com/certification/certified-advanced-networking-specialty/)  
 [考试大纲，查漏补缺](https://d1.awsstatic.com/training-and-certification/docs-advnetworking-spec/AWS-Certified-Advanced-Networking-Specialty_Exam-Guide.pdf)  
 
@@ -85,7 +121,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ## Global Accelerator vs Cloudfront
 |            | Global Accelerator                                                                                                                                         | Cloudfront                                                                                                                                                                                                                     |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| --- | --- |--- |
 | 共性       | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                     |           低延迟                                                                                                                                                                                                                     |
 | 场景       | networking service to improve application's performance and availability(Regional failover, 多个 Endpoint 分布） for global users 低延迟、高可用，eg. game | cloud distributed networking service for web applications that provides low latency and speed 用户分布广泛，访问内容有重复所以可以被 Pop 节点缓存，CF 可以缓存、压缩文件，降低 origin 压力；Lambda@Edge 提供一定的边缘计算能力 |
 | 实现方式   | client - GA --寻找最近的 endpoint；GA -- Endpoint 走 AWS backbone network；提供两个 static IP                                                              | client -- CF Pop 缓存，miss cache then refer Origin；根据 clients 地理位置不同，Pop public IP 不同                                                                                                                             |
