@@ -8,6 +8,7 @@ cover:          '/assets/img/bg-AWS-Networking-CDN.png'
 tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, ELB
 ---
 - [VPC](#vpc)
+  - [Route Table 优先级](#route-table-优先级)
   - [EC2 bandwidth](#ec2-bandwidth)
     - [Enhanced networking - ENA](#enhanced-networking---ena)
   - [prefix-list](#prefix-list)
@@ -23,7 +24,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [Direct Connect DX 专线](#direct-connect-dx-专线)
   - [VIF 分类和使用场景](#vif-分类和使用场景)
   - [one DX access to multiple US regions](#one-dx-access-to-multiple-us-regions)
-  - [路由控制](#路由控制)
+  - [路由控制、优先级](#路由控制优先级)
 - [Route53 DNS](#route53-dns)
   - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
   - [R53 支持的 DNS 类型](#r53-支持的-dns-类型)
@@ -59,6 +60,12 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 # VPC
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)  
 ![post-VPC-pricing-SAA](/assets/img/post-VPC-pricing-SAA.png)  
+
+## Route Table 优先级
+- local 优先级最高，比如 local CIDR 10.0.0.0/16，那么即使用户有 LPM 10.0.0.0/24 static，也还是 local 优先  
+- 有一个例外，GWLB endpoint 环境，Internet --> VPC 的流量，用 LPM 先送去 GWLBe 做安全检查
+![post-RT-priority-VPC](/assets/img/post-RT-priority-VPC.png)  
+![post-RT-priority-VPC--LPM-GWLBe](/assets/img/post-RT-priority-VPC--LPM-GWLBe.png)  
 
 ## EC2 bandwidth
 - [network bandwidth available to an EC2 instance depends on several factors](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-network-bandwidth.html)  
@@ -144,6 +151,18 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - 10GBASE-LR transfer/SFP for 10Gb
 
 ## VIF 分类和使用场景
+- VIF 实际上是 dot1q vlan encapsulation 的 sub-interface  
+- private VIF 连接 VGW, DXGW  
+- public VIF 连接 AWS Edge locations，访问 AWS public services  
+- VIF default MTU 1500，如果 private VIF, transmit VIF 需要开启 Jumbo Frames，需要手动配置
+  - this can cause an update to the underlying physical connection if it wasn't updated to support jumbo frames  
+  - updating the connection disrupts network connectivity for all VIF associated with the connection for up to 30 seconds    
+- transmit VIF 最小 bandwidth 要求 1G，如果客户只需要 300M 带宽那么可以向 APN/ISP 订购 1G dedicate 专线，借助 QoS 在 ISP 限速  
+- private VIF，VGW 只能关联 1 个 VPC，DXGW 可以关联不同 region 最多 10 个 VGW(VGW -- VPC)  
+- DXGW 只是用来打通 on-premise & VPC 之间通信链路，并不负责 VPC 之间互相通信    
+- DXGW 是 global 的，不区分 region；VGW 是 regional 的  
+- on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接    
+
 
 |                        | public VIF                     | private VIF       | transmit VIF                   |
 | ---------------------- | ------------------------------ | ----------------- | ------------------------------ |
@@ -157,22 +176,25 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 | uRPF check             | enabled                        | disabled          | disabled                       |
 | Technical requirement  | vlan id, IP prefix             | vlan id, VGW/DXGW | vlan id, DXGW                  |
 | BGP ASN                | public/private                 | public/private    | public/private                 |
-| BGP community          | scope, no_export               | local pref        | local pref                     |
+| BGP community          | scope(no_export)               | local pref        | local pref                     |
+
+> Local preference 相当于 metadata，可以用来控制路由  
+> 只在 IBGP 邻居之间传递，不会传递到 EBGP  
 
 ![post-Diirect-Connect-private-VIF-ANS-example](/assets/img/post-Diirect-Connect-private-VIF-ANS-example.png)  
 [题目的参考文档](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/WorkingWithVirtualInterfaces.html)  
 
 ![post-Direct-connect-public-VIF-example](/assets/img/post-Direct-connect-public-VIF-example.png)  
 
-**一些注意事项：**
-- VIF default MTU 1500，如果 private VIF, transmit VIF 需要开启 Jumbo Frames，需要手动配置
-  - this can cause an update to the underlying physical connection if it wasn't updated to support jumbo frames  
-  - updating the connection disrupts network connectivity for all VIF associated with the connection for up to 30 seconds    
-- transmit VIF 最小 bandwidth 要求 1G，如果客户只需要 300M 带宽那么可以向 APN/ISP 订购 1G dedicate 专线，借助 QoS 在 ISP 限速  
-- private VIF，VGW 只能关联 1 个 VPC，DXGW 可以关联不同 region 最多 10 个 VGW(VGW -- VPC)  
-- DXGW 只是用来打通 on-premise & VPC 之间通信链路，并不负责 VPC 之间互相通信    
-- DXGW 是 global 的，不区分 region；VGW 是 regional 的  
-- on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接    
+## one DX access to multiple US regions
+- on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability     
+- on-prem -- Direct Connect -- US region 1 -- AWS network -- US region 2，跨 region 的流量由 AWS 负责，路由表由 AWS 负责 (BGP 路由通告）    
+![post-Direct-Connect-inter-region-capability](/assets/img/post-Direct-Connect-inter-region-capability.png)  
+
+## 路由控制、优先级
+- 对于 VPC --> on-prem 方向的流量来说，首先参考 VPC 路由表，然后 DX 路由  
+- DX 路由表的 LPM(Longest Prefix Match) 条目优先级最高，然后 Local preference, AS-PATH 
+![post-RT-priority-Direct-Connect](/assest/img/post-RT-priority-Direct-Connect.png)  
 - 默认情况下，public VIF 会将 AWS global public IP prefix 通过 BGP 通告给 on-prem；用户可以联系 AWS 来通告 customer-owned IP prefix  
 - public VIF, private VIF 都可以使用 public(customer must own it) or private(64512-65535) ASN  
 - [public VIF 收到的客户侧路由明细，不会传播到 Internet 以及 AWS partner](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，使用 `no_export` 属性控制  
@@ -187,19 +209,13 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - AWS DX 为其通告的路由使用以下 BGP community:    
     - 7224:8100 – 源自关联了 Amazon 接入点的 Amazon Direct Connect 区域的路由  
     - 7224:8200 – 源自关联了 Amazon Direct Connect 接入点的大陆的路由。  
-    - No tag    – 全球 (所有公有 Amazon 区域)。  
+    - No tag    – 全球 （所有公有 Amazon 区域）。  
 - private，transmit VIF 支持 `Local Preference BGP community tags` 来控制 BGP 路由选路优先级  
   - 7224:7100 — 低    
   - 7224:7200 — 中     
   - 7224:7300 — 高    
 
-## one DX access to multiple US regions
-- on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability     
-- on-prem -- Direct Connect -- US region 1 -- AWS network -- US region 2，跨 region 的流量由 AWS 负责，路由表由 AWS 负责 (BGP 路由通告）    
-![post-Direct-Connect-inter-region-capability](/assets/img/post-Direct-Connect-inter-region-capability.png)  
-
-## 路由控制
-Active/Standby  
+[Active/Passive](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)    
 A/A  
 BGP 参数  
 
