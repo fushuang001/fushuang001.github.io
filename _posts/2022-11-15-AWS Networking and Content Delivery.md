@@ -197,7 +197,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ## 路由控制、优先级
 - 对于 VPC --> on-prem 方向的流量来说，首先参考 VPC 路由表，然后 DX 路由  
 - DX 路由表的 LPM(Longest Prefix Match) 条目优先级最高，然后 Local preference, AS-PATH 
-![post-RT-priority-Direct-Connect](/assest/img/post-RT-priority-Direct-Connect.png)  
+![post-RT-priority-Direct-Connect](/assets/img/post-RT-priority-Direct-Connect.png)  
 - 默认情况下，public VIF 会将 AWS global public IP prefix 通过 BGP 通告给 on-prem；用户可以联系 AWS 来通告 customer-owned IP prefix  
 - public VIF, private VIF 都可以使用 public(customer must own it) or private(64512-65535) ASN  
 - [public VIF 收到的客户侧路由明细，不会传播到 Internet 以及 AWS partner](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，使用 `no_export` 属性控制  
