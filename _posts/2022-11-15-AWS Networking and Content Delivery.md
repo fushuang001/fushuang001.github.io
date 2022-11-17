@@ -26,9 +26,13 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [路由控制](#路由控制)
 - [Route53 DNS](#route53-dns)
   - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
+  - [R53 支持的 DNS 类型](#r53-支持的-dns-类型)
+    - [alias vs. CNAME](#alias-vs-cname)
+  - [R53 DNS routing policy](#r53-dns-routing-policy)
   - [DNSSEC DNS 安全扩展](#dnssec-dns-安全扩展)
   - [R53 Resolver DNS Firewall](#r53-resolver-dns-firewall)
   - [Split-view DNS，对内对外提供不同服务](#split-view-dns对内对外提供不同服务)
+  - [DNS resolution bw on-prem and AWS using AWS Directory Service](#dns-resolution-bw-on-prem-and-aws-using-aws-directory-service)
   - [R53 Resolver](#r53-resolver)
     - [Inbound Resolver Endpoint](#inbound-resolver-endpoint)
     - [Outbound Resolver Endpoint](#outbound-resolver-endpoint)
@@ -141,18 +145,18 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ## VIF 分类和使用场景
 
-|                        | public VIF                     | private VIF     | transmit VIF                   |
-| ---------------------- | ------------------------------ | --------------- | ------------------------------ |
-| Connection Speed       | any                            | any             | speed >= 1G                    |
-| Gateway type           | n/a                            | VGW/DXGW        | DXGW                           |
-| Prefix limit(inbound)  | 1000                           | 100             | 100                            |
-| Prefix limit(outbound) | n/a                            | n/a             | 20 per TGW-DXGW association    |
-| Peer IPs minimum CIDR  | /31                            | /30             | /30                            |
-| Support Jumbo Frames   | no                             | yes(9001)       | yes(8500)                      |
-| Use case               | to AWS public services, eg. S3 | to VPC(1/10)    | to multiple VPCs(1000) via TGW |
-| uRPF check             | enabled                        | disabled        | disabled                       |
-| Technical requirement  | vlan id, IP prefix             | vlan id, VGW id |                                |
-| BGP ASN                | public/private                 | public/private  |
+|                        | public VIF                     | private VIF       | transmit VIF                   |
+| ---------------------- | ------------------------------ | ----------------- | ------------------------------ |
+| Connection Speed       | any                            | any               | speed >= 1G                    |
+| Gateway type           | n/a                            | VGW/DXGW          | DXGW                           |
+| Prefix limit(inbound)  | 1000                           | 100               | 100                            |
+| Prefix limit(outbound) | n/a                            | n/a               | 20 per TGW-DXGW association    |
+| Peer IPs minimum CIDR  | /31                            | /30               | /30                            |
+| Support Jumbo Frames   | no                             | yes(9001)         | yes(8500)                      |
+| Use case               | to AWS public services, eg. S3 | to VPC(1/10)      | to multiple VPCs(1000) via TGW |
+| uRPF check             | enabled                        | disabled          | disabled                       |
+| Technical requirement  | vlan id, IP prefix             | vlan id, VGW/DXGW | vlan id, DXGW                  |
+| BGP ASN                | public/private                 | public/private    | public/private                 |
 
 ![post-Diirect-Connect-private-VIF-ANS-example](/assets/img/post-Diirect-Connect-private-VIF-ANS-example.png)  
 
@@ -174,12 +178,21 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-Direct-Connect-inter-region-capability](/assets/img/post-Direct-Connect-inter-region-capability.png)  
 
 ## 路由控制
+Active/Standby  
+A/A  
+BGP 参数  
 
 # Route53 DNS
 ![Route53 failover-health-check SAA example](/assets/img/post-R53-HC.png)  
 ![post-R53-geo-SAA](/assets/img/post-R53-geo-SAA.png)  
 
 ## R53 DNS 解析的优先级
+
+## R53 支持的 DNS 类型
+
+### alias vs. CNAME
+
+## R53 DNS routing policy
 
 ## DNSSEC DNS 安全扩展
 - [Domain Name System Security Extensions](https://aws.amazon.com/about-aws/whats-new/2020/12/announcing-amazon-route-53-support-dnssec/?nc1=h_ls)，DNS 安全扩展，为 DNS 提供数据来源认证和数据完整性验证，满足 FedRAMP 等法规要求  
@@ -203,6 +216,17 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - 假设 example.com 对外、对内提供的服务不同，可以通过 R53 配置两个 hosted zone 都叫做 example.com，一个 public 对外，一个 private 关联 VPC 对内  
 - VPC 内设备会优先参考 PHZ(Private Hosted Zone) 做解析  
 ![post-R53-split-view-dns-ANS-example](/assets/img/post-R53-split-view-dns-ANS-example.png)  
+
+## DNS resolution bw on-prem and AWS using AWS Directory Service
+- 类似于 R53 inbound、outbound resolve endpoint，打通 on-prem 与 VPC 之间的 DNS 解析  
+- [需要将 R53(VPC CIDR x.x.x.2) 与 AWS Directory Service Simple AD 结合使用](https://aws.amazon.com/cn/blogs/security/how-to-set-up-dns-resolution-between-on-premises-networks-and-aws-using-aws-directory-service-and-amazon-route-53/)  
+- Simple AD provides redundant and managed DNS services across AZs  
+- 将 on-prem DNS 解析放到 R53  
+![post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53](/assets/img/post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53.png)  
+- 或者 VPC 的 DNS 解析放到 on-prem，若 on-prem 没有记录，再使用 `condition forwarder` 转发回 Simple AD --> R53  
+![post-VPC-DNS-to-On-prem](/assets/img/post-VPC-DNS-to-On-prem.png)  
+- 举个栗子，ANS-C00考试题
+![post-intergate-DNS-on-prem-VPC-R53](/assets/img/post-intergate-DNS-on-prem-VPC-R53.png)  
 
 ## R53 Resolver
 
@@ -230,7 +254,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 | 共性       | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                     | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                                                                                            |
 | 场景       | networking service to improve application's performance and availability(Regional failover, 多个 Endpoint 分布） for global users 低延迟、高可用，eg. game | cloud distributed networking service for web applications that provides low latency and speed 用户分布广泛，访问内容有重复所以可以被 Pop 节点缓存，CF 可以缓存、压缩文件，降低 origin 压力；Edge Functions 提供一定的边缘计算能力 |
 | 实现方式   | client - GA --寻找最近的 endpoint；GA -- Endpoint 走 AWS backbone network；提供两个 static IP                                                              | client -- CF Pop 缓存，miss cache then refer Origin；根据 clients 地理位置不同，Pop public IP 不同                                                                                                                                |
-| 支持的协议 | TCP, UDP, HTTP, HTTPS, gRPC；通常用于 non-HTTP 场景比如 gaming, IoT, VoIP                                                                                  | static & dynamic content, HTTP, HTTPS, WebSocket                                                                                                                                                                                  |
+| 支持的协议 | TCP, UDP, HTTP, HTTPS, gRPC；通常用于 non-HTTP 场景比如 gaming, IoT(MQTT), VoIP                                                                                  | static & dynamic content, HTTP, HTTPS, WebSocket                                                                                                                                                                                  |
 | security   | AWS Shield to prevent DDoS; if Endpoint is ALB then could integrate with WAF                                                                               | AWS Shield to prevent DDoS, WAF for additional protection against malicious traffic                                                                                                                                               |
 | 价格       | fixed hourly fee, Data Transfer-Premium                                                                                                                    | Data Transfer Out, HTTP requests                                                                                                                                                                                                  |
 
