@@ -152,17 +152,20 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ## VIF 分类和使用场景
 - VIF 实际上是 dot1q vlan encapsulation 的 sub-interface  
-- private VIF 连接 VGW, DXGW  
 - public VIF 连接 AWS Edge locations，访问 AWS public services  
+- private VIF 连接 VGW, DXGW  
+  - on-prem -- DX -- private VIF -- VPC -- PrivateLink/Endpoint -- AWS public services，这个架构当前也是 supported  
+- 同一个 physical link、LAG 最多承载 50 个 public & private VIF，1 个 transit VIF    
 - VIF default MTU 1500，如果 private VIF, transmit VIF 需要开启 Jumbo Frames，需要手动配置
+  - 若开启 Jumbo Frames，需要整个转发路径上的设备都支持 Jumbo Frames，比如 EC2, Router  
   - this can cause an update to the underlying physical connection if it wasn't updated to support jumbo frames  
   - updating the connection disrupts network connectivity for all VIF associated with the connection for up to 30 seconds    
 - transmit VIF 最小 bandwidth 要求 1G，如果客户只需要 300M 带宽那么可以向 APN/ISP 订购 1G dedicate 专线，借助 QoS 在 ISP 限速  
 - private VIF，VGW 只能关联 1 个 VPC，DXGW 可以关联不同 region 最多 10 个 VGW(VGW -- VPC)  
 - DXGW 只是用来打通 on-premise & VPC 之间通信链路，并不负责 VPC 之间互相通信    
-- DXGW 是 global 的，不区分 region；VGW 是 regional 的  
+  - DXGW 是 global 的，不区分 region；VGW 是 regional 的  
+  - DXGW 类似于 redundant BGP RR，或者说 distributed VRF  
 - on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接    
-
 
 |                        | public VIF                     | private VIF       | transmit VIF                   |
 | ---------------------- | ------------------------------ | ----------------- | ------------------------------ |
