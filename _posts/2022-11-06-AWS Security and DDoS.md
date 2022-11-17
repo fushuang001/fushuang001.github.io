@@ -33,6 +33,7 @@ tags:           AWS, SAA, IAM, STS, KMS, SecurityHub, GuardDuty, Organization, W
     - [WAF 的行为/Action](#waf-的行为action)
     - [WAF rules 分类](#waf-rules-分类)
     - [使用 WAF 的最佳实践](#使用-waf-的最佳实践)
+    - [AWS Inspector](#aws-inspector)
 - [Data security](#data-security)
   - [KMS](#kms)
   - [CloudHSM](#cloudhsm)
@@ -446,6 +447,13 @@ captcha 实际是将用户请求重定向到 waf/token 做图形验证码，如�
 ### 使用 WAF 的最佳实践
 1. 首先明确需求，比如需要设置白名单、黑名单（默认 action 为 block 或者 allow)；业务流量的特性 (source IP、URI、访问频率 等）  
 2. 其次针对性测试，比如将 WAF rule action 定义为 count，从 `Sampled requests` 观察最近 3 小时的采样，或者从 WAF logs 分析；然后根据流量特性做设置，最终将 rule action 定义为 allow 或者 block  
+
+### AWS Inspector
+- [automated and continual vulnerability management at scale](https://aws.amazon.com/inspector/?nc1=h_ls)  
+- 大规模、自动化、持续的漏洞管理  
+
+![post-aws-inspector-how-it-works](/assets/img/post-aws-inspector-how-it-works.png)  
+![post-AWS-Inspector-example](/assets/img/post-AWS-Inspector-example.png)  
 
 # Data security
 数据安全可以区分两个方面，at rest/被存储、静态，in transmit/传输过程中  

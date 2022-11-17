@@ -157,8 +157,12 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 | uRPF check             | enabled                        | disabled          | disabled                       |
 | Technical requirement  | vlan id, IP prefix             | vlan id, VGW/DXGW | vlan id, DXGW                  |
 | BGP ASN                | public/private                 | public/private    | public/private                 |
+| BGP community          | scope, no_export               | local pref        | local pref                     |
 
 ![post-Diirect-Connect-private-VIF-ANS-example](/assets/img/post-Diirect-Connect-private-VIF-ANS-example.png)  
+[题目的参考文档](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/WorkingWithVirtualInterfaces.html)  
+
+![post-Direct-connect-public-VIF-example](/assets/img/post-Direct-connect-public-VIF-example.png)  
 
 **一些注意事项：**
 - VIF default MTU 1500，如果 private VIF, transmit VIF 需要开启 Jumbo Frames，需要手动配置
@@ -171,6 +175,23 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接    
 - 默认情况下，public VIF 会将 AWS global public IP prefix 通过 BGP 通告给 on-prem；用户可以联系 AWS 来通告 customer-owned IP prefix  
 - public VIF, private VIF 都可以使用 public(customer must own it) or private(64512-65535) ASN  
+- [public VIF 收到的客户侧路由明细，不会传播到 Internet 以及 AWS partner](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，使用 `no_export` 属性控制  
+  - 但是 [客户侧通告到 AWS 的路由明细，是保留在 AWS DX 同 region，还是到 AWS all region(global)](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，可以通过 `scope BGP community tags` 来控制  
+  - [本地配置](https://aws.amazon.com/premiumsupport/knowledge-center/control-routes-direct-connect/?nc1=h_ls)，on the public prefixs that you advertise to AWS, indicate how far to propagate your prefixs in AWS network  
+    - 7224:9100—Local Amazon Region  
+    - 7224:9200—All Amazon Regions for a continent  
+      - North America–wide  
+      - Asia Pacific  
+      - Europe, the Middle East and Africa  
+    - 7224:9300—Global (all public Amazon Regions), by default  
+  - AWS DX 为其通告的路由使用以下 BGP community:    
+    - 7224:8100 – 源自关联了 Amazon 接入点的 Amazon Direct Connect 区域的路由  
+    - 7224:8200 – 源自关联了 Amazon Direct Connect 接入点的大陆的路由。  
+    - No tag    – 全球 (所有公有 Amazon 区域)。  
+- private，transmit VIF 支持 `Local Preference BGP community tags` 来控制 BGP 路由选路优先级  
+  - 7224:7100 — 低    
+  - 7224:7200 — 中     
+  - 7224:7300 — 高    
 
 ## one DX access to multiple US regions
 - on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability     
@@ -225,7 +246,7 @@ BGP 参数
 ![post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53](/assets/img/post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53.png)  
 - 或者 VPC 的 DNS 解析放到 on-prem，若 on-prem 没有记录，再使用 `condition forwarder` 转发回 Simple AD --> R53  
 ![post-VPC-DNS-to-On-prem](/assets/img/post-VPC-DNS-to-On-prem.png)  
-- 举个栗子，ANS-C00考试题
+- 举个栗子，ANS-C00 考试题
 ![post-intergate-DNS-on-prem-VPC-R53](/assets/img/post-intergate-DNS-on-prem-VPC-R53.png)  
 
 ## R53 Resolver
@@ -254,7 +275,7 @@ BGP 参数
 | 共性       | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                     | 用户分布广泛，服务端希望提供低延迟服务                                                                                                                                                                                            |
 | 场景       | networking service to improve application's performance and availability(Regional failover, 多个 Endpoint 分布） for global users 低延迟、高可用，eg. game | cloud distributed networking service for web applications that provides low latency and speed 用户分布广泛，访问内容有重复所以可以被 Pop 节点缓存，CF 可以缓存、压缩文件，降低 origin 压力；Edge Functions 提供一定的边缘计算能力 |
 | 实现方式   | client - GA --寻找最近的 endpoint；GA -- Endpoint 走 AWS backbone network；提供两个 static IP                                                              | client -- CF Pop 缓存，miss cache then refer Origin；根据 clients 地理位置不同，Pop public IP 不同                                                                                                                                |
-| 支持的协议 | TCP, UDP, HTTP, HTTPS, gRPC；通常用于 non-HTTP 场景比如 gaming, IoT(MQTT), VoIP                                                                                  | static & dynamic content, HTTP, HTTPS, WebSocket                                                                                                                                                                                  |
+| 支持的协议 | TCP, UDP, HTTP, HTTPS, gRPC；通常用于 non-HTTP 场景比如 gaming, IoT(MQTT), VoIP                                                                            | static & dynamic content, HTTP, HTTPS, WebSocket                                                                                                                                                                                  |
 | security   | AWS Shield to prevent DDoS; if Endpoint is ALB then could integrate with WAF                                                                               | AWS Shield to prevent DDoS, WAF for additional protection against malicious traffic                                                                                                                                               |
 | 价格       | fixed hourly fee, Data Transfer-Premium                                                                                                                    | Data Transfer Out, HTTP requests                                                                                                                                                                                                  |
 
