@@ -15,6 +15,7 @@ tags:           AWS, SAA, SQS, SNS, Amazon MQ, queuing, decouple
   - [SQS offers two types of message queues.](#sqs-offers-two-types-of-message-queues)
   - [payload](#payload)
 - [SNS - Notifications](#sns---notifications)
+  - [SNS topic类型](#sns-topic类型)
 - [Amazon MQ](#amazon-mq)
 
 # queuing 的原因
@@ -83,6 +84,19 @@ __SNS 并不是 queue，所以并不保证送达__；即使送达，比如接收
 
 ![post-sns-sqs-SAA](/assets/img/post-sns-sqs-SAA.png)  
 ![post-sns-SAA-example](/assets/img/post-sns-SAA-example.png)
+
+## SNS topic类型
+- FIFO  
+  - Strictly-preserved message ordering
+  - Exactly-once message delivery
+  - High throughput, up to 300 publishes/second
+  - Subscription protocols: SQS
+- Standard  
+  - Best-effort message ordering
+  - At-least once message delivery
+  - Highest throughput in publishes/second
+  - Subscription protocols: SQS, Lambda, HTTP, SMS, email, mobile application endpoints
+![post-SNS-topic-types](/assets/img/post-SNS-topic-types.png)  
 
 # Amazon MQ
 - [managed msg broker service](https://aws.amazon.com/amazon-mq/), support industary-standard APIs and protocols, including JMS, NMS, AMQP, STOMP, MQTT, Websocket  

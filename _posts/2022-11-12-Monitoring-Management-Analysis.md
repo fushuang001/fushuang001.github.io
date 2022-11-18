@@ -7,6 +7,7 @@ author:         Luke
 cover:          '/assets/img/bg-monitor-and-analysis.png'
 tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, Athena, Kinesis
 ---
+- [PHD(Personal Health Dashboard)](#phdpersonal-health-dashboard)
 - [CloudWatch](#cloudwatch)
 - [Cost Explorer](#cost-explorer)
 - [Cloudtrail](#cloudtrail)
@@ -20,6 +21,10 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 - [Athena](#athena)
 - [Kinesis](#kinesis)
   - [Kinesis 三种分类](#kinesis-三种分类)
+
+# PHD(Personal Health Dashboard)
+- 查看 EC2, Direct Connect，RDS 等维护通知  
+- 其他一些由 AWS 发起的维护事件  
 
 # CloudWatch
 - 将 AWS 各个 services 相关的 metrics/指标，logs/日志 集中起来，方便查看，以及做一些 insights 分析  

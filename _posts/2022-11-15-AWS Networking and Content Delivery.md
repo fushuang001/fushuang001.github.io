@@ -20,6 +20,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [VPN](#vpn)
   - [Transit VPC](#transit-vpc)
 - [Transit Gateway](#transit-gateway)
+  - [TGW Network Manager](#tgw-network-manager)
 - [ELB 对比](#elb-对比)
 - [ALB](#alb)
   - [Stick session](#stick-session)
@@ -66,6 +67,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 [AWS 考试预约、培训视频、白皮书](https://aws.amazon.com/certification/certified-advanced-networking-specialty/)  
 [考试大纲，查漏补缺](https://d1.awsstatic.com/training-and-certification/docs-advnetworking-spec/AWS-Certified-Advanced-Networking-Specialty_Exam-Guide.pdf)  
+[AWS 官方讲解考试大纲，把书给读薄了](https://explore.skillbuilder.aws/learn/course/14434/exam-prep-advanced-networking-specialty-ans-c01)  
+[TD, tutorialsdojo，总结、exam dumps](https://tutorialsdojo.com/aws-certified-advanced-networking-specialty-exam-study-path-guide-ans-c01/)  
 
 # VPC
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)
@@ -143,6 +146,13 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-transmit-VPC-ANS-example](/assets/img/post-transmit-VPC-ANS-example.png)  
 
 # Transit Gateway
+
+## TGW Network Manager
+[YouTube视频](https://www.youtube.com/watch?v=xjH7GI95Pgg)  
+- [a service that provides a global view of your private network](https://aws.amazon.com/transit-gateway/network-manager/), allowing you to manage your AWS and on-premises resources and seamlessly integrate with your SD-WAN solutions  
+- 集中式网络监控，Centralized Network monitoring for events, metrics to monitor the quality of your [global network](https://docs.aws.amazon.com/vpc/latest/cloudwan/cloudwan-concepts.html), both AWS and on-premises  
+- 全球网络可见性，Global Network Visiblity  
+- SD-WAN integration  
 
 # ELB 对比
 把之前做的表格添加过来  
@@ -287,7 +297,8 @@ BGP 参数
 ![post-Direct-Connect-symmetry-of-flow](/assets/img/post-Direct-Connect-symmetry-of-flow.png)  
 
 # VPN
-![post-VPN-example1](/assets/img/post-VPN-example1.png)  
+![post-VPN-example1](/assets/img/post-VPN-example1.png)
+![post-VPN-TGW-ECMP-example](/assets/img/post-VPN-TGW-ECMP-example.png)  
 
 # Route53 DNS
 ![Route53 failover-health-check SAA example](/assets/img/post-R53-HC.png)  
