@@ -369,6 +369,7 @@ aws s3api put-bucket-versioning --bucket testbucket --versioning-configuration S
 ![Multipart upload](/assets/img/IMG_20220519-151902183.png)  
 
 ### S3 bucket policy
+![post-S3-bucket-policy-example](/assets/img/post-S3-bucket-policy-example.png)  
 
 ### Pre-signed URL
 - all objects private by default, the object owner can optionally share objects with others by pre-signed URL, using their own security credentials, to grant time-limited permission to download the object  

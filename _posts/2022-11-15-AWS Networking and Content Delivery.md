@@ -10,6 +10,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [VPC](#vpc)
   - [Route Table 优先级](#route-table-优先级)
   - [IPAM - IP Address Manager](#ipam---ip-address-manager)
+  - [Egress-Only Internet Gateway](#egress-only-internet-gateway)
   - [EC2 bandwidth](#ec2-bandwidth)
     - [Enhanced networking - ENA](#enhanced-networking---ena)
   - [prefix-list](#prefix-list)
@@ -79,6 +80,11 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - to avoid CIDR overlap  
 - CloudFormation can request a CIDR block from IPAM  
 ![post-VPC-IPAM-example](/assets/img/post-VPC-IPAM-example.png)  
+
+## Egress-Only Internet Gateway
+- for ipv6, 效果类似于 NAT-GW，VPC --> Internet 流量主动出，拒绝外部始发的流量  
+- 和 NAT-GW 不同点在于，ipv6 并不区分 private, public 网段，所以说，Egress-only IGW 和 clients 都是放在 public subnet 的  
+![post-VPC-Egress-Only-IGW-example](/assets/img/post-VPC-Egress-Only-IGW-example.png)  
 
 ## EC2 bandwidth
 - [network bandwidth available to an EC2 instance depends on several factors](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-network-bandwidth.html)  
@@ -177,7 +183,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - VIF 实际上是 dot1q vlan encapsulation 的 sub-interface  
 - public VIF 连接 AWS Edge locations，访问 AWS public services  
 - private VIF 连接 VGW, DXGW  
-  - on-prem -- DX -- private VIF -- VPC -- PrivateLink/Endpoint -- AWS public services，[只针对interface Endpoint，并不针对gateway Endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-ddb.html)，这个架构当前也是 supported  
+  - on-prem -- DX -- private VIF -- VPC -- PrivateLink/Endpoint -- AWS public services，[只针对 interface Endpoint，并不针对 gateway Endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-ddb.html)，这个架构当前也是 supported  
 ![post-Direct-Connect-VPC-Endpoint-example](/assets/img/post-Direct-Connect-VPC-Endpoint-example.png)  
 - 同一个 physical link、LAG 最多承载 50 个 public & private VIF，1 个 transit VIF    
 - VIF default MTU 1500，如果 private VIF, transmit VIF 需要开启 Jumbo Frames，需要手动配置
@@ -286,11 +292,13 @@ BGP 参数
 - public hosted zone 功能  
 - Route 53 DNSSEC provides __data origin authentication__ and __data integrity verification__ for DNS and can help customers meet compliance mandates, such as FedRAMP.  
 - 若在 hosted zone 启用 DNSSEC，R53 会以加密方式对 hosted zone 当中每条 record 进行签名；R53 管理区域签名密钥，用户在 KMS 的 CMK(Customer Managed Key) 管理密钥签名密钥  
+  - 后续不要对 CMK 进行任何权限上的修改，可能导致 KSK 状态变为 ACTION_NEEDED  
   - CMK 是 asymmetric，ECC_NIST_P256  
   - 必须在 us-east-1 region  
 - When you enable DNSSEC signing on a hosted zone, Route 53 cryptographically signs each record in that hosted zone. Route 53 manages the zone-signing key, and you can manage the __key-signing key(KSK)__ in AWS Key Management Service (AWS KMS).   
 ![post-R53-DNSSEC-Key-signing-key-cfg](/assets/img/post-R53-DNSSEC-Key-signing-key-cfg.png)  
 ![post-R53-DNSSEC-KSK-CMK-ANS-example](/assets/img/post-R53-DNSSEC-KSK-CMK-ANS-example.png)  
+![post-R53-DNSSEC-KSK-CMK-ANS-example1](/assets/img/post-R53-DNSSEC-KSK-CMK-ANS-example1.png)  
 
 ## R53 Resolver DNS Firewall 
 - monitor and control the domains that applications within your VPCs can access   
