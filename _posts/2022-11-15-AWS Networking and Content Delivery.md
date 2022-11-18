@@ -78,7 +78,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ### Route Table 优先级
 - local 优先级最高，比如 local CIDR 10.0.0.0/16，那么即使用户有 LPM 10.0.0.0/24 static，也还是 local 优先  
 - 有一个例外，GWLB endpoint 环境，Internet --> VPC 的流量，用 LPM 先送去 GWLBe 做安全检查
-![post-RT-priority-VPC](/assets/img/post-RT-priority-VPC.png)  
+![post-RT-priority-VPC](/assets/img/post-RT-priority-VPC.png)
 ![post-RT-priority-VPC--LPM-GWLBe](/assets/img/post-RT-priority-VPC--LPM-GWLBe.png)  
 
 ### Route Table propagation
@@ -108,13 +108,13 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ### Enhanced networking - ENA
 - 借助 `single root I/O virtualization (SR-IOV)` 来提供高性能网络，没有额外费用  
   - 当前一代 Nitro 实例支持 enhanced networking  
-    - 需要 Kernel module (ena) 支持，查看`modinfo ena`  
+    - 需要 Kernel module (ena) 支持，查看 `modinfo ena`  
     - 需要 Instance attribute (enaSupport)  
     - 需要 Image attribute (enaSupport)  
-    - 需要特定 Network interface driver，查看`ethtool -i eth0`  
-      - 若输出 driver: ena，表示`ena` module is loaded  
-      - 若输出 driver: vif，表示`ena` module is not loaded  
-  - 可以通过`Elastic Network Adapter (ENA)`或者`Intel 82599 Virtual Function (VF) interface`两种方式启用 enhanced networking  
+    - 需要特定 Network interface driver，查看 `ethtool -i eth0`  
+      - 若输出 driver: ena，表示 `ena` module is loaded  
+      - 若输出 driver: vif，表示 `ena` module is not loaded  
+  - 可以通过 `Elastic Network Adapter (ENA)` 或者 `Intel 82599 Virtual Function (VF) interface` 两种方式启用 enhanced networking  
 - high-performance networking, higer bandwidth, higer packet per second(PPS), consistently lower inter-instance lateny  
 
 ![post-EC2-bandwidth-ENA](/assets/img/post-EC2-bandwidth-ENA.png)  
