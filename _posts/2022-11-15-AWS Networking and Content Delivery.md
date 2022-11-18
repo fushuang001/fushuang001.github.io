@@ -25,6 +25,9 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [VIF 分类和使用场景](#vif-分类和使用场景)
   - [one DX access to multiple US regions](#one-dx-access-to-multiple-us-regions)
   - [路由控制、优先级](#路由控制优先级)
+    - [Public VIF](#public-vif)
+    - [Private VIF](#private-vif)
+- [VPN](#vpn-1)
 - [Route53 DNS](#route53-dns)
   - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
   - [R53 支持的 DNS 类型](#r53-支持的-dns-类型)
@@ -167,19 +170,20 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - DXGW 类似于 redundant BGP RR，或者说 distributed VRF  
 - on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接    
 
-|                        | public VIF                     | private VIF       | transmit VIF                   |
-| ---------------------- | ------------------------------ | ----------------- | ------------------------------ |
-| Connection Speed       | any                            | any               | speed >= 1G                    |
-| Gateway type           | n/a                            | VGW/DXGW          | DXGW                           |
-| Prefix limit(inbound)  | 1000                           | 100               | 100                            |
-| Prefix limit(outbound) | n/a                            | n/a               | 20 per TGW-DXGW association    |
-| Peer IPs minimum CIDR  | /31                            | /30               | /30                            |
-| Support Jumbo Frames   | no                             | yes(9001)         | yes(8500)                      |
-| Use case               | to AWS public services, eg. S3 | to VPC(1/10)      | to multiple VPCs(1000) via TGW |
-| uRPF check             | enabled                        | disabled          | disabled                       |
-| Technical requirement  | vlan id, IP prefix             | vlan id, VGW/DXGW | vlan id, DXGW                  |
-| BGP ASN                | public/private                 | public/private    | public/private                 |
-| BGP community          | scope(no_export)               | local pref        | local pref                     |
+|                        | public VIF                     | private VIF                                 | transmit VIF                                |
+| ---------------------- | ------------------------------ | ------------------------------------------- | ------------------------------------------- |
+| Connection Speed       | any                            | any                                         | speed >= 1G                                 |
+| Gateway type           | n/a                            | VGW/DXGW                                    | DXGW                                        |
+| Prefix limit(inbound)  | 1000                           | 100                                         | 100                                         |
+| Prefix limit(outbound) | n/a                            | n/a                                         | 20 per TGW-DXGW association                 |
+| Peer IPs minimum CIDR  | /31                            | /30                                         | /30                                         |
+| Support Jumbo Frames   | no                             | yes(9001)                                   | yes(8500)                                   |
+| Use case               | to AWS public services, eg. S3 | to VPC(1/10)                                | to multiple VPCs(1000) via TGW              |
+| uRPF check             | enabled                        | disabled                                    | disabled                                    |
+| Technical requirement  | vlan id, IP prefix             | vlan id, VGW/DXGW                           | vlan id, DXGW                               |
+| BGP ASN                | public/private                 | public/private                              | public/private                              |
+| BGP community          | scope(no_export)               | local pref                                  | local pref                                  |
+| Route Control          | LPM, AS_PATH                   | LPM, Local Pref BGP community tags, AS_PATH | LPM, Local Pref BGP community tags, AS_PATH |
 
 > Local preference 相当于 metadata，可以用来控制路由  
 > 只在 IBGP 邻居之间传递，不会传递到 EBGP  
@@ -198,6 +202,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - 对于 VPC --> on-prem 方向的流量来说，首先参考 VPC 路由表，然后 DX 路由  
 - DX 路由表的 LPM(Longest Prefix Match) 条目优先级最高，然后 Local preference, AS-PATH 
 ![post-RT-priority-Direct-Connect](/assets/img/post-RT-priority-Direct-Connect.png)  
+
+### Public VIF
 - 默认情况下，public VIF 会将 AWS global public IP prefix 通过 BGP 通告给 on-prem；用户可以联系 AWS 来通告 customer-owned IP prefix  
 - public VIF, private VIF 都可以使用 public(customer must own it) or private(64512-65535) ASN  
 - [public VIF 收到的客户侧路由明细，不会传播到 Internet 以及 AWS partner](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，使用 `no_export` 属性控制  
@@ -213,14 +219,27 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
     - 7224:8100 – 源自关联了 Amazon 接入点的 Amazon Direct Connect 区域的路由  
     - 7224:8200 – 源自关联了 Amazon Direct Connect 接入点的大陆的路由。  
     - No tag    – 全球 （所有公有 Amazon 区域）。  
-- private，transmit VIF 支持 `Local Preference BGP community tags` 来控制 BGP 路由选路优先级  
+
+### Private VIF
+- 首先是 LPM 最优先  
+![post-Direct-Connect-Route-LPM-first](/assets/img/post-Direct-Connect-Route-LPM-first.png)  
+- 若无法通过 LPM 控制，并且 [DX 与 VPC 在同 region](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)，可以通过 on-prem 的 AS_PATH prepended 来控制   
+![post-Direct-Connect-Route-same-region-AS_PATH_shorter](/assets/img/post-Direct-Connect-Route-same-region-AS_PATH_shorter.png)  
+- 若 DX 与 VPC 不在相同 region，可以通过 on-prem 设置 Local Preference BGP community tags 来控制  
+- private，transmit VIF 支持 `Local Preference BGP community tags` 来 [控制 BGP 路由选路优先级](https://youtu.be/DXFooR95BYc?t=2007)，public VIF 不支持    
   - 7224:7100 — 低    
   - 7224:7200 — 中     
   - 7224:7300 — 高    
+- 实现方式，AWS 在收到 on-prem 通告 BGP 路由时，检测到 **on-prem 添加的 Local Preference BGP community tags**，将对应 tags 当作 metadata 来处理，触发了一个行为，类似于使用 prefix-list 抓取携带了特定 tags 的路由条目，然后 set Local Pref  
+- 对于 AWS --> on-prem 方向的流量，将会参考 Local Pref    
+![post-Direct-Connect-Route-Local_Pref_BGP-community-tags](/assets/img/post-Direct-Connect-Route-Local_Pref_BGP-community-tags.png)  
 
 [Active/Passive](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)    
 A/A  
 BGP 参数  
+
+# VPN
+![post-VPN-example1](/assets/img/post-VPN-example1.png)  
 
 # Route53 DNS
 ![Route53 failover-health-check SAA example](/assets/img/post-R53-HC.png)  
