@@ -8,7 +8,9 @@ cover:          '/assets/img/bg-AWS-Networking-CDN.png'
 tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, ELB
 ---
 - [VPC](#vpc)
-  - [Route Table 优先级](#route-table-优先级)
+  - [Route Table](#route-table)
+    - [Route Table 优先级](#route-table-优先级)
+    - [Route Table propagation](#route-table-propagation)
   - [IPAM - IP Address Manager](#ipam---ip-address-manager)
   - [Egress-Only Internet Gateway](#egress-only-internet-gateway)
   - [EC2 bandwidth](#ec2-bandwidth)
@@ -69,11 +71,22 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)  
 ![post-VPC-pricing-SAA](/assets/img/post-VPC-pricing-SAA.png)  
 
-## Route Table 优先级
+## Route Table
+- 每个 subnet 只能有一个 route table  
+- [Edge association](https://docs.amazonaws.cn/en_us/vpc/latest/userguide/VPC_Route_Tables.html) 一般用在 GWLB/security appliance 环境，关联 IGW  
+
+### Route Table 优先级
 - local 优先级最高，比如 local CIDR 10.0.0.0/16，那么即使用户有 LPM 10.0.0.0/24 static，也还是 local 优先  
 - 有一个例外，GWLB endpoint 环境，Internet --> VPC 的流量，用 LPM 先送去 GWLBe 做安全检查
 ![post-RT-priority-VPC](/assets/img/post-RT-priority-VPC.png)  
 ![post-RT-priority-VPC--LPM-GWLBe](/assets/img/post-RT-priority-VPC--LPM-GWLBe.png)  
+
+### Route Table propagation
+- 创建 VGW  
+- 将 VGW attach to VPC（需要等待大约 5 分钟，状态更新为 Attached)  
+- 修改 route table 条目，指定 VGW 作为特定路由条目的 target/destination  
+- Eidt route table，可以打开 propagation, allows a virtual private gateway to automatically propagate routes to the route tables. This means that you don't need to manually enter VPN routes to your route tables   
+![post-VPC-RT-propagation](/assets/img/post-VPC-RT-propagation.png)  
 
 ## IPAM - IP Address Manager
 - manage all the CIDR blocks that are used in an account or across an organization in AWS Organization  
