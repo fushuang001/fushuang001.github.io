@@ -68,7 +68,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 [考试大纲，查漏补缺](https://d1.awsstatic.com/training-and-certification/docs-advnetworking-spec/AWS-Certified-Advanced-Networking-Specialty_Exam-Guide.pdf)  
 
 # VPC
-![VPC Sharing](/assets/img/IMG_20220504-212047378.png)  
+![VPC Sharing](/assets/img/IMG_20220504-212047378.png)
 ![post-VPC-pricing-SAA](/assets/img/post-VPC-pricing-SAA.png)  
 
 ## Route Table
@@ -86,7 +86,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - 将 VGW attach to VPC（需要等待大约 5 分钟，状态更新为 Attached)  
 - 修改 route table 条目，指定 VGW 作为特定路由条目的 target/destination  
 - Eidt route table，可以打开 propagation, allows a virtual private gateway to automatically propagate routes to the route tables. This means that you don't need to manually enter VPN routes to your route tables   
-![post-VPC-RT-propagation](/assets/img/post-VPC-RT-propagation.png)  
+![post-VPC-RT-propagation](/assets/img/post-VPC-RT-propagation.png)
+![post-VPC-VGW-propagation-example](/assets/img/post-VPC-VGW-propagation-example.png)  
 
 ## IPAM - IP Address Manager
 - manage all the CIDR blocks that are used in an account or across an organization in AWS Organization  
@@ -138,7 +139,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - 缺点是 third-party vendor virtual appliances on EC2 费用高（实际上 TGW 费用也不低啊），VPN connection 吞吐量有限 (up to 1.25 Gbps per VPN tunnel)，手动配置、管理等   
 - 所以 AWS 是比较推荐使用 TGW，[表格里面提供了 VPC peering(year 2014)、transit VPC(year 2016)，TGW(year 2018) 的对比](https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/transit-vpc-solution.html)  
 
-![post-transit-vpc-how-it-design](/assets/img/post-transit-vpc-how-it-design.png)  
+![post-transit-vpc-how-it-design](/assets/img/post-transit-vpc-how-it-design.png)
 ![post-transmit-VPC-ANS-example](/assets/img/post-transmit-VPC-ANS-example.png)  
 
 # Transit Gateway
@@ -160,7 +161,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-ALB-sticky-session-ALWALB-ANS-example](/assets/img/post-ALB-sticky-session-ALWALB-ANS-example.png)  
 
 # NLB
-![post-NLB-tcp-443-ssl-cert-target-ANS-example](/assets/img/post-NLB-tcp-443-ssl-cert-target-ANS-example.png)  
+![post-NLB-tcp-443-ssl-cert-target-ANS-example](/assets/img/post-NLB-tcp-443-ssl-cert-target-ANS-example.png)
 ![post-NLB-register-IP-targets-PPv2-client-IP](/assets/img/post-NLB-register-IP-targets-PPv2-client-IP.png)  
 
 # GWLB
@@ -189,7 +190,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - DXGW 类似于 redundant BGP RR，或者说 distributed VRF  
 - on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接  
 - DXGW -- TGW -- transit VIF -- VPC, if you connect to multiple transit gateways that are in different resions, use unique BGP ASNs for each transit gateway.  
-![post-Direct-Connect-DXGW-example](/assets/img/post-Direct-Connect-DXGW-example.png)  
+![post-Direct-Connect-DXGW-example](/assets/img/post-Direct-Connect-DXGW-example.png)
 ![post-DXGW-TGW-example](/assets/img/post-DXGW-TGW-example.png)  
 
 ## VIF 分类和使用场景
@@ -224,9 +225,9 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 > Local preference 相当于 metadata，可以用来控制路由  
 > 只在 IBGP 邻居之间传递，不会传递到 EBGP  
 
-![post-Diirect-Connect-private-VIF-ANS-example](/assets/img/post-Diirect-Connect-private-VIF-ANS-example.png)  
+![post-Diirect-Connect-private-VIF-ANS-example](/assets/img/post-Diirect-Connect-private-VIF-ANS-example.png)
 [题目的参考文档](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/WorkingWithVirtualInterfaces.html)  
-![post-Direct-connect-public-VIF-example](/assets/img/post-Direct-connect-public-VIF-example.png)  
+![post-Direct-connect-public-VIF-example](/assets/img/post-Direct-connect-public-VIF-example.png)
 ![post-Direct-Connect-design-example](/assets/img/post-Direct-Connect-design-example.png)  
 
 ## one DX access to multiple US regions
@@ -309,8 +310,8 @@ BGP 参数
   - CMK 是 asymmetric，ECC_NIST_P256  
   - 必须在 us-east-1 region  
 - When you enable DNSSEC signing on a hosted zone, Route 53 cryptographically signs each record in that hosted zone. Route 53 manages the zone-signing key, and you can manage the __key-signing key(KSK)__ in AWS Key Management Service (AWS KMS).   
-![post-R53-DNSSEC-Key-signing-key-cfg](/assets/img/post-R53-DNSSEC-Key-signing-key-cfg.png)  
-![post-R53-DNSSEC-KSK-CMK-ANS-example](/assets/img/post-R53-DNSSEC-KSK-CMK-ANS-example.png)  
+![post-R53-DNSSEC-Key-signing-key-cfg](/assets/img/post-R53-DNSSEC-Key-signing-key-cfg.png)
+![post-R53-DNSSEC-KSK-CMK-ANS-example](/assets/img/post-R53-DNSSEC-KSK-CMK-ANS-example.png)
 ![post-R53-DNSSEC-KSK-CMK-ANS-example1](/assets/img/post-R53-DNSSEC-KSK-CMK-ANS-example1.png)  
 
 ## R53 Resolver DNS Firewall 
@@ -368,10 +369,10 @@ BGP 参数
 
 # Cloudfront
 
-![CF SAA example](/assets/img/post-CF-SAA.png)  
-![post-CF-SAA-example1](/assets/img/post-CF-SAA-example1.png)  
-![post-CF-S3-OAI-SAA](/assets/img/post-CF-S3-OAI-SAA.png)  
-![post-CF-S3-OAI-WAF-SAA](/assets/img/post-CF-S3-OAI-WAF-SAA.png)  
+![CF SAA example](/assets/img/post-CF-SAA.png)
+![post-CF-SAA-example1](/assets/img/post-CF-SAA-example1.png)
+![post-CF-S3-OAI-SAA](/assets/img/post-CF-S3-OAI-SAA.png)
+![post-CF-S3-OAI-WAF-SAA](/assets/img/post-CF-S3-OAI-WAF-SAA.png)
 ![post-CF-geo-restriction-example](/assets/img/post-CF-geo-restriction-example.png)  
 
 ## Versioning
