@@ -27,6 +27,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [路由控制、优先级](#路由控制优先级)
     - [Public VIF](#public-vif)
     - [Private VIF](#private-vif)
+    - [on-prem 视角](#on-prem-视角)
 - [VPN](#vpn-1)
 - [Route53 DNS](#route53-dns)
   - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
@@ -221,9 +222,10 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
     - No tag    – 全球 （所有公有 Amazon 区域）。  
 
 ### Private VIF
+- 站在 AWS DX/VIF 的视角去看，影响 `AWS --> on-prem` 的路由选路，不过所有手段都是开放给 on-prem 来执行  
 - 首先是 LPM 最优先  
 ![post-Direct-Connect-Route-LPM-first](/assets/img/post-Direct-Connect-Route-LPM-first.png)  
-- 若无法通过 LPM 控制，并且 [DX 与 VPC 在同 region](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)，可以通过 on-prem 的 AS_PATH prepended 来控制   
+- 若无法通过 LPM 控制，并且 [DX 与 VPC 在同 region](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)，可以通过 on-prem 的 AS_PATH prepending 来控制   
 ![post-Direct-Connect-Route-same-region-AS_PATH_shorter](/assets/img/post-Direct-Connect-Route-same-region-AS_PATH_shorter.png)  
 - 若 DX 与 VPC 不在相同 region，可以通过 on-prem 设置 Local Preference BGP community tags 来控制  
 - private，transmit VIF 支持 `Local Preference BGP community tags` 来 [控制 BGP 路由选路优先级](https://youtu.be/DXFooR95BYc?t=2007)，public VIF 不支持    
@@ -233,6 +235,12 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - 实现方式，AWS 在收到 on-prem 通告 BGP 路由时，检测到 **on-prem 添加的 Local Preference BGP community tags**，将对应 tags 当作 metadata 来处理，触发了一个行为，类似于使用 prefix-list 抓取携带了特定 tags 的路由条目，然后 set Local Pref  
 - 对于 AWS --> on-prem 方向的流量，将会参考 Local Pref    
 ![post-Direct-Connect-Route-Local_Pref_BGP-community-tags](/assets/img/post-Direct-Connect-Route-Local_Pref_BGP-community-tags.png)  
+
+### on-prem 视角
+- 站在 on-prem 视角，影响 `on-prem --> AWS` 的路由选路  
+- Local Pref，on-prem 设置  
+- Advertise more specific prefixes over one DX connection，从 AWS 侧控制  
+![post-Direct-Connect_Route-how-to-example](/assets/img/post-Direct-Connect_Route-how-to-example.png)  
 
 [Active/Passive](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)    
 A/A  
