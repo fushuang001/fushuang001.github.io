@@ -22,6 +22,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [VPC flowlog](#vpc-flowlog)
   - [VPC Traffic Mirroring](#vpc-traffic-mirroring)
 - [Transit Gateway](#transit-gateway)
+  - [TGW attachment types](#tgw-attachment-types)
   - [TGW Network Manager](#tgw-network-manager)
 - [ELB 对比](#elb-对比)
 - [ALB](#alb)
@@ -157,6 +158,13 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 # Transit Gateway
 
+## TGW attachment types
+- VPC  
+- peering  
+- Connect 
+  - use GRE(Generic Routing Encapsulation) for higher bandwidth performance compared to a VPN connection, SD-WAN     
+- VPN  
+
 ## TGW Network Manager
 [YouTube 视频](https://www.youtube.com/watch?v=xjH7GI95Pgg)  
 - [a service that provides a global view of your private network](https://aws.amazon.com/transit-gateway/network-manager/), allowing you to manage your AWS and on-premises resources and seamlessly integrate with your SD-WAN solutions  
@@ -211,7 +219,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接  
 - DXGW -- TGW -- transit VIF -- VPC, if you connect to multiple transit gateways that are in different resions, use unique BGP ASNs for each transit gateway.  
 ![post-Direct-Connect-DXGW-example](/assets/img/post-Direct-Connect-DXGW-example.png)
-![post-DXGW-TGW-example](/assets/img/post-DXGW-TGW-example.png)  
+![post-DXGW-TGW-example](/assets/img/post-DXGW-TGW-example.png)
+![post-DXGW-example](/assets/img/post-DXGW-example.png)  
 
 ## VIF 分类和使用场景
 - VIF 实际上是 dot1q vlan encapsulation 的 sub-interface  
@@ -375,7 +384,8 @@ BGP 参数
 - [Global Accelerator](https://aws.amazon.com/global-accelerator/?nc1=h_ls) 使用 AWS 全球骨干网，加速用户的访问  
 - 降低延迟、抖动、丢包  
 - 提供两个全球静态共有 IP(static public IP)  
-- 后端可以是 ALB, NLB, EC2, 或者 EIP
+- 后端可以是 ALB, NLB, EC2, 或者 EIP  
+- to reduce latency by routing traffic to the nearest application endpoint that is closest in proximity with the users  
 
 ![how it works](/assets/img/post-GA-how-it-works.png)  
 ![GA SAA example](/assets/img/post-GA-SAA.png)  

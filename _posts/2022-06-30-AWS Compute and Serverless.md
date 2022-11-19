@@ -26,6 +26,7 @@ tags:           AWS, SAA, EC2, Lambda, Serverless, ECS, EKS, Container
 - [Containers](#containers)
   - [ECS - Elastic Container Service](#ecs---elastic-container-service)
   - [EKS - Elastic Kubernetes Service](#eks---elastic-kubernetes-service)
+    - [EKS add-on for ELB](#eks-add-on-for-elb)
 - [Serveless](#serveless)
   - [Fargate](#fargate)
   - [Lambda](#lambda)
@@ -250,6 +251,13 @@ Amazon EKS is conceptually similar to Amazon ECS, but with the following differe
   - While Amazon ECS runs on AWS native technology, Amazon EKS runs on top of Kubernetes.  
 
 ![EKS SAA example](/assets/img/post-EKS-SAA.png)  
+
+### EKS add-on for ELB
+- `AWS Load Balancer Controller` optional add-on in EKS cluster that manages AWS ELB for EKS  
+  - Kubernetes Ingress  
+    - Load Balancer Controller will provision ALB  
+  - Load Balancer  
+    - Load Balancer Controller will provision NLB
 
 # Serveless
 合适的才是最好的，关注业务本身即可  
