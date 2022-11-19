@@ -61,6 +61,7 @@ PHD
 __Regional__  
 VPC  
 VPC Endpoint  
+Route 53 Resolver Inbound/Outbound Endpoint  
 TGW  
 EC2  
 ELB  

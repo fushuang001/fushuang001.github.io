@@ -19,6 +19,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [VPC Endpoint, Endpoint Services, PrivateLink](#vpc-endpoint-endpoint-services-privatelink)
   - [VPN](#vpn)
   - [Transit VPC](#transit-vpc)
+  - [VPC flowlog](#vpc-flowlog)
+  - [VPC Traffic Mirroring](#vpc-traffic-mirroring)
 - [Transit Gateway](#transit-gateway)
   - [TGW Network Manager](#tgw-network-manager)
 - [ELB 对比](#elb-对比)
@@ -145,10 +147,18 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-transit-vpc-how-it-design](/assets/img/post-transit-vpc-how-it-design.png)
 ![post-transmit-VPC-ANS-example](/assets/img/post-transmit-VPC-ANS-example.png)  
 
+## VPC flowlog
+
+## VPC Traffic Mirroring
+- target/destination:  
+  - ENI  
+  - NLB, UDP listener 4789  
+  - GWLBe, layer3 GW  
+
 # Transit Gateway
 
 ## TGW Network Manager
-[YouTube视频](https://www.youtube.com/watch?v=xjH7GI95Pgg)  
+[YouTube 视频](https://www.youtube.com/watch?v=xjH7GI95Pgg)  
 - [a service that provides a global view of your private network](https://aws.amazon.com/transit-gateway/network-manager/), allowing you to manage your AWS and on-premises resources and seamlessly integrate with your SD-WAN solutions  
 - 集中式网络监控，Centralized Network monitoring for events, metrics to monitor the quality of your [global network](https://docs.aws.amazon.com/vpc/latest/cloudwan/cloudwan-concepts.html), both AWS and on-premises  
 - 全球网络可见性，Global Network Visiblity  
@@ -311,7 +321,10 @@ BGP 参数
 ### alias vs. CNAME
 
 ## R53 DNS routing policy
-
+- **latency-based**  
+  - for an application that is hosted in multiple AWS regions, latency-based routing can *improve performance* for the application users by serving requests from the AWS region that provides the *lowest latency*, thus ensuring *highest performance*.  
+- geolocation
+- 
 ## DNSSEC DNS 安全扩展
 - [Domain Name System Security Extensions](https://aws.amazon.com/about-aws/whats-new/2020/12/announcing-amazon-route-53-support-dnssec/?nc1=h_ls)，DNS 安全扩展，为 DNS 提供数据来源认证和数据完整性验证，满足 FedRAMP 等法规要求  
 - public hosted zone 功能  
