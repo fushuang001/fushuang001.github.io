@@ -59,7 +59,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [R53 Resolver](#r53-resolver)
     - [Inbound Resolver Endpoint](#inbound-resolver-endpoint)
     - [Outbound Resolver Endpoint](#outbound-resolver-endpoint)
-    - [Query logging](#query-logging)
+    - [Public DNS Query logging for Public Hosted Zone](#public-dns-query-logging-for-public-hosted-zone)
+    - [Resolver query logging for Private Hosted Zone](#resolver-query-logging-for-private-hosted-zone)
   - [R53 Health Check](#r53-health-check)
 - [Global Accelerator](#global-accelerator)
   - [Global Accelerator vs Cloudfront](#global-accelerator-vs-cloudfront)
@@ -223,7 +224,6 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - [example of HowTo](https://aws.amazon.com/blogs/networking-and-content-delivery/diagnosing-traffic-disruption-using-aws-transit-gateway-network-manager-route-analyzer/)  
 - validate your existing route cfg  
 - diagnose route-related issues that are causing traffic disruption in your global network  
-
 
 # ELB 对比
 把之前做的表格添加过来  
@@ -435,9 +435,17 @@ BGP 参数
 
 ### Outbound Resolver Endpoint
 
-### Query logging 
-- public and private DNS query logging  
+### Public DNS Query logging for Public Hosted Zone 
+- [public hosted zone 可以配置，入口在 hosted zone，CW Logs group 接收日志](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html)  
 - [中国区暂时不支持 public DNS query logs](https://docs.amazonaws.cn/en_us/aws/latest/userguide/route53.html)  
+
+![post-R53-public-hosted-zone-query-logging](/assets/img/post-R53-public-hosted-zone-query-logging.png)
+![post-R53-public-hosted-zone-query-logging-cfg](/assets/img/post-R53-public-hosted-zone-query-logging-cfg.png)  
+
+### Resolver query logging for Private Hosted Zone
+- [private hosted zone，配置入口在 R53 Resolver，需要关联 VPC](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-query-logs.html)  
+
+![post-R53-Resolver-query-logging-public-and-PHZ](/assets/img/post-R53-Resolver-query-logging-public-and-PHZ.png)  
 
 ## R53 Health Check
 
