@@ -8,10 +8,14 @@ cover:          '/assets/img/bg-AWS-Networking-CDN.png'
 tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, ELB
 ---
 - [VPC](#vpc)
+  - [AmazonProvidedDNS](#amazonprovideddns)
+  - [Subnet](#subnet)
+    - [CIDR Reservation](#cidr-reservation)
   - [Route Table](#route-table)
     - [Route Table 优先级](#route-table-优先级)
     - [Route Table propagation](#route-table-propagation)
   - [IPAM - IP Address Manager](#ipam---ip-address-manager)
+  - [Reachability Analyzer](#reachability-analyzer)
   - [Egress-Only Internet Gateway](#egress-only-internet-gateway)
   - [EC2 bandwidth](#ec2-bandwidth)
     - [Enhanced networking - ENA](#enhanced-networking---ena)
@@ -26,6 +30,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [TGW flowlog](#tgw-flowlog)
   - [TGW attachment types](#tgw-attachment-types)
   - [TGW Network Manager](#tgw-network-manager)
+    - [Route Analyzer](#route-analyzer)
 - [ELB 对比](#elb-对比)
 - [ALB](#alb)
   - [Stick session](#stick-session)
@@ -34,6 +39,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [Direct Connect DX 专线](#direct-connect-dx-专线)
   - [DXGW](#dxgw)
   - [VIF 分类和使用场景](#vif-分类和使用场景)
+  - [VIF down, how to TS](#vif-down-how-to-ts)
   - [one DX access to multiple US regions](#one-dx-access-to-multiple-us-regions)
   - [路由控制、优先级](#路由控制优先级)
     - [Public VIF](#public-vif)
@@ -80,6 +86,20 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)
 ![post-VPC-pricing-SAA](/assets/img/post-VPC-pricing-SAA.png)  
 
+## AmazonProvidedDNS
+- VPC CIDR plus 2, eg. 10.0.0.2  
+- enableDnsHostNames, enableDnsSupport  
+
+## Subnet
+- [one subnet could only in one specific AZ](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html)  
+- could ipv6 only  
+- *Auto-assign IP settings*: public IP enalbe or not  
+- *Resource-based Name (RBN) settings*: the hostname type for EC2 instances in the subnet, how DNS A/AAAA record queries are handled  
+- minimum /28, maximum /16  
+
+### CIDR Reservation
+- prevent AWS from automatically assigning IPv4 or IPv6 addresses within a CIDR range you specify   
+
 ## Route Table
 - 每个 subnet 只能有一个 route table  
 - [Edge association](https://docs.amazonaws.cn/en_us/vpc/latest/userguide/VPC_Route_Tables.html) 一般用在 GWLB/security appliance 环境，关联 IGW  
@@ -103,6 +123,11 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - to avoid CIDR overlap  
 - CloudFormation can request a CIDR block from IPAM  
 ![post-VPC-IPAM-example](/assets/img/post-VPC-IPAM-example.png)  
+
+## Reachability Analyzer
+- a configuration analysis tool that enables you to *perform connectivity testing* between a source and destination resources *inside your VPCs*
+- verify that your network cfg matches your intended connectivity  
+- automate the verification of your connectivity intent as your network cfg changes  
 
 ## Egress-Only Internet Gateway
 - for ipv6, 效果类似于 NAT-GW，VPC --> Internet 流量主动出，拒绝外部始发的流量  
@@ -188,6 +213,17 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - 集中式网络监控，Centralized Network monitoring for events, metrics to monitor the quality of your [global network](https://docs.aws.amazon.com/vpc/latest/cloudwan/cloudwan-concepts.html), both AWS and on-premises  
 - 全球网络可见性，Global Network Visiblity  
 - SD-WAN integration  
+
+### Route Analyzer
+- [perform an analysis of the routes](https://docs.aws.amazon.com/vpc/latest/tgwnm/route-analyzer.html) in your *TGW route tables only*, for specifid source & destination    
+  - TGW have to register to Network Manager global network  
+  - does not analyze routes in VPC route tables or in your customer gateway devices  
+  - does not analyze security group rules or network ACL rules  
+  - Free to use as part of AWS Transit Gateway Network Manager  
+  - [example of HowTo](https://aws.amazon.com/blogs/networking-and-content-delivery/diagnosing-traffic-disruption-using-aws-transit-gateway-network-manager-route-analyzer/)  
+- validate your existing route cfg  
+- diagnose route-related issues that are causing traffic disruption in your global network  
+
 
 # ELB 对比
 把之前做的表格添加过来  
@@ -275,6 +311,11 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 [题目的参考文档](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/WorkingWithVirtualInterfaces.html)  
 ![post-Direct-connect-public-VIF-example](/assets/img/post-Direct-connect-public-VIF-example.png)
 ![post-Direct-Connect-design-example](/assets/img/post-Direct-Connect-design-example.png)  
+
+## VIF down, how to TS
+- physical, Tx/Rx, if any CRC/error    
+- layer2 VLAN encap, ARP  
+- layer3, correct peered IP address on sub-intf, not physical intf  
 
 ## one DX access to multiple US regions
 - on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability     
