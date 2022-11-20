@@ -15,6 +15,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Egress-Only Internet Gateway](#egress-only-internet-gateway)
   - [EC2 bandwidth](#ec2-bandwidth)
     - [Enhanced networking - ENA](#enhanced-networking---ena)
+    - [Elastic Fabric Adapter - EFA](#elastic-fabric-adapter---efa)
   - [prefix-list](#prefix-list)
   - [VPC Endpoint, Endpoint Services, PrivateLink](#vpc-endpoint-endpoint-services-privatelink)
   - [VPN](#vpn)
@@ -22,6 +23,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [VPC flowlog](#vpc-flowlog)
   - [VPC Traffic Mirroring](#vpc-traffic-mirroring)
 - [Transit Gateway](#transit-gateway)
+  - [TGW flowlog](#tgw-flowlog)
   - [TGW attachment types](#tgw-attachment-types)
   - [TGW Network Manager](#tgw-network-manager)
 - [ELB 对比](#elb-对比)
@@ -52,6 +54,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [Inbound Resolver Endpoint](#inbound-resolver-endpoint)
     - [Outbound Resolver Endpoint](#outbound-resolver-endpoint)
     - [Query logging](#query-logging)
+  - [R53 Health Check](#r53-health-check)
 - [Global Accelerator](#global-accelerator)
   - [Global Accelerator vs Cloudfront](#global-accelerator-vs-cloudfront)
 - [Cloudfront](#cloudfront)
@@ -126,6 +129,15 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 ![post-EC2-bandwidth-ENA](/assets/img/post-EC2-bandwidth-ENA.png)  
 
+### Elastic Fabric Adapter - EFA
+- ENA provide traditional IP networking features that are required to support VPC networking   
+- EFAs provide all of the same traditional IP networking features as ENAs, and they also [support OS-bypass capabilities](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa.html)  
+- OS-bypass enables *HPC and machine learning applications* to bypass the operating system kernel and to communicate directly with the EFA device  
+- low latency, high throught, and *instane could communicate directly with the network interface hardware*  
+- 通常用于 HPC 高性能集群、机器学习场景，instance 可以 bypass OS kernel，直接和网卡硬件/EFA 通信    
+
+![post-EC2-EFA](/assets/img/post-EC2-EFA.png)  
+
 ## prefix-list
 - 通过 prefix-list 来包含多个 IP 地址/段，可以被 security-group，route-table 引用  
 - prefix-list 的 Max entries 大小，占用 security-group 的空间；比如 Max entries = 10 但是只写了两个 entries，也会占用 10 个 SG 容量；Max entries 可以修改变大，不能变小  
@@ -157,6 +169,11 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - GWLBe, layer3 GW  
 
 # Transit Gateway
+- centrally connect multiple same region(could cross account) VPCs  
+- supports an MTU of 8500 bytes for traffic between VPCs, DX, TGW Connect, TGW peering  
+- support an MTU of 1500 bytes for traffic over VPN  
+
+## TGW flowlog
 
 ## TGW attachment types
 - VPC  
@@ -270,6 +287,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-RT-priority-Direct-Connect](/assets/img/post-RT-priority-Direct-Connect.png)  
 
 ### Public VIF
+- [public VIF 的 Active/Passive 路由控制](https://aws.amazon.com/premiumsupport/knowledge-center/dx-create-dx-connection-from-public-vif/?nc1=h_ls)  
 - 默认情况下，public VIF 会将 AWS global public IP prefix 通过 BGP 通告给 on-prem；用户可以联系 AWS 来通告 customer-owned IP prefix  
 - public VIF, private VIF 都可以使用 public(customer must own it) or private(64512-65535) ASN  
 - [public VIF 收到的客户侧路由明细，不会传播到 Internet 以及 AWS partner](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，使用 `no_export` 属性控制  
@@ -379,6 +397,8 @@ BGP 参数
 ### Query logging 
 - public and private DNS query logging  
 - [中国区暂时不支持 public DNS query logs](https://docs.amazonaws.cn/en_us/aws/latest/userguide/route53.html)  
+
+## R53 Health Check
 
 # Global Accelerator 
 - [Global Accelerator](https://aws.amazon.com/global-accelerator/?nc1=h_ls) 使用 AWS 全球骨干网，加速用户的访问  

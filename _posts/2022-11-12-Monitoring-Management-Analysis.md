@@ -9,6 +9,11 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 ---
 - [PHD(Personal Health Dashboard)](#phdpersonal-health-dashboard)
 - [CloudWatch](#cloudwatch)
+  - [CW Alarms](#cw-alarms)
+  - [CW Metrics](#cw-metrics)
+  - [CW Logs, Logs Insight](#cw-logs-logs-insight)
+  - [CW Insights for Lambda, Container, Contributor](#cw-insights-for-lambda-container-contributor)
+  - [X-Ray trace](#x-ray-trace)
 - [Cost Explorer](#cost-explorer)
 - [Cloudtrail](#cloudtrail)
   - [AWS Global Services](#aws-global-services)
@@ -31,6 +36,17 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 - 通过创建 CloudWatch Alert，在特定情况下（比如 EC2 CPU 利用率 5 分钟内持续 80%) 获得 SNS 告警，然后采取行动  
 - CloudWatch 默认采集 EC2 的 CPU 利用率，NetworkIn/Out 情况，不采集 EC2 memory usage, disk swap 信息  
 - 可以通过安装 CloudWatch Agent 来采集对应信息  
+
+## CW Alarms
+- based on Metrics to set Alarms, if triggered then you see Alerts  
+
+## CW Metrics
+
+## CW Logs, Logs Insight
+
+## CW Insights for Lambda, Container, Contributor
+
+## X-Ray trace
 
 # Cost Explorer
 
