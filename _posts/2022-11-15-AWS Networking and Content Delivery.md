@@ -39,7 +39,9 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [Direct Connect DX 专线](#direct-connect-dx-专线)
   - [DXGW](#dxgw)
   - [VIF 分类和使用场景](#vif-分类和使用场景)
-  - [VIF down, how to TS](#vif-down-how-to-ts)
+  - [DX 故障排查](#dx-故障排查)
+  - [data encrypt](#data-encrypt)
+    - [MACsec](#macsec)
   - [one DX access to multiple US regions](#one-dx-access-to-multiple-us-regions)
   - [路由控制、优先级](#路由控制优先级)
     - [Public VIF](#public-vif)
@@ -47,6 +49,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [on-prem 视角](#on-prem-视角)
     - [symmetry of flow](#symmetry-of-flow)
 - [VPN](#vpn-1)
+  - [Site-to-Site VPN](#site-to-site-vpn)
 - [Route53 DNS](#route53-dns)
   - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
   - [R53 支持的 DNS 类型](#r53-支持的-dns-类型)
@@ -65,6 +68,11 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [Global Accelerator](#global-accelerator)
   - [Global Accelerator vs Cloudfront](#global-accelerator-vs-cloudfront)
 - [Cloudfront](#cloudfront)
+  - [secure access and restrict access to content](#secure-access-and-restrict-access-to-content)
+    - [Signed URL, Signed cookes](#signed-url-signed-cookes)
+    - [restrict access to S3 origin, OAC and OAI](#restrict-access-to-s3-origin-oac-and-oai)
+    - [field-level encryption](#field-level-encryption)
+    - [Geographically restrict](#geographically-restrict)
   - [Versioning](#versioning)
   - [Customing with edge functions 边缘函数](#customing-with-edge-functions-边缘函数)
     - [Cloudfront Functions](#cloudfront-functions)
@@ -81,6 +89,18 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 [AWS 考试预约、培训视频、白皮书](https://aws.amazon.com/certification/certified-advanced-networking-specialty/)  
 [考试大纲，查漏补缺](https://d1.awsstatic.com/training-and-certification/docs-advnetworking-spec/AWS-Certified-Advanced-Networking-Specialty_Exam-Guide.pdf)  
 [AWS 官方讲解考试大纲，把书给读薄了](https://explore.skillbuilder.aws/learn/course/14434/exam-prep-advanced-networking-specialty-ans-c01)  
+注意 module 3 里面有一些问题，已经提交 feedback  
+Domain 3: Network Management and Operations  
+True or False?  
+The Route Analyzer feature analyzes routes in transit gateway route tables only.  
+  
+[The Route Analyzer analyzes routes in transit gateway route tables only. It does not analyze routes in VPC route tables or in your customer gateway devices.](https://docs.aws.amazon.com/vpc/latest/tgwnm/route-analyzer.html)   
+
+What is Amazon Route 53 Resolver Outbound Endpoint?  
+A feature you can enable in Amazon Route 53 that cryptographically signs each record in the hosted zone. This ensures that the DNS responses have not been tampered with during transit  
+
+[the question should be DNSSEC](https://aws.amazon.com/about-aws/whats-new/2020/12/announcing-amazon-route-53-support-dnssec/?nc1=h_ls)  
+
 [TD, tutorialsdojo，总结、exam dumps](https://tutorialsdojo.com/aws-certified-advanced-networking-specialty-exam-study-path-guide-ans-c01/)  
 
 # VPC
@@ -97,6 +117,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - *Auto-assign IP settings*: public IP enalbe or not  
 - *Resource-based Name (RBN) settings*: the hostname type for EC2 instances in the subnet, how DNS A/AAAA record queries are handled  
 - minimum /28, maximum /16  
+- network ACL 在 subnet 级别生效  
 
 ### CIDR Reservation
 - prevent AWS from automatically assigning IPv4 or IPv6 addresses within a CIDR range you specify   
@@ -288,6 +309,13 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - updating the connection disrupts network connectivity for all VIF associated with the connection for up to 30 seconds    
 - transmit VIF 最小 bandwidth 要求 1G，如果客户只需要 300M 带宽那么可以向 APN/ISP 订购 1G dedicate 专线，借助 QoS 在 ISP 限速  
 - private VIF，VGW 只能关联 1 个 VPC，DXGW 可以关联不同 region 最多 10 个 VGW(VGW -- VPC)    
+- 从购买、配置的角度来看：  
+  - standard VIF  
+    - 本 AWS account 下的 DX, VIF  
+  - hosted VIF  
+    - 跨 AWS account，共享 DX connection；或者从 APN 购买的 VIF  
+  - hosted connection
+    - sub-1G connection，一般是从 APN/ISP 购买  
 
 |                        | public VIF                     | private VIF                                 | transmit VIF                                |
 | ---------------------- | ------------------------------ | ------------------------------------------- | ------------------------------------------- |
@@ -312,10 +340,27 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-Direct-connect-public-VIF-example](/assets/img/post-Direct-connect-public-VIF-example.png)
 ![post-Direct-Connect-design-example](/assets/img/post-Direct-Connect-design-example.png)  
 
-## VIF down, how to TS
+## DX 故障排查
+- [参考文档](https://docs.aws.amazon.com/directconnect/latest/UserGuide/Troubleshooting.html)  
 - physical, Tx/Rx, if any CRC/error    
 - layer2 VLAN encap, ARP  
 - layer3, correct peered IP address on sub-intf, not physical intf  
+- layer4, TCP, BGP    
+
+## data encrypt
+- DX 本身只提供 private connection，并不提供加密  
+- 可以通过 MACsec 或者 IPsec VPN 来提供加密  
+
+### MACsec
+- IEEE 802.1 layer2 standard, provides data confidentiality, data integrity, data origin authenticity for DX  
+- only available on dedicated connection  
+- MACsec security key is a *pre-shared key* that establishes the MACsec connectivity between CGW & AWS, the key is generated by the devices at the ends of the connection using the CKN/CAK pair that you provide to AWS and have also provisioned on your device  
+- the key pairs used to generate the MACsec secret key:  
+  - Connectivity Association Key (CAK)   
+  - Connection Key Name (CKN)  
+
+![post-Direct-Connect-MACsec-howtocfg](/assets/img/post-Direct-Connect-MACsec-howtocfg.png)
+![post-Direct-Connect-MACsec-associate-MACsec-keys](/assets/img/post-Direct-Connect-MACsec-associate-MACsec-keys.png)  
 
 ## one DX access to multiple US regions
 - on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability     
@@ -375,10 +420,15 @@ BGP 参数
 ![post-Direct-Connect-symmetry-of-flow](/assets/img/post-Direct-Connect-symmetry-of-flow.png)  
 
 # VPN
+- AWS managed VPN, Site-to-Site, on-prem to VPC  
+- Client VPN, remote client to VPC  
+
+## Site-to-Site VPN
 ![post-VPN-example1](/assets/img/post-VPN-example1.png)
 ![post-VPN-TGW-ECMP-example](/assets/img/post-VPN-TGW-ECMP-example.png)  
 
 # Route53 DNS
+![post-R53-at-a-glance](/assets/img/post-R53-at-a-glance.png)  
 ![Route53 failover-health-check SAA example](/assets/img/post-R53-HC.png)  
 ![post-R53-geo-SAA](/assets/img/post-R53-geo-SAA.png)  
 
@@ -436,8 +486,11 @@ BGP 参数
 ### Outbound Resolver Endpoint
 
 ### Public DNS Query logging for Public Hosted Zone 
+- 所谓 public，两层含义，第一是 clients 来自公网，第二是 hosted zone 类型为 public  
 - [public hosted zone 可以配置，入口在 hosted zone，CW Logs group 接收日志](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html)  
 - [中国区暂时不支持 public DNS query logs](https://docs.amazonaws.cn/en_us/aws/latest/userguide/route53.html)  
+- Query logs contain only the queries that DNS resolvers forward to Route 53. 如果 DNS resolver 已经由缓存了，会在 R53 声明的 TTL 到期前，回复缓存内容  
+- 如果不需要明细内容，可以查看 [CW Metrics -- R53 -- Hosted Zone Metrics -- DNSQueries](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zone-public-viewing-query-metrics.html)
 
 ![post-R53-public-hosted-zone-query-logging](/assets/img/post-R53-public-hosted-zone-query-logging.png)
 ![post-R53-public-hosted-zone-query-logging-cfg](/assets/img/post-R53-public-hosted-zone-query-logging-cfg.png)  
@@ -474,8 +527,25 @@ BGP 参数
 
 ![CF SAA example](/assets/img/post-CF-SAA.png)
 ![post-CF-SAA-example1](/assets/img/post-CF-SAA-example1.png)
+
+## secure access and restrict access to content
+[保护数据安全](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/SecurityAndPrivateContent.html)  
+
+### Signed URL, Signed cookes
+
+### restrict access to S3 origin, OAC and OAI
 ![post-CF-S3-OAI-SAA](/assets/img/post-CF-S3-OAI-SAA.png)
-![post-CF-S3-OAI-WAF-SAA](/assets/img/post-CF-S3-OAI-WAF-SAA.png)
+![post-CF-S3-OAI-WAF-SAA](/assets/img/post-CF-S3-OAI-WAF-SAA.png)  
+
+### field-level encryption
+- enforce secure *end-to-end* connections *to origin* servers by using HTTPS  
+- client/viewer -- HTTPS --- Cloudfront --- HTTP Listener --- origin ALB --- EC2, only EC2 could decrypt and see the content 
+- [you need to specify the set of fields in POST requests that you want to be encrypted](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html), and the *public key*(asymmetric encryption) to use to encrypt them   
+
+![post-CF-field-level-encryption-howto](/assets/img/post-CF-field-level-encryption-howto.png)
+![post-CF-field-level-encryption-example](/assets/img/post-CF-field-level-encryption-example.png)  
+
+### Geographically restrict
 ![post-CF-geo-restriction-example](/assets/img/post-CF-geo-restriction-example.png)  
 
 ## Versioning
