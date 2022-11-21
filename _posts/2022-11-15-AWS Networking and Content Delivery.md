@@ -48,6 +48,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [Public VIF](#public-vif)
     - [Private VIF](#private-vif)
     - [on-prem 视角](#on-prem-视角)
+    - [Active/Passive 路由](#activepassive-路由)
     - [symmetry of flow](#symmetry-of-flow)
 - [VPN](#vpn-1)
   - [Site-to-Site VPN](#site-to-site-vpn)
@@ -206,6 +207,11 @@ A feature you can enable in Amazon Route 53 that cryptographically signs each re
 
 ## VPC Endpoint, Endpoint Services, PrivateLink
 S3 intf 走的是 private subnet/ip；gw 是 public ip
+
+![post-VPC-Endpoint-STS-proxy-exampel](/assets/img/post-VPC-Endpoint-STS-proxy-exampel.png)  
+[题目参考文档](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-proxy.html)  
+>If you configure a proxy on an Amazon EC2 instance launched with an attached IAM role, ensure that you exempt the address used to access the instance metadata.   
+>To do this, set the NO_PROXY environment variable to the IP address of the instance metadata service, 169.254.169.254. This address does not vary.
 
 ## VPN
 
@@ -386,8 +392,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-Direct-Connect-inter-region-capability](/assets/img/post-Direct-Connect-inter-region-capability.png)  
 
 ## 路由控制、优先级
-- 对于 VPC --> on-prem 方向的流量来说，首先参考 VPC 路由表，然后 DX 路由  
-- DX 路由表的 LPM(Longest Prefix Match) 条目优先级最高，然后 Local preference, AS-PATH 
+- 对于 VPC --> on-prem 方向的流量来说，首先参考 VPC 路由表，然后 DX 路由   
+- DX 路由表的 LPM(Longest Prefix Match) 条目优先级最高，然后 Local preference, AS-PATH   
 ![post-RT-priority-Direct-Connect](/assets/img/post-RT-priority-Direct-Connect.png)  
 
 ### Public VIF
@@ -429,9 +435,10 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - Advertise more specific prefixes over one DX connection，从 AWS 侧控制  
 ![post-Direct-Connect_Route-how-to-example](/assets/img/post-Direct-Connect_Route-how-to-example.png)  
 
+### Active/Passive 路由
 [Active/Passive](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)    
-A/A  
-BGP 参数  
+[Creating active/passive BGP connections over AWS Direct Connect](https://aws.amazon.com/es/blogs/networking-and-content-delivery/creating-active-passive-bgp-connections-over-aws-direct-connect/) 
+![post-Direct-Connect-Act-Pas-example](/assets/img/post-Direct-Connect-Act-Pas-example.png)  
 
 ### symmetry of flow
 - 云上、云下两个方向的流量，经过同一条线路  
