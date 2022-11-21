@@ -284,6 +284,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 # Direct Connect DX 专线
 [15 道 AWS 官方题库，DX 占比例很大](https://explore.skillbuilder.aws/learn/course/12676/aws-certified-advanced-networking-specialty-official-practice-question-set-ans-c01-english)  
 
+![post-Direct-Connect-resilience-example](/assets/img/post-Direct-Connect-resilience-example.png)  
+
 **申请步骤：**
 - 提交申请 connection request
 - 下载证书 LoA, Letter of Authorization
@@ -575,7 +577,7 @@ BGP 参数
 - 后端可以是 ALB, NLB, EC2, 或者 EIP  
 - 通过修改 R53 或者其他 vendor DNS 设置，把 domain name 指向 GA；DNS TTL 可以设置大一些，比如 1 day  
 - 建议 reduce your request and cookie size
-  - client --> AWS 方向，接收到完整 requests 之后，application 才能处理；更大的 request & cookie size，可能传输慢  
+  - client --> AWS 方向，接收到完整 requests 之后，application 才能处理；更大的 request & cookie size，如果网络状况差，可能传输慢  
   - AWS --> client 方向，DTO 是收费的  
   
 
