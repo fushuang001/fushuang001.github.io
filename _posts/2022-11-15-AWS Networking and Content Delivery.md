@@ -77,8 +77,10 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [field-level encryption](#field-level-encryption)
     - [Geographically restrict](#geographically-restrict)
   - [Versioning](#versioning)
+  - [Optimizing caching and availability 提高缓存命中率](#optimizing-caching-and-availability-提高缓存命中率)
   - [Customing with edge functions 边缘函数](#customing-with-edge-functions-边缘函数)
     - [Cloudfront Functions](#cloudfront-functions)
+  - [CF and edge function logging](#cf-and-edge-function-logging)
     - [Lambda@Edge](#lambdaedge)
 - [API Gateway](#api-gateway)
 - [Troubleshooting Tools](#troubleshooting-tools)
@@ -643,6 +645,21 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - versioning 比 invalidate 便宜，invalidate 操作收费，versioning 只是收取将 file 传递到 Edge 的费用  
 - CF access log 包含文件版本号，方便查看、排错  
 
+## Optimizing caching and availability 提高缓存命中率
+- Origin Shield
+  - 如果 PoP 没有 cache，PoP 去 REC；如果 REC 也没有 cache，就去 origin  
+  - 为了降低 origin 压力，更好的性能，可以指定 PoP 先去指定的 [REC(Origin Shield)](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html) 查看有没有 cache  
+  - 适用于实时流式处理、动态图像、clients分布在不同地理区域  
+![post-CF-origin-shield-howto](/assets/img/post-CF-origin-shield-howto.png)  
+
+- [What you can do to Improving performance](https://aws.amazon.com/blogs/networking-and-content-delivery/improve-your-website-performance-with-amazon-cloudfront/)  
+  - define your caching strategy  
+  - improve cache  hit ratio  
+  - utilize CF capabilities at Edge  
+    - HTTP redirect to HTTPs
+    - compression(cache policy, Gzip, Brotli) 省钱(DTO)  
+    - Origin Shield
+
 ## Customing with edge functions 边缘函数
 - 用户自定义代码，在 CF edge 运行，针对 HTTP request、respond 自定义   
 - 用户只需要关心部署到 CF 的代码/函数 (coding)，不需要关心 coding 所运行底层环境，按用量付费  
@@ -659,6 +676,27 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - request authorization  
 
 ![post-CF-edge-CF-Functions](/assets/img/post-CF-edge-CF-Functions.png)  
+
+## CF and edge function logging
+- [doc about the log feature](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/logging.html)  
+- **standsard logs(access logs)**  
+  - contain detailed info(33 fields) about every user requests that CF receives  
+  - delivery to S3 bucket    
+  - *Timing of log file delivery*: up to several times an hour, usually within an hour  
+- real-time logs  
+  - get info about requests made to a distribution in real time(*logs are delivered within seconds of receiving the requests*)  
+  - delivery to data stream in Amazon Kinesis Data Streams  
+  - sameling rate: the percentage of requests for which you want to receive real-time log records  
+  - specific fields(total 43 fields available)  
+    - origin-fbl(first-byte latency)  
+    - origin-lbl  
+    - cs-header-  
+  - specific cache behaviors (path patterns) that you want to receive real-time logs for  
+- *edge function logs*  
+  - for Lambda@Edge and CF Functions  
+  - delivery to CW logs group in us-east-1 region  
+
+![post-CF-realtime-logging-Kinesis-Data-Streams](/assets/img/post-CF-realtime-logging-Kinesis-Data-Streams.png)  
 
 ### Lambda@Edge
 - [Lambda 需要部署在 us-east-1 region](https://www.stormit.cloud/blog/lambda-at-edge/)，Node.js, Python  
