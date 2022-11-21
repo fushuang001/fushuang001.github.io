@@ -370,6 +370,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - layer3, correct peered IP address on sub-intf, not physical intf  
 - layer4, TCP, BGP    
 
+![post-Direct-Connect-mpls-Q-in-Q-example](/assets/img/post-Direct-Connect-mpls-Q-in-Q-example.png)  
+
 ## data encrypt
 - DX 本身只提供 private connection，并不提供加密  
 - 可以通过 MACsec 或者 IPsec VPN 来提供加密  
