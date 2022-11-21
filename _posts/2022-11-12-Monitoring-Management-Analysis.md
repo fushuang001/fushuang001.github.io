@@ -72,6 +72,7 @@ Route 53
 WAF  
 Cloudfront  
 Global Accellerator  
+DXGW  
 PHD  
 
 __Regional__  
