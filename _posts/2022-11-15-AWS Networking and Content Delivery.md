@@ -50,6 +50,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [symmetry of flow](#symmetry-of-flow)
 - [VPN](#vpn-1)
   - [Site-to-Site VPN](#site-to-site-vpn)
+  - [Client VPN](#client-vpn)
 - [Route53 DNS](#route53-dns)
   - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
   - [R53 支持的 DNS 类型](#r53-支持的-dns-类型)
@@ -80,7 +81,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [API Gateway](#api-gateway)
 - [Troubleshooting Tools](#troubleshooting-tools)
   - [DNS](#dns)
-  - [packets capture & analysis](#packets-capture--analysis)
+  - [packets capture \& analysis](#packets-capture--analysis)
   - [SSL/TLS](#ssltls)
   - [trace forwarding path](#trace-forwarding-path)
   - [Connections](#connections)
@@ -420,10 +421,50 @@ BGP 参数
 ![post-Direct-Connect-symmetry-of-flow](/assets/img/post-Direct-Connect-symmetry-of-flow.png)  
 
 # VPN
-- AWS managed VPN, Site-to-Site, on-prem to VPC  
-- Client VPN, remote client to VPC  
+- AWS managed VPN, Site-to-Site, on-prem DC & VPC  
+- Client VPN, remote client & VPC  
+- -[YouTube 视频，AWS re:Invent 2018](https://www.youtube.com/watch?v=qmKkbuS9gRs)  
 
 ## Site-to-Site VPN
+- fully managed and highly available VPN termination endpoints at AWS end  
+- *two VPN tunnels* per one VPN connection  
+- IPsec Site-to-Site tunnel with AES-256, SHA-2, and latest DH groups  
+- support for NAT-T  
+- charged per hour per VPN connection  
+- VPN setup options:
+  - Static  
+    - policy-based or route-based  
+    - static routing  
+    - pre-shared key  for tunnel authenication
+  - Dynamic  
+    - route-based only  
+    - dynamic routing(both side support BGP)  
+    - pre-shared key  
+- tunnel establishment - static & dynamic:
+  - one connection, two tunnel(in differ AZ for HA)  
+  - each tunnel limited up to 1.25 Gbps  
+  - on-prem --> AWS, could ECMP on both tunnels  
+  - AWS --> on-prem, if with VGW, could use only one of the tunnel  
+  - AWS --> on-prem, if with TGW, could use all of the tunnels for ECMP    
+
+![post-VPN-S2S-VGW-traffic-flow](/assets/img/post-VPN-S2S-traffic-flow.png)
+![post-VPN-S2S-TGW-traffic-flow-ECMP](/assets/img/post-VPN-S2S-TGW-traffic-flow-ECMP.png)  
+
+## Client VPN
+- AWS managed client-based VPN service  
+- secure access to any resource in AWS and on-premises from anywhere using *OpenVPN* clients  
+- client VPN Endpoint, is the terminate endpoint for your client VPN, in specific subnet    
+  - client VPN Endpoint could in *same VPC multiple subnets*, each AZ one subnet(similar with TGW)  
+  - AWS 在指定 subnet 放置一张 ENI，用来做 routing，实现方式和 TGW 类似  
+- *client authentication*，认证之后，可以连接 client VPN，但是流量不通  
+  - Active Directory，无论 AD 部署在什么位置，如果需要，可以借助 AD Connector 转发对应流量  
+  - manually authentication  
+- client authorization，授权，通过授权之后，才可以访问具体服务  
+  - network-based   
+  - security groups  
+ 
+![post-VPN-client-vpn-authentication-authorization](/assets/img/post-VPN-client-vpn-authentication-authorization.png)  
+
 ![post-VPN-example1](/assets/img/post-VPN-example1.png)
 ![post-VPN-TGW-ECMP-example](/assets/img/post-VPN-TGW-ECMP-example.png)  
 
