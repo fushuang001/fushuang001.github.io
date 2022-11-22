@@ -44,6 +44,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [data encrypt](#data-encrypt)
     - [MACsec](#macsec)
   - [one DX access to multiple US regions](#one-dx-access-to-multiple-us-regions)
+  - [access a remote AWS region](#access-a-remote-aws-region)
   - [路由控制、优先级](#路由控制优先级)
     - [Public VIF](#public-vif)
     - [Private VIF](#private-vif)
@@ -98,7 +99,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [performance, concurrent requests](#performance-concurrent-requests)
 
 [AWS 考试预约、培训视频、白皮书](https://aws.amazon.com/certification/certified-advanced-networking-specialty/)  
-[考试大纲，查漏补缺](https://d1.awsstatic.com/training-and-certification/docs-advnetworking-spec/AWS-Certified-Advanced-Networking-Specialty_Exam-Guide.pdf)  
+[Network Learning Plan，完整的学习路径](https://explore.skillbuilder.aws/learn/public/learning_plan/view/89/networking-learning-plan?la=sec&sec=lp)  
 [AWS 官方讲解考试大纲，把书给读薄了](https://explore.skillbuilder.aws/learn/course/14434/exam-prep-advanced-networking-specialty-ans-c01)  
 注意 module 3 里面有一些问题，已经提交 feedback  
 Domain 3: Network Management and Operations  
@@ -113,6 +114,8 @@ A feature you can enable in Amazon Route 53 that cryptographically signs each re
 [the question should be DNSSEC](https://aws.amazon.com/about-aws/whats-new/2020/12/announcing-amazon-route-53-support-dnssec/?nc1=h_ls)  
 
 [TD, tutorialsdojo，总结、exam dumps](https://tutorialsdojo.com/aws-certified-advanced-networking-specialty-exam-study-path-guide-ans-c01/)  
+[exam dumps](https://www.awslagi.com/aws-certified-advanced-networking-specialty-practice-exam/)  
+[exampracticetests，很多题的答案有问题，推荐用 Bing 搜索题干，查看 ExamTopics 的讨论](https://exampracticetests.com/aws/Advanced_Networking-Specialty_ANS-C00/)  
 
 # VPC
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)
@@ -166,6 +169,9 @@ A feature you can enable in Amazon Route 53 that cryptographically signs each re
 - to avoid CIDR overlap  
 - CloudFormation can request a CIDR block from IPAM  
 - for IPv4 & IPv6  
+- with AWS *[CloudFormation custom resource](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cfn-customresource.html)* and Lambda invocation, you could allocate IP when create VPC, and reclaim the VPC's IP allocation when VPC is deleted.
+  - CloudFormation Custom resources provide a way for you to write custom provisioning logic in CloudFormation template and have CloudFormation run it during a stack operation, such as when you create, update or delete a stack
+![post-VPC-IPAM-CFN-custom-resource-example](/assets/img/post-VPC-IPAM-CFN-custom-resource-example.png)
 ![post-VPC-IPAM-example](/assets/img/post-VPC-IPAM-example.png)  
 
 ## Network Analysis
@@ -408,6 +414,16 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability     
 - on-prem -- Direct Connect -- US region 1 -- AWS network -- US region 2，跨 region 的流量由 AWS 负责，路由表由 AWS 负责 (BGP 路由通告）    
 ![post-Direct-Connect-inter-region-capability](/assets/img/post-Direct-Connect-inter-region-capability.png)  
+
+## access a remote AWS region
+- AWS DX locations in *public Regions or AWSGovCloud(US)* can *access public services* in any other public region(excluding China)
+  - public VIF, and BGP
+- could *access a VPC* in your account as well
+  - DXGW in any region, DXGW -- DX connection --- private VIF --- remote region VPCs, or TGW
+  - or public VIF for DX connection, then establis a VPN connection to your VPC in remote region 
+- [single AWS DX connection for multi-Region servies](https://docs.aws.amazon.com/directconnect/latest/UserGuide/remote_regions.html)
+- All networking traffic remains on the AWS global network backbone
+![post-Direct-Connect-one-DX-connection-remote-Regions](/assets/img/post-Direct-Connect-one-DX-connection-remote-Regions.png)  
 
 ## 路由控制、优先级
 - 对于 VPC --> on-prem 方向的流量来说，首先参考 VPC 路由表，然后 DX 路由   
