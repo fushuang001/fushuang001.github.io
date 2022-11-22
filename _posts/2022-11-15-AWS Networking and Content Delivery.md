@@ -84,7 +84,6 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [CF and edge function logging](#cf-and-edge-function-logging)
 - [API Gateway](#api-gateway)
   - [Deployment types/部署类型](#deployment-types部署类型)
-  - [REST API 调用](#rest-api-调用)
   - [API Caching, throttle](#api-caching-throttle)
   - [Usage Plans and API Keys](#usage-plans-and-api-keys)
   - [Same Origin Policy](#same-origin-policy)
@@ -737,9 +736,26 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 # API Gateway
 - [API GW](https://www.amazonaws.cn/api-gateway/?nc1=h_ls)  
-- fully managed service/[完全托管服务](https://www.youtube.com/watch?v=1XcpQHfTOvs)，使用场景是创建、发布、维护、监控、保护任意规模的 API  
+- fully managed service/[完全托管服务](https://www.youtube.com/watch?v=1XcpQHfTOvs)，使用场景是创建、发布、维护、监控、保护任意规模的 API
+- [AWS re:Invent 2019: [REPEAT 2] I didn’t know Amazon API Gateway did that (SVS212-R2)](https://www.youtube.com/watch?v=yfJZc3sJZ8E)，幽默风趣，内容丰富
 - APIs act as "front door" for applications to access data/function from your backend services. API 作为 app 访问后端数据/服务的“前门”，后端可以是 EC2, Lambda, 或者任何 web application  
-- client -- API GW -- Lambda/EC2/DDB  
+- 支持 HTTP, REST, WebSocket API
+![REST API](/assets/img/IMG_20221012-163914187.png) 
+- **常见的 integration types/使用场景：**
+  - Lambda function
+    - connect via *proxy* or direct *integration*
+    - proxy:
+      - client --> API-GW(Wrapper with metadata and pass to the backend) --> Lambda
+      - client <-- API-GW(response pass, untouched, to client) <-- Lambda
+    - integration:
+      - client --> API-GW(by using VTL, requests can be modified by API-GW) --> Lambda
+      - ![post-APIGW-Lambda-integration-flow](/assets/img/post-APIGW-Lambda-integration-flow.png)
+  - HTTP/S
+  - AWS Services endpoints, such as EC2, DDB, Kinesis
+  - VPC PrivateLink(resources behind NLB)
+  - Mock
+    - respond to requests without a backend service(OPTIONS)
+    - 对比 CORS
 
 ## Deployment types/部署类型
 不同类型对应不同的场景，[参考文档](https://www.sentiatechblog.com/amazon-api-gateway-types-use-cases-and-performance)  
@@ -751,11 +767,11 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - reduced latency for requests that originate in the same region
   - can cfg your own CDN/CF
   - can protect with WAF
+  - recommended API type for general use cases
 - **Private endpoint**
   - securely expose your REST APIs only to other services within your VPC/DX
 
-## REST API 调用
-![REST API](/assets/img/IMG_20221012-163914187.png)  
+![post-APIGW-architecture-types](/assets/img/post-APIGW-architecture-types.png)   
 
 ## API Caching, throttle
 - API GW 从 Endpoint 拿到信息之后，第二次 client 请求就不会回源了，类似于 CF PoP 
