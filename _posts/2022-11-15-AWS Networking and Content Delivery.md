@@ -84,10 +84,11 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [CF and edge function logging](#cf-and-edge-function-logging)
 - [API Gateway](#api-gateway)
   - [Deployment types/部署类型](#deployment-types部署类型)
+  - [Security](#security)
   - [API Caching, throttle](#api-caching-throttle)
-  - [Usage Plans and API Keys](#usage-plans-and-api-keys)
   - [Same Origin Policy](#same-origin-policy)
     - [CORS 简单介绍](#cors-简单介绍)
+  - [Monitor, Metrics, Logs](#monitor-metrics-logs)
 - [Troubleshooting Tools](#troubleshooting-tools)
   - [DNS](#dns)
   - [packets capture \& analysis](#packets-capture--analysis)
@@ -752,7 +753,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
       - ![post-APIGW-Lambda-integration-flow](/assets/img/post-APIGW-Lambda-integration-flow.png)
   - HTTP/S
   - AWS Services endpoints, such as EC2, DDB, Kinesis
-  - VPC PrivateLink(resources behind NLB)
+  - VPC PrivateLink(resources behind NLB), private integrations
   - Mock
     - respond to requests without a backend service(OPTIONS)
     - 对比 CORS
@@ -773,18 +774,43 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ![post-APIGW-architecture-types](/assets/img/post-APIGW-architecture-types.png)   
 
+**Stages**
+- 不同环境，可能使用了不同的后端服务
+- 可以借助 Lambda Env Variable 或者 Aliases 来操作
+![post-APIGW-Stages](/assets/img/post-APIGW-Stages.png)  
+
+## Security
+- Authorization 认证
+  - Open, no authentication/authorization
+  - [IAM permissions](https://docs.aws.amazon.com/apigateway/latest/developerguide/security-iam.html)
+    - IAM policy, AWS credentials to grant access
+    - 简单场景，比如只暴露 API 给特定 IP range
+  - Amazon Cognito authorizer
+    - Amazon Cognito is a managed user directory for authentication
+    - connect to the Amazon *Cognito User Pool* and, with *OAuth*, scope to enable authorization
+  - Lambda authorizers
+    - 自定义 Lambda 来验证 bearer token(OAuth or SAML)
+- WAF
+  - 比如防范 SQLi，XSS
+  - block IP(API GW 借助 IAM resource policy 也可以做到，可能更经济实用）
+  - block requests originating from a specify country or region
+  - match specify string or regular expression pattern in the HTTP header, method, query string, URI, request body
+  - block atachks from specific user-agent, bad bots（对比 Bing, Google 等对 SEO 有好处的 good bots), and content scrapers/爬虫
+
 ## API Caching, throttle
 - API GW 从 Endpoint 拿到信息之后，第二次 client 请求就不会回源了，类似于 CF PoP 
+- leverage **cache keys** in order to optimize response
+  - path, headers, query strings
+- can be set up by stage or method
 - API GW is low cost and scales automatically
-- could  **throttle** API GW to prevent attacks   
-  - steady-state requests rate 10,000 per second  
-  - maximum concurrent requests is 5,000 across all APIs within an AWS account  
+- could  **throttle** API GW to prevent attacks，throttle 是 per region/per account 级别
+  - steady-state requests rate 10,000 per second(RPS)  
+  - maximum concurrent requests is 5,000 per second across all APIs within an AWS account  
+  - configure method-level throtting in a **Usage Plan**
+    - Usage Plans and API Keys，区分不同的用户，对 VIP 用户提供更多/更好的服务 
   - if exceed the limit, got `429 Too Many Requests` error response; client could resubmit the failed requests    
-![caching](/assets/img/IMG_20221012-171018008.png)  
-
-## Usage Plans and API Keys
-- 区分不同的用户，对 VIP 用户提供更多/更好的服务  
-![API Keys](/assets/img/IMG_20221012-171905991.png)  
+![caching](/assets/img/IMG_20221012-171018008.png) 
+![API Keys](/assets/img/IMG_20221012-171905991.png) 
 
 ## Same Origin Policy
 - [同源策略](https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy)，防止 Cross-Site-Scripting/XSS 攻击  
@@ -800,6 +826,30 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ![CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/cors_principle.png)  
 ![post-APIGW-CORS-SAP-example1](/assets/img/post-APIGW-CORS-SAP-example1.png)  
+
+## Monitor, Metrics, Logs
+[docs](https://docs.aws.amazon.com/apigateway/latest/developerguide/security-monitoring.html)  
+**Monitoring**  
+- CloudWatch
+  - 提供三个维度的 metrics，API-, stage-, method-level
+  - 4xx, 5xx
+  - Count, CacheHitCount, CacheMisCount
+  - IntegrationLatency
+- AWS X-Ray
+  - trace and analyze requests end to end
+- Cloudtrail
+- AWS Config
+  - assess/评估，audit, evaluate/评价 configuration updates
+
+**Logs**  
+- Logs to CloudWatch logs
+  - Execution logs
+  - error/info level
+  - log full requests/responses
+- Access logs
+  - customize log format
+  - CLF(Common Log Format), JSON, XML, CSV
+- Logs to Amazon Kinesis Data Firehose
 
 # Troubleshooting Tools
 
