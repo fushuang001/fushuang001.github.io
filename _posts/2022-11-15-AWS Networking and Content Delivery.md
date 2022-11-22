@@ -623,6 +623,10 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 | 价格       | fixed hourly fee, Data Transfer-Premium                                                                                                                    | Data Transfer Out, HTTP requests                                                                                                                                                                                                  |
 
 # Cloudfront
+![post-CF-overview](/assets/img/post-CF-overview.png)
+![post-CF-request-flow](/assets/img/post-CF-request-flow.png)
+![post-CF-Measuring-what-matters](/assets/img/post-CF-Measuring-what-matters.png)  
+> TTFB, Time To First Bytes  
 
 ![CF SAA example](/assets/img/post-CF-SAA.png)
 ![post-CF-SAA-example1](/assets/img/post-CF-SAA-example1.png)
@@ -654,19 +658,28 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - CF access log 包含文件版本号，方便查看、排错  
 
 ## Optimizing caching and availability 提高缓存命中率
-- Origin Shield
+- **Origin Shield**  
   - 如果 PoP 没有 cache，PoP 去 REC；如果 REC 也没有 cache，就去 origin  
   - 为了降低 origin 压力，更好的性能，可以指定 PoP 先去指定的 [REC(Origin Shield)](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html) 查看有没有 cache  
   - 适用于实时流式处理、动态图像、clients 分布在不同地理区域  
 ![post-CF-origin-shield-howto](/assets/img/post-CF-origin-shield-howto.png)  
 
-- [What you can do to Improving performance](https://aws.amazon.com/blogs/networking-and-content-delivery/improve-your-website-performance-with-amazon-cloudfront/)  
+- **What you can do to Improving performance**  
+![post-CF-content-breakdown-per-web-page](/assets/img/post-CF-content-breakdown-per-web-page.png)  
+  - [参考文档](https://aws.amazon.com/blogs/networking-and-content-delivery/improve-your-website-performance-with-amazon-cloudfront/)   
+  - [AWS re:Invent 2020: Improving website performance using Amazon CloudFront](https://www.youtube.com/watch?v=JUtM0hRoo8Q)  
   - define your caching strategy  
-  - improve cache  hit ratio  
+  - improve cache hit ratio  
+  - use HTTP2 if possible  
+  - use TLS1.3 if possible  
   - utilize CF capabilities at Edge  
     - HTTP redirect to HTTPs
     - compression(cache policy, Gzip, Brotli) 省钱 (DTO)  
+      - Brotli compression 是 Google 提出的一种压缩方式，比 gzip 优化 25%  
     - Origin Shield
+
+![post-CF-WordPress-CF-architecture-TTL-recommendations](/assets/img/post-CF-WordPress-CF-architecture-TTL-recommendations.png)
+![post-CF-performance-improvements-TLS1-3](/assets/img/post-CF-performance-improvements-TLS1-3.png)  
 
 ## Customing with edge functions 边缘函数
 - 用户自定义代码，在 CF edge 运行，针对 HTTP request、respond 自定义   
