@@ -747,7 +747,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
     - connect via *proxy* or direct *integration*
     - proxy:
       - client --> API-GW(Wrapper with metadata and pass to the backend) --> Lambda
-      - client <-- API-GW(response pass, untouched, to client) <-- Lambda
+      - client <-- API-GW(response pass, untouched, to client) <-- ([must be JSON format](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html))Lambda
     - integration:
       - client --> API-GW(by using VTL, requests can be modified by API-GW) --> Lambda
       - ![post-APIGW-Lambda-integration-flow](/assets/img/post-APIGW-Lambda-integration-flow.png)
