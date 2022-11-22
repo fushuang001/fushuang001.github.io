@@ -34,8 +34,6 @@ tags:           AWS, SAA, EC2, Lambda, Serverless, ECS, EKS, Container
     - [AWS Lambda function handler](#aws-lambda-function-handler)
     - [Environment variables](#environment-variables)
   - [Elastic Beanstalk](#elastic-beanstalk)
-  - [API Gateway](#api-gateway)
-    - [一些组件](#一些组件)
 - [SAM - Serverless Application Model](#sam---serverless-application-model)
 - [不同架构举例](#不同架构举例)
 - [Lambda, ECS，EKS 取舍](#lambda-ecseks-取舍)
@@ -318,56 +316,6 @@ You can use the following general syntax when creating a function handler in Pyt
 ## Elastic Beanstalk
 对于 developer 来说，如果不希望关注 infrastructure 比如 EC2, ELB, scaling, health check 等，可以交给 EB 负责；
 developer 一键式部署应用即可
-
-## API Gateway
-从分类来讲，[API GW](https://www.amazonaws.cn/api-gateway/?nc1=h_ls) 可以放到 Networking & Content Delivery，不过和 Lambda 集成多一些，所以放这里了   
-fully managed service/[完全托管服务](https://www.youtube.com/watch?v=1XcpQHfTOvs)，使用场景是创建、发布、维护、监控、保护任意规模的 API  
-APIs act as "front door" for applications to access data/function from your backend services. API 作为 app 访问后端数据/服务的“前门”，后端可以是 EC2, Lambda, 或者任何 web application  
-client -- API GW -- Lambda/EC2/DDB  
-
-### 一些组件
-<span style='background:lime;color:black'>Deployment types/部署类型</span>
-不同类型对应不同的场景，[参考文档](https://www.sentiatechblog.com/amazon-api-gateway-types-use-cases-and-performance)  
-- Edge-optimized endpoint
-  - client -- CF -API GW
-  - reduced latency for requests from around the world
-- Regional endpoint
-  - reduced latency for requests that originate in the same region
-  - can cfg your own CDN/CF
-  - can protect with WAF
-- Private endpoint
-  - securely expose your REST APIs only to other services within your VPC/DX
-
-<span style='background:lime;color:black'>REST API 调用</span>
-![REST API](/assets/img/IMG_20221012-163914187.png)  
-
-<span style='background:lime;color:black'>API Caching, throttle</span>
-- API GW 从 Endpoint 拿到信息之后，第二次 client 请求就不会回源了，类似于 CF PoP 
-- API GW is low cost and scales automatically
-- could  **throttle** API GW to prevent attacks   
-  - steady-state requests rate 10,000 per second  
-  - maximum concurrent requests is 5,000 across all APIs within an AWS account  
-  - if exceed the limit, got `429 Too Many Requests` error response; client could resubmit the failed requests    
-![caching](/assets/img/IMG_20221012-171018008.png)  
-
-<span style='background:lime;color:black'>Usage Plans and API Keys</span>
-- 区分不同的用户，对 VIP 用户提供更多/更好的服务  
-![API Keys](/assets/img/IMG_20221012-171905991.png)  
-
-<span style='background:lime;color:black'>Same Origin Policy</span>
-- [同源策略](https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy)，防止 Cross-Site-Scripting/XSS 攻击  
-- **从 client browser 层面来实现**，不过 Postman/curl 可能会忽略 XSS  
-- web browser permits scripts contained in a first web page to access data in a second web page, but only if both web pages have the same origin/domain name. 同源/同域名，同 scheme(http, https)，浏览器才认为 XSS 有效  
-
-<span style='background:lime;color:black'>CORS</span>
-- Cross-origin Resource Sharing，[跨域资源共享](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS)   
-- **server 层面来控制**，相当于在特定条件下 bypass Same Origin Policy  
-- let servers describe which origins are permitted to read that information from a web browser，所以实际上 CORS 是 enforced by client/broswer  
-- allows restricted resources(eg. fonts, images) on a web page to be requested from another domain outside the domain from which the first resource was served.  
-- when use Javascript/AJAX that uses multiple domains with API GW, ensure you have enabled CORS on API GW
-
-![CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/cors_principle.png)  
-![post-APIGW-CORS-SAP-example1](/assets/img/post-APIGW-CORS-SAP-example1.png)  
 
 # SAM - Serverless Application Model
 类似于 EB，借助 CloudFormation 来部署 serverless 应用的一种方式  
