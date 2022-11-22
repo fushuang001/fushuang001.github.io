@@ -743,14 +743,15 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ## Deployment types/部署类型
 不同类型对应不同的场景，[参考文档](https://www.sentiatechblog.com/amazon-api-gateway-types-use-cases-and-performance)  
-- Edge-optimized endpoint
+- **Edge-optimized endpoint**  
   - client -- CF -API GW
-  - reduced latency for requests from around the world
-- Regional endpoint
+    - CF to reduce TLS connection overhead(reduce roundtrip time)
+  - reduced latency for requests from around the world, designed for a globally distributed set of clients
+- **Regional endpoint**  
   - reduced latency for requests that originate in the same region
   - can cfg your own CDN/CF
   - can protect with WAF
-- Private endpoint
+- **Private endpoint**
   - securely expose your REST APIs only to other services within your VPC/DX
 
 ## REST API 调用
