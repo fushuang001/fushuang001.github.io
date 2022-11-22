@@ -462,6 +462,10 @@ CMK(Customer Managed Keys) 是 per region 的
 - generate, store, import, export and manage cryptographic keys, and KMS key materials  
 - audit the key usage independently of AWS Ctrail  
 - if requere to store the keys that has been validated to FIPS 140-S level 3  
+- Meet performance requirements of your applications through [elasticity, adding or removing HSM instances while achieving latency and reliability goals](https://aws.amazon.com/cloudhsm/features/).
+  - When you create an AWS CloudHSM cluster with more than one HSM, [you automatically get load balancing](https://docs.aws.amazon.com/cloudhsm/latest/userguide/clusters.html#cluster-high-availability-load-balancing)
+![post-CloudHSM-performance-scaling-load-balance](/assets/img/post-CloudHSM-performance-scaling-load-balance.png)
+![post--CloudHSM-performance-scaling-load-balance-example](/assets/img/post--CloudHSM-performance-scaling-load-balance-example.png)  
 
 ## GuardDuty
 provides intelligent **threat detection** for your AWS infrastructure and resources. It identifies threats by continuously monitoring the network activity and account behavior within your AWS environment.  
