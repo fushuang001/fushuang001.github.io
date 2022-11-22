@@ -16,7 +16,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [Route Table 优先级](#route-table-优先级)
     - [Route Table propagation](#route-table-propagation)
   - [IPAM - IP Address Manager](#ipam---ip-address-manager)
-  - [Reachability Analyzer](#reachability-analyzer)
+  - [Network Analysis](#network-analysis)
   - [EIGW - Egress-Only Internet Gateway](#eigw---egress-only-internet-gateway)
   - [EC2 bandwidth](#ec2-bandwidth)
     - [Enhanced networking - ENA](#enhanced-networking---ena)
@@ -80,8 +80,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Optimizing caching and availability 提高缓存命中率](#optimizing-caching-and-availability-提高缓存命中率)
   - [Customing with edge functions 边缘函数](#customing-with-edge-functions-边缘函数)
     - [Cloudfront Functions](#cloudfront-functions)
-  - [CF and edge function logging](#cf-and-edge-function-logging)
     - [Lambda@Edge](#lambdaedge)
+  - [CF and edge function logging](#cf-and-edge-function-logging)
 - [API Gateway](#api-gateway)
 - [Troubleshooting Tools](#troubleshooting-tools)
   - [DNS](#dns)
@@ -162,10 +162,17 @@ A feature you can enable in Amazon Route 53 that cryptographically signs each re
 - for IPv4 & IPv6  
 ![post-VPC-IPAM-example](/assets/img/post-VPC-IPAM-example.png)  
 
-## Reachability Analyzer
-- a configuration analysis tool that enables you to *perform connectivity testing* between a source and destination resources *inside your VPCs*
-- verify that your network cfg matches your intended connectivity  
-- automate the verification of your connectivity intent as your network cfg changes  
+## Network Analysis
+- **Reachability Analyzer**  
+  - 主要作用是检测 source、destination 流量不通时候，[security group、ACL、route table、ELB 等配置问题](https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html)   
+  - a configuration analysis tool that enables you to *perform connectivity testing* between a source and destination resources *inside your VPCs*
+  - verify that your network cfg matches your intended connectivity  
+  - automate the verification of your connectivity intent as your network cfg changes  
+ 
+- **Network Access Analyzer**  
+  - [主要作用是提高 AWS 云上资源的安全性，检测 network access 是否合规](https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/what-is-vaa.html)  
+  - identifie unintended network access to your resources on AWS 检测不应该被访问、扫描的服务  
+![post-VPC-Network-Access-Analyzer-howto](/assets/img/post-VPC-Network-Access-Analyzer-howto.png)  
 
 ## EIGW - Egress-Only Internet Gateway
 - for ipv6, 效果类似于 NAT-GW，VPC --> Internet 流量主动出，拒绝外部始发的流量  
@@ -251,7 +258,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - VPN  
 
 ## TGW Network Manager
-[YouTube 视频](https://www.youtube.com/watch?v=xjH7GI95Pgg)  
+- [YouTube 视频](https://www.youtube.com/watch?v=xjH7GI95Pgg)  
+- 主要作用是管理复杂的 global network，提高可见性，辅助快速定位故障，集中式监控、event 通知    
 - [a service that provides a global view of your private network](https://aws.amazon.com/transit-gateway/network-manager/), allowing you to manage your AWS and on-premises resources and seamlessly integrate with your SD-WAN solutions  
 - 集中式网络监控，Centralized Network monitoring for events, metrics to monitor the quality of your [global network](https://docs.aws.amazon.com/vpc/latest/cloudwan/cloudwan-concepts.html), both AWS and on-premises  
 - 全球网络可见性，Global Network Visiblity  
@@ -649,7 +657,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - Origin Shield
   - 如果 PoP 没有 cache，PoP 去 REC；如果 REC 也没有 cache，就去 origin  
   - 为了降低 origin 压力，更好的性能，可以指定 PoP 先去指定的 [REC(Origin Shield)](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html) 查看有没有 cache  
-  - 适用于实时流式处理、动态图像、clients分布在不同地理区域  
+  - 适用于实时流式处理、动态图像、clients 分布在不同地理区域  
 ![post-CF-origin-shield-howto](/assets/img/post-CF-origin-shield-howto.png)  
 
 - [What you can do to Improving performance](https://aws.amazon.com/blogs/networking-and-content-delivery/improve-your-website-performance-with-amazon-cloudfront/)  
@@ -657,7 +665,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - improve cache  hit ratio  
   - utilize CF capabilities at Edge  
     - HTTP redirect to HTTPs
-    - compression(cache policy, Gzip, Brotli) 省钱(DTO)  
+    - compression(cache policy, Gzip, Brotli) 省钱 (DTO)  
     - Origin Shield
 
 ## Customing with edge functions 边缘函数
@@ -677,27 +685,6 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ![post-CF-edge-CF-Functions](/assets/img/post-CF-edge-CF-Functions.png)  
 
-## CF and edge function logging
-- [doc about the log feature](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/logging.html)  
-- **standsard logs(access logs)**  
-  - contain detailed info(33 fields) about every user requests that CF receives  
-  - delivery to S3 bucket    
-  - *Timing of log file delivery*: up to several times an hour, usually within an hour  
-- real-time logs  
-  - get info about requests made to a distribution in real time(*logs are delivered within seconds of receiving the requests*)  
-  - delivery to data stream in Amazon Kinesis Data Streams  
-  - sameling rate: the percentage of requests for which you want to receive real-time log records  
-  - specific fields(total 43 fields available)  
-    - origin-fbl(first-byte latency)  
-    - origin-lbl  
-    - cs-header-  
-  - specific cache behaviors (path patterns) that you want to receive real-time logs for  
-- *edge function logs*  
-  - for Lambda@Edge and CF Functions  
-  - delivery to CW logs group in us-east-1 region  
-
-![post-CF-realtime-logging-Kinesis-Data-Streams](/assets/img/post-CF-realtime-logging-Kinesis-Data-Streams.png)  
-
 ### Lambda@Edge
 - [Lambda 需要部署在 us-east-1 region](https://www.stormit.cloud/blog/lambda-at-edge/)，Node.js, Python  
 - 在接近 viewer 的 edge location 执行，[实际上是 REC(Regional Edge Cache)](https://aws.amazon.com/cn/blogs/aws/introducing-cloudfront-functions-run-your-code-at-the-edge-with-low-latency-at-any-scale/)，并不是 Pop 节点  
@@ -707,6 +694,27 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ![post-CF-edge-LambdaEdge](/assets/img/post-CF-edge-LambdaEdge.png)  
 ![post-CF-edge-Lambda-at-Edge-ANS-example](/assets/img/post-CF-edge-Lambda-at-Edge-ANS-example.png)  
+
+## CF and edge function logging
+- [doc about the log feature](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/logging.html)  
+- **standsard logs(access logs)**  
+  - contain detailed info(33 fields) about every user requests that CF receives 并不是实时日志  
+  - delivery to S3 bucket    
+  - *Timing of log file delivery*: up to several times an hour, usually within an hour  
+- **real-time logs**  
+  - get info about requests made to a distribution in real time(*logs are delivered within seconds of receiving the requests*)，可以是多个 distribution，近乎实时的日志  
+  - delivery to data stream in Amazon Kinesis Data Streams  
+  - sameling rate: the percentage of requests for which you want to receive real-time log records  
+  - specific fields(total 43 fields available)  
+    - origin-fbl(first-byte latency)  
+    - origin-lbl  
+    - cs-header-  
+  - specific cache behaviors (path patterns) that you want to receive real-time logs for  
+- **edge function logs**  
+  - for Lambda@Edge and CF Functions  
+  - delivery to CW logs group in us-east-1 region  
+
+![post-CF-realtime-logging-Kinesis-Data-Streams](/assets/img/post-CF-realtime-logging-Kinesis-Data-Streams.png)  
 
 # API Gateway
 
