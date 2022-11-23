@@ -333,7 +333,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - DXGW 只是用来打通 on-premise & VPC 之间通信链路，并不负责 VPC 之间互相通信    
   - 新功能 [SiteLink](https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-aws-direct-connect-sitelink/)，创建 private/transit VIF 时候如果选择打开 *SiteLink*，就可以实现穿越 DXGW 通信  
   - DXGW 是 global 的，不区分 region；VGW 是 regional 的  
-  - DXGW 类似于 redundant BGP RR，或者说 distributed VRF  
+  - DXGW 类似于 redundant *BGP RR*，或者说 distributed VRF  
 - on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接  
 - DXGW -- TGW -- transit VIF -- VPC, if you connect to multiple transit gateways that are in different resions, use unique BGP ASNs for each transit gateway.  
 ![post-Direct-Connect-DXGW-example](/assets/img/post-Direct-Connect-DXGW-example.png)
@@ -359,23 +359,24 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
     - 本 AWS account 下的 DX, VIF  
   - hosted VIF  
     - 跨 AWS account，共享 DX connection；或者从 APN 购买的 VIF  
+    - ![post-Direct-Connect-hosted](/assets/img/post-Direct-Connect-hosted.png)
   - hosted connection
     - sub-1G connection，一般是从 APN/ISP 购买  
 
-|                        | public VIF                     | private VIF                                 | transmit VIF                                |
-| ---------------------- | ------------------------------ | ------------------------------------------- | ------------------------------------------- |
-| Connection Speed       | any                            | any                                         | speed >= 1G                                 |
-| Gateway type           | n/a                            | VGW/DXGW                                    | DXGW                                        |
-| Prefix limit(inbound)  | 1000                           | 100                                         | 100                                         |
-| Prefix limit(outbound) | n/a                            | n/a                                         | 20 per TGW-DXGW association                 |
-| Peer IPs minimum CIDR  | /31                            | /30                                         | /30                                         |
-| Support Jumbo Frames   | no                             | yes(9001)                                   | yes(8500)                                   |
-| Use case               | to AWS public services, eg. S3 | to VPC(1/10)                                | to multiple VPCs(1000) via TGW              |
-| uRPF check             | enabled                        | disabled                                    | disabled                                    |
-| Technical requirement  | vlan id, IP prefix             | vlan id, VGW/DXGW                           | vlan id, DXGW                               |
-| BGP ASN                | public/private                 | public/private                              | public/private                              |
-| BGP community          | scope(no_export)               | local pref                                  | local pref                                  |
-| Route Control          | LPM, AS_PATH                   | LPM, Local Pref BGP community tags, AS_PATH | LPM, Local Pref BGP community tags, AS_PATH |
+|                        | public VIF                                           | private VIF                                                          | transmit VIF                                                         |
+| ---------------------- | ---------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Connection Speed       | any                                                  | any                                                                  | speed >= 1G                                                          |
+| Gateway type           | n/a                                                  | VGW/DXGW                                                             | DXGW                                                                 |
+| Prefix limit(inbound)  | 1000                                                 | 100                                                                  | 100                                                                  |
+| Prefix limit(outbound) | n/a                                                  | n/a                                                                  | 20 per TGW-DXGW association                                          |
+| Peer IPs minimum CIDR  | /31                                                  | /30                                                                  | /30                                                                  |
+| Support Jumbo Frames   | no                                                   | yes(9001)                                                            | yes(8500)                                                            |
+| Use case               | to AWS public services, eg. S3                       | to VPC(1/10)                                                         | to multiple VPCs(1000) via TGW                                       |
+| uRPF check             | enabled                                              | disabled                                                             | disabled                                                             |
+| Technical requirement  | vlan id, IP prefix                                   | vlan id, VGW/DXGW                                                    | vlan id, DXGW                                                        |
+| BGP ASN                | public/private                                       | public/private                                                       | public/private                                                       |
+| BGP community          | scope(no_export)                                     | local pref                                                           | local pref                                                           |
+| Route Control          | LPM, AS_PATH(only supported when using a Public ASN) | LPM, Local Pref BGP community tags, AS_PATH, MED(lower is preferred) | LPM, Local Pref BGP community tags, AS_PATH, MED(lower is preferred) |
 
 > Local preference 相当于 metadata，可以用来控制路由  
 > 只在 IBGP 邻居之间传递，不会传递到 EBGP  
@@ -474,7 +475,13 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ### Active/Passive 路由
 [Active/Passive](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)    
 [Creating active/passive BGP connections over AWS Direct Connect](https://aws.amazon.com/es/blogs/networking-and-content-delivery/creating-active-passive-bgp-connections-over-aws-direct-connect/) 
-![post-Direct-Connect-Act-Pas-example](/assets/img/post-Direct-Connect-Act-Pas-example.png)  
+![post-BGP-routing-overview](/assets/img/post-BGP-routing-overview.png)
+>Local Pref, AS_Path 都可以用来做 inbound & outbound tuning
+> MED 用来做 inbound tuning, lower metric values are preferred
+
+![post-Direct-Connect-VIF-Act-Stby](/assets/img/post-Direct-Connect-VIF-Act-Stby.png)
+![post-Direct-Connect-Act-Pas-example](/assets/img/post-Direct-Connect-Act-Pas-example.png)
+![post-Direct-Connect-Act-Passive-example](/assets/img/post-Direct-Connect-Act-Passive-example.png)  
 
 ### symmetry of flow
 - 云上、云下两个方向的流量，经过同一条线路  
