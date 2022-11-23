@@ -34,6 +34,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [Route Analyzer](#route-analyzer)
 - [ELB 对比](#elb-对比)
 - [ALB](#alb)
+  - [Listener Rule condition types](#listener-rule-condition-types)
   - [Stick session](#stick-session)
 - [NLB](#nlb)
 - [GWLB](#gwlb)
@@ -114,8 +115,8 @@ A feature you can enable in Amazon Route 53 that cryptographically signs each re
 [the question should be DNSSEC](https://aws.amazon.com/about-aws/whats-new/2020/12/announcing-amazon-route-53-support-dnssec/?nc1=h_ls)  
 
 [TD, tutorialsdojo，总结、exam dumps](https://tutorialsdojo.com/aws-certified-advanced-networking-specialty-exam-study-path-guide-ans-c01/)  
-[exam dumps](https://www.awslagi.com/aws-certified-advanced-networking-specialty-practice-exam/)  
-[exampracticetests，很多题的答案有问题，推荐用 Bing 搜索题干，查看 ExamTopics 的讨论](https://exampracticetests.com/aws/Advanced_Networking-Specialty_ANS-C00/)  
+[exam dumps，答案并不全对，需要自己判断](https://www.awslagi.com/aws-certified-advanced-networking-specialty-practice-exam/)  
+[exampracticetests，很多题的答案有问题，推荐用 Bing 搜索题干或者某个选项内容，查看 ExamTopics 的讨论](https://exampracticetests.com/aws/Advanced_Networking-Specialty_ANS-C00/)  
 
 # VPC
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)
@@ -298,6 +299,25 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 把之前做的表格添加过来  
 
 # ALB
+
+## Listener Rule condition types
+[参考文档](https://docs.amazonaws.cn/en_us/elasticloadbalancing/latest/application/load-balancer-listeners.html)  
+- host-header
+  - *.example.com
+- http-header
+  - [User-Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent)
+    - The User-Agent request header is a characteristic string that lets servers and network peers identify the application, operating system, vendor, and/or version of the requesting user agent.
+- http-request-method
+  - GET
+- path-pattern
+  - /img/*
+- query-string
+  - Env:dev
+- source-ip
+  - 1.1.1.1
+
+![post-ALB-Listener-rules](/assets/img/post-ALB-Listener-rules.png)
+![post-ALB-Listener-rules-example](/assets/img/post-ALB-Listener-rules-example.png)
 
 ## Stick session
 - [stickiness session 支持两种类型](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/sticky-sessions.html)，duration based 和 application based  
