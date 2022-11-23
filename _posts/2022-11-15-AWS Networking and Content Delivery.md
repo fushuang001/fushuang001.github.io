@@ -444,13 +444,14 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-Direct-Connect-inter-region-capability](/assets/img/post-Direct-Connect-inter-region-capability.png)  
 
 ## access a remote AWS region
-- AWS DX locations in *public Regions or AWSGovCloud(US)* can *access public services* in any other public region(excluding China)
+- AWS DX locations in *public Regions or AWSGovCloud(US)* can **access public services** in any other public region(excluding China)
   - public VIF, and BGP
   - 只能通过 public VIF 来访问其他 region public service
   - 注意下面 “路由控制” 提到的 public VIF 适用的 community 7224:9300, global, by default
-- could *access a VPC* in your account as well
-  - DXGW in any region, DXGW -- DX connection --- private VIF --- remote region VPCs, or TGW
-  - or public VIF for DX connection, then establis a VPN connection to your VPC in remote region 
+- could **access a VPC** in your account as well
+  - *DXGW in any region*, DXGW -- DX connection --- private VIF --- remote region VPCs, or TGW
+  - or *public VIF for DX connection, then establis a VPN connection to your VPC in remote region* 
+  - ![post-Direct-Connect-assecc-remote-region-example](/assets/img/post-Direct-Connect-assecc-remote-region-example.png)
 - [single AWS DX connection for multi-Region servies](https://docs.aws.amazon.com/directconnect/latest/UserGuide/remote_regions.html)
 - All networking traffic remains on the AWS global network backbone
 ![post-Direct-Connect-one-DX-connection-remote-Regions](/assets/img/post-Direct-Connect-one-DX-connection-remote-Regions.png)  
