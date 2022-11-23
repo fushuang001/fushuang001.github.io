@@ -19,7 +19,8 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
   - [AWS Global Services](#aws-global-services)
 - [AWS Config](#aws-config)
 - [CloudFormation CFN](#cloudformation-cfn)
-  - [CloudFormation StackSets 堆栈集](#cloudformation-stacksets-堆栈集)
+  - [CFN StackSets 堆栈集](#cfn-stacksets-堆栈集)
+  - [CFN Stack Drift Detection // 堆栈集资源的配置发生了变化](#cfn-stack-drift-detection--堆栈集资源的配置发生了变化)
 - [EventBridge](#eventbridge)
 - [Trusted Advisor](#trusted-advisor)
 - [Cost Explore](#cost-explore)
@@ -89,16 +90,23 @@ DynamoDb
 - [AWS Config](https://aws.amazon.com/cn/config/faq/) 是 AWS 托管服务，提供 AWS 资源库存、配置历史记录和配置更改通知，以确保安全性和方便管理  
 - 借助 AWS Config，您可以找到现有的 AWS 资源，导出 AWS 资源的完整库存清单与所有配置详细信息，并确定在任何时间点上配置资源的方式  
 - 这些功能提供了合规性审计、安全分析、资源更改跟踪和故障排除  
+- 可以通过 SNS, EventBridge 等发送通知，EventBridge 可以联动 Lambda
 ![AWS Config SAA example](/assets/img/post-AWS-Config-SAA.png)  
 ![post-AWS-Config-automate-audit-cfg-changes](/assets/img/post-AWS-Config-automate-audit-cfg-changes.png)  
 
 # CloudFormation CFN
 
-## CloudFormation StackSets 堆栈集
+## CFN StackSets 堆栈集
 - AWS [CloudFormation StackSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/what-is-cfnstacksets.html) extends the capability of stacks by enabling you to create, update, or delete stacks across multiple accounts and AWS Regions with a single operation.  
 - 在单次操作中跨多个账户、region 场景、更新、删除 stack；通过 admin account，定义 CFN template，用模板来定义具体操作（比如创建 IAM role），应用到指定 target accounts  
 ![post-CFN-StackSets-how-it-works](/assets/img/post-CFN-StackSets-how-it-works.png)  
 ![post-CFN-StackSets-SAP-example](/assets/img/post-CFN-StackSets-SAP-example.png)  
+
+## CFN Stack Drift Detection // 堆栈集资源的配置发生了变化
+- 可以通过 check stack drift 来观察 CFN 创建的资源，相关配置没通过 CFN 做了修改
+- AWS Config 有一条 rule `cloudformation-stack-drift-detection-check` 来做相关检查
+![post-Config-CFN-drift-detection-check](/assets/img/post-Config-CFN-drift-detection-check.png)
+![post-Config-CFN-drift-detection-check-example](/assets/img/post-Config-CFN-drift-detection-check-example.png)
 
 # EventBridge
 - 根据特定 event，触发后续的联动操作  
