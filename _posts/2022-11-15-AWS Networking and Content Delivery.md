@@ -248,6 +248,13 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-transmit-VPC-ANS-example](/assets/img/post-transmit-VPC-ANS-example.png)  
 
 ## VPC flowlog
+- 三个层面可以配置，VPC, Subnet, ENI
+- 默认格式，自定义格式（比如 EKS 环境，希望查看真实 src/dest packets IP)
+- 保存到 S3 桶或者 CW Logs group，或者直接最为 producer 发送 stream data 到 Kinesis Firehose
+- 聚合时间 1 分钟，或者 10 分钟
+- [有一些 limitation](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html) 比如 DHCP, traffic mirror, 169.254 metadata, DNS, to NLB Endpoint Service 不会被记录
+![post-VPC-flowlog-cfg](/assets/img/post-VPC-flowlog-cfg.png)
+![post-VPC-flowlog-GuardDuty-example](/assets/img/post-VPC-flowlog-GuardDuty-example.png)
 
 ## VPC Traffic Mirroring
 - target/destination:  
@@ -476,7 +483,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 [Active/Passive](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)    
 [Creating active/passive BGP connections over AWS Direct Connect](https://aws.amazon.com/es/blogs/networking-and-content-delivery/creating-active-passive-bgp-connections-over-aws-direct-connect/) 
 ![post-BGP-routing-overview](/assets/img/post-BGP-routing-overview.png)
->Local Pref, AS_Path 都可以用来做 inbound & outbound tuning
+>Local Pref, AS_Path 都可以用来做 inbound & outbound tuning  
 > MED 用来做 inbound tuning, lower metric values are preferred
 
 ![post-Direct-Connect-VIF-Act-Stby](/assets/img/post-Direct-Connect-VIF-Act-Stby.png)
@@ -497,6 +504,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - *two VPN tunnels* per one VPN connection  
 - IPsec Site-to-Site tunnel with AES-256, SHA-2, and latest DH groups  
 - support for NAT-T  
+- [firewall rules bw the internet and your CGW](https://docs.aws.amazon.com/vpn/latest/s2svpn/your-cgw.html#FirewallRules)
+![post-VPN-firewall-rules](/assets/img/post-VPN-firewall-rules.png)  
 - charged per hour per VPN connection  
 - VPN setup options:
   - Static  
