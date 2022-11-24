@@ -273,6 +273,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
     - inter-region, intra-region TGW peering
   - Connect
     - GRE(Generic Routing Encapsulation), SD-WAN
+    - could over IGW(internet), or VGW(DX to VPC then EC2, the SD-WAN appliance)
     - ![post-TGW-SD-WAN-how-to](/assets/img/post-TGW-SD-WAN-how-to.png)
   - VPN
     - enable acceleration 
@@ -375,11 +376,11 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - VIF 实际上是 dot1q vlan encapsulation 的 sub-interface  
 - public VIF 连接 AWS Edge locations，访问 AWS public services  
 - private VIF 连接 VGW, DXGW  
-  - on-prem -- DX -- private VIF -- VPC -- PrivateLink/Endpoint -- AWS public services，[只针对 interface Endpoint，并不针对 gateway Endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-ddb.html)，这个架构当前也是 supported  
+  - on-prem -- DX -- private VIF -- VPC -- PrivateLink/Endpoint -- AWS public services，[只针对 interface Endpoint，并不针对 gateway Endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-ddb.html) 
+  - ![post-Direct-Connect-VPC-Endpoint-example](/assets/img/post-Direct-Connect-VPC-Endpoint-example.png) 
 - transit VIF 可以连接多个 VPC
   - 所以为什么还需要 private VIF？答案是 pricing，TGW 每小时收费并且处理流量收费
-  - 所以如果某个 VPC 的流量进、出 size 很大，推荐 private VIF
-![post-Direct-Connect-VPC-Endpoint-example](/assets/img/post-Direct-Connect-VPC-Endpoint-example.png)  
+  - 所以如果某个 VPC 的流量进、出 size 很大，推荐 private VIF 
 - 同一个 physical link、LAG 最多承载 50 个 public & private VIF，1 个 transit VIF    
 - VIF default MTU 1500，如果 private VIF, transmit VIF 需要开启 Jumbo Frames，需要手动配置
   - 若开启 Jumbo Frames，需要整个转发路径上的设备都支持 Jumbo Frames，比如 EC2, Router  
@@ -532,6 +533,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - AWS managed VPN, Site-to-Site, on-prem DC & VPC  
 - Client VPN, remote client & VPC  
 - -[YouTube 视频，AWS re:Invent 2018](https://www.youtube.com/watch?v=qmKkbuS9gRs)  
+![post-VPN-example1](/assets/img/post-VPN-example1.png)
+![post-VPN-TGW-ECMP-example](/assets/img/post-VPN-TGW-ECMP-example.png)  
 
 ## Site-to-Site VPN
 - fully managed and highly available VPN termination endpoints at AWS end  
@@ -558,6 +561,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - AWS --> on-prem, if with TGW, could use all of the tunnels for ECMP    
 - [enable acceleration](https://docs.aws.amazon.com/vpn/latest/s2svpn/accelerated-vpn.html) when use TGW VPN attachment
   - ![post-VPN-S2S-TGW-VPN-enable-acceleration](/assets/img/post-VPN-S2S-TGW-VPN-enable-acceleration.png)
+
 ![post-VPN-S2S-VGW-traffic-flow](/assets/img/post-VPN-S2S-traffic-flow.png)
 ![post-VPN-S2S-TGW-traffic-flow-ECMP-with-BGP](/assets/img/post-VPN-S2S-TGW-traffic-flow-ECMP-with-BGP.png)  
 
@@ -567,6 +571,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - client VPN Endpoint, is the terminate endpoint for your client VPN, in specific subnet    
   - client VPN Endpoint could in *same VPC multiple subnets*, each AZ one subnet(similar with TGW)  
   - AWS 在指定 subnet 放置一张 ENI，用来做 routing，实现方式和 TGW 类似  
+  - ![post-VPN-client-VPN](/assets/img/post-VPN-client-VPN.png)
 - *client authentication*，[认证之后，可以连接 client VPN，但是流量不通](https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/client-authentication.html)  
   - Active Directory，无论 AD 部署在什么位置，如果需要，可以借助 AD Connector 转发对应流量   
   - Federated, SAML  
@@ -582,9 +587,6 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-VPN-client-vpn-authentication-authorization](/assets/img/post-VPN-client-vpn-authentication-authorization.png)
 ![post-VPN-client-vpn-authorization-rule](/assets/img/post-VPN-client-vpn-authorization-rule.png)
 ![post-VPN-client-vpn-connectivity](/assets/img/post-VPN-client-vpn-connectivity.png)  
-
-![post-VPN-example1](/assets/img/post-VPN-example1.png)
-![post-VPN-TGW-ECMP-example](/assets/img/post-VPN-TGW-ECMP-example.png)  
 
 # Route53 DNS
 ![post-R53-at-a-glance](/assets/img/post-R53-at-a-glance.png)  
