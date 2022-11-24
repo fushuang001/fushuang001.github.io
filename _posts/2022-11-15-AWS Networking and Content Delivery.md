@@ -245,7 +245,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - 所以 AWS 是比较推荐使用 TGW，[表格里面提供了 VPC peering(year 2014)、transit VPC(year 2016)，TGW(year 2018) 的对比](https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/transit-vpc-solution.html)  
 
 ![post-transit-vpc-how-it-design](/assets/img/post-transit-vpc-how-it-design.png)
-![post-transmit-VPC-ANS-example](/assets/img/post-transmit-VPC-ANS-example.png)  
+![post-transmit-VPC-ANS-example](/assets/img/post-transmit-VPC-ANS-example.png)
+![post-VPC-transit-VPC-DX-example](/assets/img/post-VPC-transit-VPC-DX-example.png)
 
 ## VPC flowlog
 - 三个层面可以配置，VPC, Subnet, ENI
