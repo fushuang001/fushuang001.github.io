@@ -153,6 +153,7 @@ A feature you can enable in Amazon Route 53 that cryptographically signs each re
 ### Route Table 优先级
 - local 优先级最高，比如 local CIDR 10.0.0.0/16，那么即使用户有 LPM 10.0.0.0/24 static，也还是 local 优先  
 - 有一个例外，GWLB endpoint 环境，Internet --> VPC 的流量，用 LPM 先送去 GWLBe 做安全检查
+
 ![post-RT-priority-VPC](/assets/img/post-RT-priority-VPC.png)
 ![post-RT-priority-VPC--LPM-GWLBe](/assets/img/post-RT-priority-VPC--LPM-GWLBe.png)  
 
@@ -161,6 +162,7 @@ A feature you can enable in Amazon Route 53 that cryptographically signs each re
 - 将 VGW attach to VPC（需要等待大约 5 分钟，状态更新为 Attached)  
 - 修改 route table 条目，指定 VGW 作为特定路由条目的 target/destination  
 - Eidt route table，可以打开 propagation, allows a virtual private gateway to automatically propagate routes to the route tables. This means that you don't need to manually enter VPN routes to your route tables   
+
 ![post-VPC-RT-propagation](/assets/img/post-VPC-RT-propagation.png)
 ![post-VPC-VGW-propagation-example](/assets/img/post-VPC-VGW-propagation-example.png)  
 
@@ -171,6 +173,7 @@ A feature you can enable in Amazon Route 53 that cryptographically signs each re
 - for IPv4 & IPv6  
 - with AWS *[CloudFormation custom resource](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cfn-customresource.html)* and Lambda invocation, you could allocate IP when create VPC, and reclaim the VPC's IP allocation when VPC is deleted.
   - CloudFormation Custom resources provide a way for you to write custom provisioning logic in CloudFormation template and have CloudFormation run it during a stack operation, such as when you create, update or delete a stack
+
 ![post-VPC-IPAM-CFN-custom-resource-example](/assets/img/post-VPC-IPAM-CFN-custom-resource-example.png)
 ![post-VPC-IPAM-example](/assets/img/post-VPC-IPAM-example.png)  
 
@@ -184,11 +187,13 @@ A feature you can enable in Amazon Route 53 that cryptographically signs each re
 - **Network Access Analyzer**  
   - [主要作用是提高 AWS 云上资源的安全性，检测 network access 是否合规](https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/what-is-vaa.html)  
   - identifie unintended network access to your resources on AWS 检测不应该被访问、扫描的服务  
+
 ![post-VPC-Network-Access-Analyzer-howto](/assets/img/post-VPC-Network-Access-Analyzer-howto.png)  
 
 ## EIGW - Egress-Only Internet Gateway
 - for ipv6, 效果类似于 NAT-GW，VPC --> Internet 流量主动出，拒绝外部始发的流量  
 - 和 NAT-GW 不同点在于，ipv6 并不区分 private, public 网段，所以说，Egress-only IGW 和 clients 都是放在 public subnet 的  
+
 ![post-VPC-Egress-Only-IGW-example](/assets/img/post-VPC-Egress-Only-IGW-example.png)  
 
 ## EC2 bandwidth
@@ -224,6 +229,7 @@ A feature you can enable in Amazon Route 53 that cryptographically signs each re
 - 通过 prefix-list 来包含多个 IP 地址/段，可以被 security-group，route-table 引用  
 - prefix-list 的 Max entries 大小，占用 security-group 的空间；比如 Max entries = 10 但是只写了两个 entries，也会占用 10 个 SG 容量；Max entries 可以修改变大，不能变小  
 - 可以通过 [AWS-managed prefix-list](https://docs.aws.amazon.com/vpc/latest/userguide/working-with-aws-managed-prefix-lists.html)，比如`com.amazonaws.region.s3` 动态获取 AWS service IP ranges 最新地址范围，目前支持 CF, DDB, S3, Ground Station  
+
 ![post-AWS-managed-prefix-list](/assets/img/post-AWS-managed-prefix-list.png)  
 
 ## VPC Endpoint, Endpoint Services, PrivateLink
@@ -254,6 +260,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - 保存到 S3 桶或者 CW Logs group，或者直接最为 producer 发送 stream data 到 Kinesis Firehose
 - 聚合时间 1 分钟，或者 10 分钟
 - [有一些 limitation](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html) 比如 DHCP, traffic mirror, 169.254 metadata, DNS, to NLB Endpoint Service 不会被记录
+
 ![post-VPC-flowlog-cfg](/assets/img/post-VPC-flowlog-cfg.png)
 ![post-VPC-flowlog-GuardDuty-example](/assets/img/post-VPC-flowlog-GuardDuty-example.png)
 
@@ -267,7 +274,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - centrally connect multiple same region(could cross account) VPCs  
 - supports an MTU of 8500 bytes for traffic between VPCs, DX, TGW Connect, TGW peering  
 - support an MTU of 1500 bytes for traffic over VPN
-- attachment type:
+- **attachment type:**
   - VPC
   - Peering
     - inter-region, intra-region TGW peering
@@ -305,18 +312,18 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ## Listener Rule condition types
 [参考文档](https://docs.amazonaws.cn/en_us/elasticloadbalancing/latest/application/load-balancer-listeners.html)  
-- host-header
+- **host-header**
   - *.example.com
-- http-header
+- **http-header**
   - [User-Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent)
     - The User-Agent request header is a characteristic string that lets servers and network peers identify the application, operating system, vendor, and/or version of the requesting user agent.
-- http-request-method
+- **http-request-method**
   - GET
-- path-pattern
+- **path-pattern**
   - /img/*
-- query-string
+- **query-string**
   - Env:dev
-- source-ip
+- **source-ip**
   - 1.1.1.1
 
 ![post-ALB-Listener-rules](/assets/img/post-ALB-Listener-rules.png)
@@ -362,14 +369,15 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ## DXGW
 - DXGW 只是用来打通 on-premise & VPC 之间通信链路，并不负责 VPC 之间互相通信    
   - 新功能 [SiteLink](https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-aws-direct-connect-sitelink/)，创建 private/transit VIF 时候如果选择打开 *SiteLink*，就可以实现穿越 DXGW 通信  
+  - ![post-Direct-Connect-private-transit-VIF-DXGW-SiteLink](/assets/img/post-Direct-Connect-private-transit-VIF-DXGW-SiteLink.png) 
   - DXGW 是 global 的，不区分 region；VGW 是 regional 的  
   - DXGW 类似于 redundant *BGP RR*，或者说 distributed VRF  
 - on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接  
 - DXGW -- TGW -- transit VIF -- VPC, if you connect to multiple transit gateways that are in different resions, use unique BGP ASNs for each transit gateway.  
+  
 ![post-Direct-Connect-DXGW-example](/assets/img/post-Direct-Connect-DXGW-example.png)
 ![post-DXGW-TGW-example](/assets/img/post-DXGW-TGW-example.png)
-![post-DXGW-example](/assets/img/post-DXGW-example.png)
-![post-Direct-Connect-private-transit-VIF-DXGW-SiteLink](/assets/img/post-Direct-Connect-private-transit-VIF-DXGW-SiteLink.png)  
+![post-DXGW-example](/assets/img/post-DXGW-example.png) 
 
 ## VIF 分类和使用场景
 ![post-Direct-Connect-VIF-types](/assets/img/post-Direct-Connect-VIF-types.png)  
@@ -453,6 +461,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability
 - blog 的时间是 2013 年，还没有 DXGW(2017-Nov-01 announced)，所以说 US regions 的 inter-region 功能，并不需要 DXGW；和后面的 access a remot AWS region(DXGW needed) 不一样
 - on-prem -- Direct Connect -- US region 1 -- AWS network -- US region 2，跨 region 的流量由 AWS 负责，路由表由 AWS 负责 (BGP 路由通告）    
+
 ![post-Direct-Connect-inter-region-capability](/assets/img/post-Direct-Connect-inter-region-capability.png)  
 
 ## access a remote AWS region
@@ -466,11 +475,13 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - 和 US region 那里是同一道题，只不过关注点不同 ![post-Direct-Connect-access-remote-region-example](/assets/img/post-Direct-Connect-access-remote-region-example.png)
 - [single AWS DX connection for multi-Region servies](https://docs.aws.amazon.com/directconnect/latest/UserGuide/remote_regions.html)
 - All networking traffic remains on the AWS global network backbone
+
 ![post-Direct-Connect-one-DX-connection-remote-Regions](/assets/img/post-Direct-Connect-one-DX-connection-remote-Regions.png)  
 
 ## 路由控制、优先级
 - 对于 VPC --> on-prem 方向的流量来说，首先参考 VPC 路由表，然后 DX 路由   
 - DX 路由表的 LPM(Longest Prefix Match) 条目优先级最高，然后 Local preference, AS-PATH   
+
 ![post-RT-priority-Direct-Connect](/assets/img/post-RT-priority-Direct-Connect.png)  
 
 ### Public VIF
@@ -496,9 +507,9 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ### Private VIF
 - 站在 AWS DX/VIF 的视角去看，影响 `AWS --> on-prem` 的路由选路，不过所有手段都是开放给 on-prem 来执行  
 - 首先是 LPM 最优先  
-![post-Direct-Connect-Route-LPM-first](/assets/img/post-Direct-Connect-Route-LPM-first.png)  
+  - ![post-Direct-Connect-Route-LPM-first](/assets/img/post-Direct-Connect-Route-LPM-first.png)  
 - 若无法通过 LPM 控制，并且 [DX 与 VPC 在同 region](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)，可以通过 on-prem 的 AS_PATH prepending 来控制   
-![post-Direct-Connect-Route-same-region-AS_PATH_shorter](/assets/img/post-Direct-Connect-Route-same-region-AS_PATH_shorter.png)  
+  - ![post-Direct-Connect-Route-same-region-AS_PATH_shorter](/assets/img/post-Direct-Connect-Route-same-region-AS_PATH_shorter.png)  
 - 若 DX 与 VPC 不在相同 region，可以通过 on-prem 设置 Local Preference BGP community tags 来控制  
 - private，transmit VIF 支持 `Local Preference BGP community tags` 来 [控制 BGP 路由选路优先级](https://youtu.be/DXFooR95BYc?t=2007)，public VIF 不支持    
   - 7224:7100 — 低    
@@ -506,17 +517,19 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - 7224:7300 — 高    
 - 实现方式，AWS 在收到 on-prem 通告 BGP 路由时，检测到 **on-prem 添加的 Local Preference BGP community tags**，将对应 tags 当作 metadata 来处理，触发了一个行为，类似于使用 prefix-list 抓取携带了特定 tags 的路由条目，然后 set Local Pref  
 - 对于 AWS --> on-prem 方向的流量，将会参考 Local Pref    
-![post-Direct-Connect-Route-Local_Pref_BGP-community-tags](/assets/img/post-Direct-Connect-Route-Local_Pref_BGP-community-tags.png)  
+  - ![post-Direct-Connect-Route-Local_Pref_BGP-community-tags](/assets/img/post-Direct-Connect-Route-Local_Pref_BGP-community-tags.png)  
 
 ### on-prem 视角
 - 站在 on-prem 视角，影响 `on-prem --> AWS` 的路由选路  
 - Local Pref，on-prem 设置  
 - Advertise more specific prefixes over one DX connection，从 AWS 侧控制  
+
 ![post-Direct-Connect_Route-how-to-example](/assets/img/post-Direct-Connect_Route-how-to-example.png)  
 
 ### Active/Passive 路由
 [Active/Passive](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)    
 [Creating active/passive BGP connections over AWS Direct Connect](https://aws.amazon.com/es/blogs/networking-and-content-delivery/creating-active-passive-bgp-connections-over-aws-direct-connect/) 
+
 ![post-BGP-routing-overview](/assets/img/post-BGP-routing-overview.png)
 >Local Pref, AS_Path 都可以用来做 inbound & outbound tuning  
 > MED 用来做 inbound tuning, lower metric values are preferred
@@ -527,6 +540,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ### symmetry of flow
 - 云上、云下两个方向的流量，经过同一条线路  
+
 ![post-Direct-Connect-symmetry-of-flow](/assets/img/post-Direct-Connect-symmetry-of-flow.png)  
 
 # VPN
@@ -542,7 +556,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - IPsec Site-to-Site tunnel with AES-256, SHA-2, and latest DH groups  
 - support for NAT-T  
 - [firewall rules bw the internet and your CGW](https://docs.aws.amazon.com/vpn/latest/s2svpn/your-cgw.html#FirewallRules)
-![post-VPN-firewall-rules](/assets/img/post-VPN-firewall-rules.png)  
+  - ![post-VPN-firewall-rules](/assets/img/post-VPN-firewall-rules.png)  
 - charged per hour per VPN connection  
 - VPN setup options:
   - Static  
@@ -613,6 +627,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - CMK 是 asymmetric，ECC_NIST_P256  
   - 必须在 us-east-1 region  
 - When you enable DNSSEC signing on a hosted zone, Route 53 cryptographically signs each record in that hosted zone. Route 53 manages the zone-signing key, and you can manage the __key-signing key(KSK)__ in AWS Key Management Service (AWS KMS).   
+
 ![post-R53-DNSSEC-Key-signing-key-cfg](/assets/img/post-R53-DNSSEC-Key-signing-key-cfg.png)
 ![post-R53-DNSSEC-KSK-CMK-ANS-example](/assets/img/post-R53-DNSSEC-KSK-CMK-ANS-example.png)
 ![post-R53-DNSSEC-KSK-CMK-ANS-example1](/assets/img/post-R53-DNSSEC-KSK-CMK-ANS-example1.png)  
@@ -627,6 +642,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ## Split-view DNS，对内对外提供不同服务
 - 假设 example.com 对外、对内提供的服务不同，可以通过 R53 配置两个 hosted zone 都叫做 example.com，一个 public 对外，一个 private 关联 VPC 对内  
 - VPC 内设备会优先参考 PHZ(Private Hosted Zone) 做解析  
+
 ![post-R53-split-view-dns-ANS-example](/assets/img/post-R53-split-view-dns-ANS-example.png)  
 
 ## DNS resolution bw on-prem and AWS using AWS Directory Service
@@ -634,9 +650,9 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - [需要将 R53(VPC CIDR x.x.x.2) 与 AWS Directory Service Simple AD 结合使用](https://aws.amazon.com/cn/blogs/security/how-to-set-up-dns-resolution-between-on-premises-networks-and-aws-using-aws-directory-service-and-amazon-route-53/)  
 - Simple AD provides redundant and managed DNS services across AZs  
 - 将 on-prem DNS 解析放到 R53  
-![post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53](/assets/img/post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53.png)  
+  - ![post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53](/assets/img/post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53.png)  
 - 或者 VPC 的 DNS 解析放到 on-prem，若 on-prem 没有记录，再使用 `condition forwarder` 转发回 Simple AD --> R53  
-![post-VPC-DNS-to-On-prem](/assets/img/post-VPC-DNS-to-On-prem.png)  
+  - ![post-VPC-DNS-to-On-prem](/assets/img/post-VPC-DNS-to-On-prem.png)  
 - 举个栗子，ANS-C00 考试题
 ![post-intergate-DNS-on-prem-VPC-R53](/assets/img/post-intergate-DNS-on-prem-VPC-R53.png)  
 
@@ -742,6 +758,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - 如果 PoP 没有 cache，PoP 去 REC；如果 REC 也没有 cache，就去 origin  
   - 为了降低 origin 压力，更好的性能，可以指定 PoP 先去指定的 [REC(Origin Shield)](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html) 查看有没有 cache  
   - 适用于实时流式处理、动态图像、clients 分布在不同地理区域  
+
 ![post-CF-origin-shield-howto](/assets/img/post-CF-origin-shield-howto.png)  
 
 - **What you can do to Improving performance**  
@@ -824,7 +841,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
       - client <-- API-GW(response pass, untouched, to client) <-- ([must be JSON format](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html))Lambda
     - integration:
       - client --> API-GW(by using VTL, requests can be modified by API-GW) --> Lambda
-      - ![post-APIGW-Lambda-integration-flow](/assets/img/post-APIGW-Lambda-integration-flow.png)
+  ![post-APIGW-Lambda-integration-flow](/assets/img/post-APIGW-Lambda-integration-flow.png)
   - HTTP/S
   - AWS Services endpoints, such as EC2, DDB, Kinesis
   - VPC PrivateLink(resources behind NLB), private integrations
