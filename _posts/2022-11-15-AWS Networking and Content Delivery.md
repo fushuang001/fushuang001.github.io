@@ -452,7 +452,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - could **access a VPC** in your account as well
   - *DXGW in any region*, DXGW -- DX connection --- private VIF --- remote region VPCs, or TGW
   - or *public VIF for DX connection, then establis a VPN connection to your VPC in remote region* 
-  - 和 US region 那里是同一道题，只不过关注点不同 ![post-Direct-Connect-assecc-remote-region-example](/assets/img/post-Direct-Connect-assecc-remote-region-example.png)
+  - 和 US region 那里是同一道题，只不过关注点不同 ![post-Direct-Connect-access-remote-region-example](/assets/img/post-Direct-Connect-access-remote-region-example.png)
 - [single AWS DX connection for multi-Region servies](https://docs.aws.amazon.com/directconnect/latest/UserGuide/remote_regions.html)
 - All networking traffic remains on the AWS global network backbone
 ![post-Direct-Connect-one-DX-connection-remote-Regions](/assets/img/post-Direct-Connect-one-DX-connection-remote-Regions.png)  
