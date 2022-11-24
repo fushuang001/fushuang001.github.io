@@ -439,7 +439,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-Direct-Connect-MACsec-associate-MACsec-keys](/assets/img/post-Direct-Connect-MACsec-associate-MACsec-keys.png)  
 
 ## one DX access to multiple US regions
-- on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability     
+- on-prem 和某个 US regions VPC 建立 **dedicated** DX，[同一条 DX 可以打通 on-prem 与 US 其他 regions](https://aws.amazon.com/cn/blogs/aws/aws-direct-connect-access-to-multiple-us-regions/), DX inter-region capability
+- blog 的时间是 2013 年，还没有 DXGW(2017-Nov-01 announced)，所以说 US regions 的 inter-region 功能，并不需要 DXGW；和后面的 access a remot AWS region(DXGW needed) 不一样
 - on-prem -- Direct Connect -- US region 1 -- AWS network -- US region 2，跨 region 的流量由 AWS 负责，路由表由 AWS 负责 (BGP 路由通告）    
 ![post-Direct-Connect-inter-region-capability](/assets/img/post-Direct-Connect-inter-region-capability.png)  
 
@@ -451,7 +452,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - could **access a VPC** in your account as well
   - *DXGW in any region*, DXGW -- DX connection --- private VIF --- remote region VPCs, or TGW
   - or *public VIF for DX connection, then establis a VPN connection to your VPC in remote region* 
-  - ![post-Direct-Connect-assecc-remote-region-example](/assets/img/post-Direct-Connect-assecc-remote-region-example.png)
+  - 和 US region 那里是同一道题，只不过关注点不同 ![post-Direct-Connect-assecc-remote-region-example](/assets/img/post-Direct-Connect-assecc-remote-region-example.png)
 - [single AWS DX connection for multi-Region servies](https://docs.aws.amazon.com/directconnect/latest/UserGuide/remote_regions.html)
 - All networking traffic remains on the AWS global network backbone
 ![post-Direct-Connect-one-DX-connection-remote-Regions](/assets/img/post-Direct-Connect-one-DX-connection-remote-Regions.png)  
@@ -465,7 +466,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - [public VIF 的 Active/Passive 路由控制](https://aws.amazon.com/premiumsupport/knowledge-center/dx-create-dx-connection-from-public-vif/?nc1=h_ls)  
 - 默认情况下，public VIF 会将 AWS global public IP prefix 通过 BGP 通告给 on-prem；用户可以联系 AWS 来通告 customer-owned IP prefix  
 - public VIF, private VIF 都可以使用 public(customer must own it) or private(64512-65535) ASN  
-  - 如果使用public BGP ASN，customer must own it; only public BGP ASG support AS_PATH Prepending
+  - 如果使用 public BGP ASN，customer must own it; only public BGP ASG support AS_PATH Prepending
   - [post-Direct-Connect-public-VIF-route-control-example](/assets/img/post-Direct-Connect-public-VIF-route-control-example.png)
 - [public VIF 收到的客户侧路由明细，不会传播到 Internet 以及 AWS partner](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，使用 `no_export` 属性控制  
   - 但是 [客户侧通告到 AWS 的路由明细，是保留在 AWS DX 同 region，还是到 AWS all region(global)](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，可以通过 `scope BGP community tags` 来控制  
