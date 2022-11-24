@@ -103,21 +103,22 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 [Network Learning Plan，完整的学习路径](https://explore.skillbuilder.aws/learn/public/learning_plan/view/89/networking-learning-plan?la=sec&sec=lp)  
 [AWS 官方提供的 15 道题，和 10 个 sample questions 不一样](https://explore.skillbuilder.aws/learn/course/12676/aws-certified-advanced-networking-specialty-official-practice-question-set-ans-c01-english)  
 [AWS 官方讲解考试大纲，把书给读薄了](https://explore.skillbuilder.aws/learn/course/14434/exam-prep-advanced-networking-specialty-ans-c01)  
-  注意 module 3 里面有一些问题，已经提交 feedback  
-  Domain 3: Network Management and Operations  
-  True or False?  
-  The Route Analyzer feature analyzes routes in transit gateway route tables only.  
-    
-  [The Route Analyzer analyzes routes in transit gateway route tables only. It does not analyze routes in VPC route tables or in your customer gateway devices.](https://docs.aws.amazon.com/vpc/latest/tgwnm/route-analyzer.html)   
 
-  What is Amazon Route 53 Resolver Outbound Endpoint?  
-  A feature you can enable in Amazon Route 53 that cryptographically signs each record in the hosted zone. This ensures that the DNS responses have not been tampered with during transit  
+    注意 module 3 里面有一些问题，已经提交 feedback  
+    Domain 3: Network Management and Operations  
+    True or False?  
+    The Route Analyzer feature analyzes routes in transit gateway route tables only.  
+      
+    [The Route Analyzer analyzes routes in transit gateway route tables only. It does not analyze routes in VPC route tables or in your customer gateway devices.](https://docs.aws.amazon.com/vpc/latest/tgwnm/route-analyzer.html)   
 
-  [the question should be DNSSEC](https://aws.amazon.com/about-aws/whats-new/2020/12/announcing-amazon-route-53-support-dnssec/?nc1=h_ls)  
+    What is Amazon Route 53 Resolver Outbound Endpoint?  
+    A feature you can enable in Amazon Route 53 that cryptographically signs each record in the hosted zone. This ensures that the DNS responses have not been tampered with during transit  
+
+    [the question should be DNSSEC](https://aws.amazon.com/about-aws/whats-new/2020/12/announcing-amazon-route-53-support-dnssec/?nc1=h_ls)  
 
 [TD, tutorialsdojo，总结、exam dumps](https://tutorialsdojo.com/aws-certified-advanced-networking-specialty-exam-study-path-guide-ans-c01/)  
-[exam dumps，答案并不全对，需要自己判断](https://www.awslagi.com/aws-certified-advanced-networking-specialty-practice-exam/)  
-[exampracticetests，很多题的答案有问题，推荐用 Bing 搜索题干或者某个选项内容，查看 ExamTopics 的讨论](https://exampracticetests.com/aws/Advanced_Networking-Specialty_ANS-C00/)  
+[exam dumps，答案可能有问题，需要自己判断](https://www.awslagi.com/aws-certified-advanced-networking-specialty-practice-exam/)  
+[exampracticetests，答案可能有问题，推荐 Bing 搜索查看 ExamTopics 的讨论](https://exampracticetests.com/aws/Advanced_Networking-Specialty_ANS-C00/)  
 
 # VPC
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)
