@@ -244,10 +244,10 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - on-prem 与 [Transit VPC](https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/transit-vpc-option.html) 打通 VPN 连接，之后通过 Transit VPC，打通 on-prem 与其他 VPC 之间的连接  
 - hub-spoke 模型提供 inter-VPC connectivity, hub/central VPC 通常使用 `BGP over IPsec VPN` 连接 spoke VPC  
 - Transit/hub/central VPC 使用 EC2 virtual Router 借助第三方 software appliances that route incoming traffic to their destinations using the VPN overlay
-- 不可能使用两个 VGW 建立 VPN 连接
-  - ![post-VPC-transit-VPC-example](/assets/img/post-VPC-transit-VPC-example.png)    
+- 不可能使用两个 VGW 建立 VPN 连接   
   - 优点是 hub/central 的 EC2 virtual router 可以提供 IPS/WAF 等功能；hub-spoke 设计相对简单，transitive routing enabled using the overlay VPN network  
   - 缺点是 third-party vendor virtual appliances on EC2 费用高（实际上 TGW 费用也不低啊），VPN connection 吞吐量有限 (up to 1.25 Gbps per VPN tunnel)，手动配置、管理等   
+  ![post-VPC-transit-VPC-example](/assets/img/post-VPC-transit-VPC-example.png) 
 - 所以 AWS 是比较推荐使用 TGW，[表格里面提供了 VPC peering(year 2014)、transit VPC(year 2016)，TGW(year 2018) 的对比](https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/transit-vpc-solution.html)  
 
 ![post-transit-vpc-how-it-design](/assets/img/post-transit-vpc-how-it-design.png)
@@ -281,7 +281,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - Connect
     - GRE(Generic Routing Encapsulation), SD-WAN
     - could over IGW(internet), or VGW(DX to VPC then EC2, the SD-WAN appliance)
-    - ![post-TGW-SD-WAN-how-to](/assets/img/post-TGW-SD-WAN-how-to.png)
+    ![post-TGW-SD-WAN-how-to](/assets/img/post-TGW-SD-WAN-how-to.png)
   - VPN
     - enable acceleration 
 
@@ -368,10 +368,10 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ## DXGW
 - DXGW 只是用来打通 on-premise & VPC 之间通信链路，并不负责 VPC 之间互相通信    
-  - 新功能 [SiteLink](https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-aws-direct-connect-sitelink/)，创建 private/transit VIF 时候如果选择打开 *SiteLink*，就可以实现穿越 DXGW 通信  
-  - ![post-Direct-Connect-private-transit-VIF-DXGW-SiteLink](/assets/img/post-Direct-Connect-private-transit-VIF-DXGW-SiteLink.png) 
+  - 新功能 [SiteLink](https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-aws-direct-connect-sitelink/)，创建 private/transit VIF 时候如果选择打开 *SiteLink*，就可以实现穿越 DXGW 通信   
   - DXGW 是 global 的，不区分 region；VGW 是 regional 的  
   - DXGW 类似于 redundant *BGP RR*，或者说 distributed VRF  
+  ![post-Direct-Connect-private-transit-VIF-DXGW-SiteLink](/assets/img/post-Direct-Connect-private-transit-VIF-DXGW-SiteLink.png)
 - on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接  
 - DXGW -- TGW -- transit VIF -- VPC, if you connect to multiple transit gateways that are in different resions, use unique BGP ASNs for each transit gateway.  
   
@@ -385,7 +385,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - public VIF 连接 AWS Edge locations，访问 AWS public services  
 - private VIF 连接 VGW, DXGW  
   - on-prem -- DX -- private VIF -- VPC -- PrivateLink/Endpoint -- AWS public services，[只针对 interface Endpoint，并不针对 gateway Endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-ddb.html) 
-  - ![post-Direct-Connect-VPC-Endpoint-example](/assets/img/post-Direct-Connect-VPC-Endpoint-example.png) 
+  ![post-Direct-Connect-VPC-Endpoint-example](/assets/img/post-Direct-Connect-VPC-Endpoint-example.png) 
 - transit VIF 可以连接多个 VPC
   - 所以为什么还需要 private VIF？答案是 pricing，TGW 每小时收费并且处理流量收费
   - 所以如果某个 VPC 的流量进、出 size 很大，推荐 private VIF 
@@ -400,7 +400,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
     - 本 AWS account 下的 DX, VIF  
   - hosted VIF  
     - 跨 AWS account，共享 DX connection；或者从 APN 购买的 VIF  
-    - ![post-Direct-Connect-hosted](/assets/img/post-Direct-Connect-hosted.png)
+    ![post-Direct-Connect-hosted](/assets/img/post-Direct-Connect-hosted.png)
   - **dedicated connection**
     - 1, 10, 100 Gbps
     - 50 VIFs and 1 transit VIF per dedicated connection
@@ -507,9 +507,9 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ### Private VIF
 - 站在 AWS DX/VIF 的视角去看，影响 `AWS --> on-prem` 的路由选路，不过所有手段都是开放给 on-prem 来执行  
 - 首先是 LPM 最优先  
-  - ![post-Direct-Connect-Route-LPM-first](/assets/img/post-Direct-Connect-Route-LPM-first.png)  
+  ![post-Direct-Connect-Route-LPM-first](/assets/img/post-Direct-Connect-Route-LPM-first.png)  
 - 若无法通过 LPM 控制，并且 [DX 与 VPC 在同 region](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)，可以通过 on-prem 的 AS_PATH prepending 来控制   
-  - ![post-Direct-Connect-Route-same-region-AS_PATH_shorter](/assets/img/post-Direct-Connect-Route-same-region-AS_PATH_shorter.png)  
+  ![post-Direct-Connect-Route-same-region-AS_PATH_shorter](/assets/img/post-Direct-Connect-Route-same-region-AS_PATH_shorter.png)  
 - 若 DX 与 VPC 不在相同 region，可以通过 on-prem 设置 Local Preference BGP community tags 来控制  
 - private，transmit VIF 支持 `Local Preference BGP community tags` 来 [控制 BGP 路由选路优先级](https://youtu.be/DXFooR95BYc?t=2007)，public VIF 不支持    
   - 7224:7100 — 低    
@@ -517,7 +517,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - 7224:7300 — 高    
 - 实现方式，AWS 在收到 on-prem 通告 BGP 路由时，检测到 **on-prem 添加的 Local Preference BGP community tags**，将对应 tags 当作 metadata 来处理，触发了一个行为，类似于使用 prefix-list 抓取携带了特定 tags 的路由条目，然后 set Local Pref  
 - 对于 AWS --> on-prem 方向的流量，将会参考 Local Pref    
-  - ![post-Direct-Connect-Route-Local_Pref_BGP-community-tags](/assets/img/post-Direct-Connect-Route-Local_Pref_BGP-community-tags.png)  
+  ![post-Direct-Connect-Route-Local_Pref_BGP-community-tags](/assets/img/post-Direct-Connect-Route-Local_Pref_BGP-community-tags.png)  
 
 ### on-prem 视角
 - 站在 on-prem 视角，影响 `on-prem --> AWS` 的路由选路  
@@ -556,7 +556,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - IPsec Site-to-Site tunnel with AES-256, SHA-2, and latest DH groups  
 - support for NAT-T  
 - [firewall rules bw the internet and your CGW](https://docs.aws.amazon.com/vpn/latest/s2svpn/your-cgw.html#FirewallRules)
-  - ![post-VPN-firewall-rules](/assets/img/post-VPN-firewall-rules.png)  
+   ![post-VPN-firewall-rules](/assets/img/post-VPN-firewall-rules.png)  
 - charged per hour per VPN connection  
 - VPN setup options:
   - Static  
@@ -574,7 +574,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - AWS --> on-prem, if with VGW, could use only one of the tunnel  
   - AWS --> on-prem, if with TGW, could use all of the tunnels for ECMP    
 - [enable acceleration](https://docs.aws.amazon.com/vpn/latest/s2svpn/accelerated-vpn.html) when use TGW VPN attachment
-  - ![post-VPN-S2S-TGW-VPN-enable-acceleration](/assets/img/post-VPN-S2S-TGW-VPN-enable-acceleration.png)
+  ![post-VPN-S2S-TGW-VPN-enable-acceleration](/assets/img/post-VPN-S2S-TGW-VPN-enable-acceleration.png)
 
 ![post-VPN-S2S-VGW-traffic-flow](/assets/img/post-VPN-S2S-traffic-flow.png)
 ![post-VPN-S2S-TGW-traffic-flow-ECMP-with-BGP](/assets/img/post-VPN-S2S-TGW-traffic-flow-ECMP-with-BGP.png)  
@@ -585,7 +585,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - client VPN Endpoint, is the terminate endpoint for your client VPN, in specific subnet    
   - client VPN Endpoint could in *same VPC multiple subnets*, each AZ one subnet(similar with TGW)  
   - AWS 在指定 subnet 放置一张 ENI，用来做 routing，实现方式和 TGW 类似  
-  - ![post-VPN-client-VPN](/assets/img/post-VPN-client-VPN.png)
+    ![post-VPN-client-VPN](/assets/img/post-VPN-client-VPN.png)
 - *client authentication*，[认证之后，可以连接 client VPN，但是流量不通](https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/client-authentication.html)  
   - Active Directory，无论 AD 部署在什么位置，如果需要，可以借助 AD Connector 转发对应流量   
   - Federated, SAML  
@@ -637,7 +637,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - supports allow lists or deny lists to filter the set of domains that you can use
 - can effectively prevent the use of DNS queries to exfiltrate data 防范 [域名解析泄露](https://www.infoblox.com/dns-security-resource-center/dns-security-issues-threats/dns-security-threats-data-exfiltration/)    
   - DNS tunneling 的一种应用，重点在于将数据送出去，不一定得到 DNS response   
-  - ![post-R53-DNS-exfiltrate-how-it-works](/assets/img/post-R53-DNS-exfiltrate-how-it-works.png)   
+    ![post-R53-DNS-exfiltrate-how-it-works](/assets/img/post-R53-DNS-exfiltrate-how-it-works.png)   
 
 ## Split-view DNS，对内对外提供不同服务
 - 假设 example.com 对外、对内提供的服务不同，可以通过 R53 配置两个 hosted zone 都叫做 example.com，一个 public 对外，一个 private 关联 VPC 对内  
@@ -650,9 +650,9 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - [需要将 R53(VPC CIDR x.x.x.2) 与 AWS Directory Service Simple AD 结合使用](https://aws.amazon.com/cn/blogs/security/how-to-set-up-dns-resolution-between-on-premises-networks-and-aws-using-aws-directory-service-and-amazon-route-53/)  
 - Simple AD provides redundant and managed DNS services across AZs  
 - 将 on-prem DNS 解析放到 R53  
-  - ![post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53](/assets/img/post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53.png)  
+   ![post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53](/assets/img/post-On-Prem-AWS-Simple-AD-forward-DNS-to-R53.png)  
 - 或者 VPC 的 DNS 解析放到 on-prem，若 on-prem 没有记录，再使用 `condition forwarder` 转发回 Simple AD --> R53  
-  - ![post-VPC-DNS-to-On-prem](/assets/img/post-VPC-DNS-to-On-prem.png)  
+   ![post-VPC-DNS-to-On-prem](/assets/img/post-VPC-DNS-to-On-prem.png)  
 - 举个栗子，ANS-C00 考试题
 ![post-intergate-DNS-on-prem-VPC-R53](/assets/img/post-intergate-DNS-on-prem-VPC-R53.png)  
 
@@ -868,6 +868,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 **Stages**
 - 不同环境，可能使用了不同的后端服务
 - 可以借助 Lambda Env Variable 或者 Aliases 来操作
+
 ![post-APIGW-Stages](/assets/img/post-APIGW-Stages.png)  
 
 ## Security
