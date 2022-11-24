@@ -403,7 +403,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 | Technical requirement  | vlan id, IP prefix                                   | vlan id, VGW/DXGW                                                    | vlan id, DXGW                                                        |
 | BGP ASN                | public/private                                       | public/private                                                       | public/private                                                       |
 | BGP community          | scope(no_export)                                     | local pref                                                           | local pref                                                           |
-| Route Control          | LPM, AS_PATH(only supported when using a Public ASN) | LPM, Local Pref BGP community tags, AS_PATH, MED(lower is preferred) | LPM, Local Pref BGP community tags, AS_PATH, MED(lower is preferred) |
+| Route Control          | LPM, Local Pref(on-prem outbound), AS_PATH(only supported when using a Public ASN) | LPM, Local Pref(on-prem outbound), Local Pref BGP community tags(VPC outbound), AS_PATH, MED(lower is preferred) | LPM, Local Pref(on-prem outbound), Local Pref BGP community tags(VPC outbound), AS_PATH, MED(lower is preferred) |
 
 > Local preference 相当于 metadata，可以用来控制路由  
 > 只在 IBGP 邻居之间传递，不会传递到 EBGP  
