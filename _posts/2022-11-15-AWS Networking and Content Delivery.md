@@ -26,9 +26,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Transit VPC](#transit-vpc)
   - [VPC flowlog](#vpc-flowlog)
   - [VPC Traffic Mirroring](#vpc-traffic-mirroring)
-- [Transit Gateway](#transit-gateway)
+- [TGW - Transit Gateway](#tgw---transit-gateway)
   - [TGW flowlog](#tgw-flowlog)
-  - [TGW attachment types](#tgw-attachment-types)
   - [TGW Network Manager](#tgw-network-manager)
     - [Route Analyzer](#route-analyzer)
 - [ELB 对比](#elb-对比)
@@ -264,19 +263,21 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - NLB, UDP listener 4789  
   - GWLBe, layer3 GW  
 
-# Transit Gateway
+# TGW - Transit Gateway
 - centrally connect multiple same region(could cross account) VPCs  
 - supports an MTU of 8500 bytes for traffic between VPCs, DX, TGW Connect, TGW peering  
-- support an MTU of 1500 bytes for traffic over VPN  
+- support an MTU of 1500 bytes for traffic over VPN
+- attachment type:
+  - VPC
+  - Peering
+    - inter-region, intra-region TGW peering
+  - Connect
+    - GRE(Generic Routing Encapsulation), SD-WAN
+    - ![post-TGW-SD-WAN-how-to](/assets/img/post-TGW-SD-WAN-how-to.png)
+  - VPN
+    - enable acceleration 
 
 ## TGW flowlog
-
-## TGW attachment types
-- VPC  
-- peering  
-- Connect 
-  - use GRE(Generic Routing Encapsulation) for higher bandwidth performance compared to a VPN connection, SD-WAN     
-- VPN  
 
 ## TGW Network Manager
 - [YouTube 视频](https://www.youtube.com/watch?v=xjH7GI95Pgg)  
@@ -375,6 +376,9 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - public VIF 连接 AWS Edge locations，访问 AWS public services  
 - private VIF 连接 VGW, DXGW  
   - on-prem -- DX -- private VIF -- VPC -- PrivateLink/Endpoint -- AWS public services，[只针对 interface Endpoint，并不针对 gateway Endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-ddb.html)，这个架构当前也是 supported  
+- transit VIF 可以连接多个 VPC
+  - 所以为什么还需要 private VIF？答案是 pricing，TGW 每小时收费并且处理流量收费
+  - 所以如果某个 VPC 的流量进、出 size 很大，推荐 private VIF
 ![post-Direct-Connect-VPC-Endpoint-example](/assets/img/post-Direct-Connect-VPC-Endpoint-example.png)  
 - 同一个 physical link、LAG 最多承载 50 个 public & private VIF，1 个 transit VIF    
 - VIF default MTU 1500，如果 private VIF, transmit VIF 需要开启 Jumbo Frames，需要手动配置
@@ -552,9 +556,10 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - on-prem --> AWS, could ECMP on both tunnels  
   - AWS --> on-prem, if with VGW, could use only one of the tunnel  
   - AWS --> on-prem, if with TGW, could use all of the tunnels for ECMP    
-
+- [enable acceleration](https://docs.aws.amazon.com/vpn/latest/s2svpn/accelerated-vpn.html) when use TGW VPN attachment
+  - ![post-VPN-S2S-TGW-VPN-enable-acceleration](/assets/img/post-VPN-S2S-TGW-VPN-enable-acceleration.png)
 ![post-VPN-S2S-VGW-traffic-flow](/assets/img/post-VPN-S2S-traffic-flow.png)
-![post-VPN-S2S-TGW-traffic-flow-ECMP](/assets/img/post-VPN-S2S-TGW-traffic-flow-ECMP.png)  
+![post-VPN-S2S-TGW-traffic-flow-ECMP-with-BGP](/assets/img/post-VPN-S2S-TGW-traffic-flow-ECMP-with-BGP.png)  
 
 ## Client VPN
 - AWS managed client-based VPN service  
