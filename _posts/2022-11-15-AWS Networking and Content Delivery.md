@@ -23,7 +23,6 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [Elastic Fabric Adapter - EFA](#elastic-fabric-adapter---efa)
   - [prefix-list](#prefix-list)
   - [VPC Endpoint, Endpoint Services, PrivateLink](#vpc-endpoint-endpoint-services-privatelink)
-  - [VPN](#vpn)
   - [Transit VPC](#transit-vpc)
   - [VPC flowlog](#vpc-flowlog)
   - [VPC Traffic Mirroring](#vpc-traffic-mirroring)
@@ -52,7 +51,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [on-prem 视角](#on-prem-视角)
     - [Active/Passive 路由](#activepassive-路由)
     - [symmetry of flow](#symmetry-of-flow)
-- [VPN](#vpn-1)
+- [VPN](#vpn)
   - [Site-to-Site VPN](#site-to-site-vpn)
   - [Client VPN](#client-vpn)
 - [Route53 DNS](#route53-dns)
@@ -235,14 +234,14 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 >If you configure a proxy on an Amazon EC2 instance launched with an attached IAM role, ensure that you exempt the address used to access the instance metadata.   
 >To do this, set the NO_PROXY environment variable to the IP address of the instance metadata service, 169.254.169.254. This address does not vary.
 
-## VPN
-
 ## Transit VPC
 - on-prem 与 [Transit VPC](https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/transit-vpc-option.html) 打通 VPN 连接，之后通过 Transit VPC，打通 on-prem 与其他 VPC 之间的连接  
-- hub-spoke 模型提供 inter-VPC connectivity, hub/central VPC 通常使用`BGP over IPsec VPN` 连接 spoke VPC  
-- Transit/hub/central VPC 使用 EC2 virtual Router 借助第三方 software appliances that route incoming traffic to their destinations using the VPN overlay    
-- 优点是 hub/central 的 EC2 virtual router 可以提供 IPS/WAF 等功能；hub-spoke 设计相对简单，transitive routing enabled using the overlay VPN network  
-- 缺点是 third-party vendor virtual appliances on EC2 费用高（实际上 TGW 费用也不低啊），VPN connection 吞吐量有限 (up to 1.25 Gbps per VPN tunnel)，手动配置、管理等   
+- hub-spoke 模型提供 inter-VPC connectivity, hub/central VPC 通常使用 `BGP over IPsec VPN` 连接 spoke VPC  
+- Transit/hub/central VPC 使用 EC2 virtual Router 借助第三方 software appliances that route incoming traffic to their destinations using the VPN overlay
+- 不可能使用两个VGW建立VPN连接
+  - ![post-VPC-transit-VPC-example](/assets/img/post-VPC-transit-VPC-example.png)    
+  - 优点是 hub/central 的 EC2 virtual router 可以提供 IPS/WAF 等功能；hub-spoke 设计相对简单，transitive routing enabled using the overlay VPN network  
+  - 缺点是 third-party vendor virtual appliances on EC2 费用高（实际上 TGW 费用也不低啊），VPN connection 吞吐量有限 (up to 1.25 Gbps per VPN tunnel)，手动配置、管理等   
 - 所以 AWS 是比较推荐使用 TGW，[表格里面提供了 VPC peering(year 2014)、transit VPC(year 2016)，TGW(year 2018) 的对比](https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/transit-vpc-solution.html)  
 
 ![post-transit-vpc-how-it-design](/assets/img/post-transit-vpc-how-it-design.png)
