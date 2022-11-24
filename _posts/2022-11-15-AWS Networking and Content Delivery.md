@@ -100,6 +100,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 [AWS 考试预约、培训视频、白皮书](https://aws.amazon.com/certification/certified-advanced-networking-specialty/)  
 [Network Learning Plan，完整的学习路径](https://explore.skillbuilder.aws/learn/public/learning_plan/view/89/networking-learning-plan?la=sec&sec=lp)  
+[AWS 官方提供的 15 道题，和 10 个 sample questions 不一样；DX 部分比较多](https://explore.skillbuilder.aws/learn/course/12676/aws-certified-advanced-networking-specialty-official-practice-question-set-ans-c01-english)  
 [AWS 官方讲解考试大纲，把书给读薄了](https://explore.skillbuilder.aws/learn/course/14434/exam-prep-advanced-networking-specialty-ans-c01)  
 注意 module 3 里面有一些问题，已经提交 feedback  
 Domain 3: Network Management and Operations  
@@ -238,7 +239,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - on-prem 与 [Transit VPC](https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/transit-vpc-option.html) 打通 VPN 连接，之后通过 Transit VPC，打通 on-prem 与其他 VPC 之间的连接  
 - hub-spoke 模型提供 inter-VPC connectivity, hub/central VPC 通常使用 `BGP over IPsec VPN` 连接 spoke VPC  
 - Transit/hub/central VPC 使用 EC2 virtual Router 借助第三方 software appliances that route incoming traffic to their destinations using the VPN overlay
-- 不可能使用两个VGW建立VPN连接
+- 不可能使用两个 VGW 建立 VPN 连接
   - ![post-VPC-transit-VPC-example](/assets/img/post-VPC-transit-VPC-example.png)    
   - 优点是 hub/central 的 EC2 virtual router 可以提供 IPS/WAF 等功能；hub-spoke 设计相对简单，transitive routing enabled using the overlay VPN network  
   - 缺点是 third-party vendor virtual appliances on EC2 费用高（实际上 TGW 费用也不低啊），VPN connection 吞吐量有限 (up to 1.25 Gbps per VPN tunnel)，手动配置、管理等   
@@ -694,6 +695,9 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ![CF SAA example](/assets/img/post-CF-SAA.png)
 ![post-CF-SAA-example1](/assets/img/post-CF-SAA-example1.png)
+![post-CF-WAF-example](/assets/img/post-CF-WAF-example.png)
+> 题目本身不难，只是没有明确提到 WAF，而是说了 Web ACL Control List(Web ACLs)...
+> Lambda@edge 可以实现，但需要 coding，部署
 
 ## secure access and restrict access to content
 [保护数据安全](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/SecurityAndPrivateContent.html)  
