@@ -90,7 +90,11 @@ DynamoDb
 - [AWS Config](https://aws.amazon.com/cn/config/faq/) 是 AWS 托管服务，提供 AWS 资源库存、配置历史记录和配置更改通知，以确保安全性和方便管理  
 - 借助 AWS Config，您可以找到现有的 AWS 资源，导出 AWS 资源的完整库存清单与所有配置详细信息，并确定在任何时间点上配置资源的方式  
 - 这些功能提供了合规性审计、安全分析、资源更改跟踪和故障排除  
-- 可以通过 SNS, EventBridge 等发送通知，EventBridge 可以联动 Lambda
+- [可以通过 SNS, EventBridge 等发送通知](https://docs.aws.amazon.com/config/latest/developerguide/monitoring.html)
+  - 可以通过 SNS --> Endpoint SQS 的方式，筛选感兴趣的 changes，比如 security group 的变化，忽略某些 changes 比如 EC2 tags
+  ![post-Config-filter-specify-changes-example](/assets/img/post-Config-filter-specify-changes-example.png)
+  - EventBridge 可以和 Config 联动，比如基于 event/ruls 的通知，take corrective action；EventBridge 可以和 lambda 联动
+- 有很多 aws 已经定义的规则，比如 CFN-drift，也可以通过 lambda 定义规则，比如检查是否所有 EBS 都是 gp3
 ![AWS Config SAA example](/assets/img/post-AWS-Config-SAA.png)  
 ![post-AWS-Config-automate-audit-cfg-changes](/assets/img/post-AWS-Config-automate-audit-cfg-changes.png)  
 
