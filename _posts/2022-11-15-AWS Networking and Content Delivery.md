@@ -331,6 +331,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ![post-ALB-Listener-rules](/assets/img/post-ALB-Listener-rules.png)
 ![post-ALB-Listener-rules-example](/assets/img/post-ALB-Listener-rules-example.png)
+>这道题还有另一个版本，答案里面说是 "Use host header-based"，这就很离谱了，因为 host header 其实是说 example.com，没办法区分的；  
+>如果遇到了，答案说 http-header，就选 http-header；否则应该选 path-based.
 
 ## Stick session
 - [stickiness session 支持两种类型](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/sticky-sessions.html)，duration based 和 application based  
