@@ -12,6 +12,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [AmazonProvidedDNS](#amazonprovideddns)
   - [CIDR, 2nd CIDR](#cidr-2nd-cidr)
   - [Subnet](#subnet)
+    - [Subnet sizing, reserved IP](#subnet-sizing-reserved-ip)
     - [CIDR Reservation](#cidr-reservation)
     - [IPv6 - DNS64 settings](#ipv6---dns64-settings)
   - [Route Table](#route-table)
@@ -135,17 +136,26 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [添加 2nd CIDR，限制条件和原本 CIDR 有关](https://docs.aws.amazon.com/vpc/latest/userguide/configure-your-vpc.html)
     - 若原本是 publicly routable CIDR，后续只能添加 publicly routable CIDR
     - 若原本是 private CIDR 比如 10.0.0.0/8，后续可以添加不属于 172.16.0.0/12, 192.168.0.0/16 private CIDR，或者 publicly routable CIDR
-    ![post-VPC-CIDR-restriction](/assets/img/post-VPC-CIDR-restriction.png)
-    ![post-VPC-CIDR-restriction-example](/assets/img/post-VPC-CIDR-restriction-example.png)
+  ![post-VPC-CIDR-restriction](/assets/img/post-VPC-CIDR-restriction.png)
+  ![post-VPC-CIDR-restriction-example](/assets/img/post-VPC-CIDR-restriction-example.png)
 
 ## Subnet
 - [one subnet could only in one specific AZ](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html)  
 - could ipv6 only  
 - *Auto-assign IP settings*: public IP enalbe or not  
 - *Resource-based Name (RBN) settings*: the hostname type for EC2 instances in the subnet, how DNS A/AAAA record queries are handled  
-- CIDR minimum /28, maximum /16  
-- 配置之后，无法修改 subnet CIDR
 - network ACL 在 subnet 级别生效  
+
+### Subnet sizing, reserved IP
+- subnet CIDR minimum /28, maximum /16  
+- 配置之后，无法修改 subnet CIDR
+- [每个subnet，都有5个reserved IP](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html#subnet-sizing)
+  - 10.0.0.0, network address
+  - 10.0.0.1, VPC router
+  - 10.0.0.2, R53 DNS
+  - 10.0.0.3, future use
+  - 10.0.0.255, network bcast
+![post-VPC-subnet-sizing-reserved-IP](/assets/img/post-VPC-subnet-sizing-reserved-IP.png)
 
 ### CIDR Reservation
 - prevent AWS from automatically assigning IPv4 or IPv6 addresses within a CIDR range you specify   
