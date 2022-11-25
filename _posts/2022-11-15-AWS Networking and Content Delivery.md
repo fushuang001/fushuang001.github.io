@@ -324,9 +324,10 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
     - [TGW1 --- TGW Peering --- TGW2, TGW2 -- DXGW, 那么 TGW1 也可以通过 DXGW 访问 on-prem](https://docs.aws.amazon.com/directconnect/latest/UserGuide/prefix-example.html)
     - 在 DX 去关联 DXGW, TGW 时候，最多可以写 20 条 **Allowed prefixes**
     - single transit VIF per DX physical link
+    - [这个 link 提供的参考图，每个 region 的 TGW 都去关联了 DXGW，不过其他 tips 很有用](https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/aws-dx-dxgw-with-aws-transit-gateway-multi-regions-and-aws-public-peering.html)
     ![post-Direct-Connect-DXGW-TGW-Peering](/assets/img/post-Direct-Connect-DXGW-TGW-Peering.png)
     ![post-Direct-Connect-DXGW-TGW-Peering-example](/assets/img/post-Direct-Connect-DXGW-TGW-Peering-example.png)
-    
+
 ## TGW flowlog
 
 ## appliance mode
@@ -423,6 +424,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - 同一个 physical DX 只能有一个 transit VIF
   - TGW1 --- TGW Peering --- TGW2, TGW2 -- DXGW, 那么 TGW1 也可以通过 DXGW 访问 on-prem
   - [注意在关联 TGW, DXGW 时候，**Allowed prefixes** 需要写两个 TGW/region 的 prefix](https://docs.aws.amazon.com/directconnect/latest/UserGuide/prefix-example.html)
+  - [这个 link 提供的参考图，每个 region 的 TGW 都去关联了 DXGW，不过其他 tips 很有用](https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/aws-dx-dxgw-with-aws-transit-gateway-multi-regions-and-aws-public-peering.html)
   ![post-Direct-Connect-DXGW-TGW-Peering](/assets/img/post-Direct-Connect-DXGW-TGW-Peering.png)
   ![post-Direct-Connect-DXGW-TGW-Peering-example](/assets/img/post-Direct-Connect-DXGW-TGW-Peering-example.png)  
 
