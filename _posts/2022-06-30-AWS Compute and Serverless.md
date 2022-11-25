@@ -146,7 +146,7 @@ non-Nitro 平台的 EC2（比如 t2.micro) 升级 Nitro 平台（比如 t3.micro
 **Cluster-集群** 
 - instances inside same AZ  
 - low-latency network performance
-- HPC  
+- [HPC with AWS](https://aws.amazon.com/getting-started/hands-on/hpc/3/)
 ![post-EC2-placement-example](/assets/img/post-EC2-placement-example.png)  
 
 ---

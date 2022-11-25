@@ -29,6 +29,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Transit VPC](#transit-vpc)
   - [VPC flowlog](#vpc-flowlog)
   - [VPC Traffic Mirroring](#vpc-traffic-mirroring)
+  - [NAT-GW](#nat-gw)
 - [TGW - Transit Gateway](#tgw---transit-gateway)
   - [TGW flowlog](#tgw-flowlog)
   - [TGW Network Manager](#tgw-network-manager)
@@ -149,13 +150,14 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ### Subnet sizing, reserved IP
 - subnet CIDR minimum /28, maximum /16  
 - 配置之后，无法修改 subnet CIDR
-- [每个subnet，都有5个reserved IP](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html#subnet-sizing)
+- [每个 subnet，都有 5 个 reserved IP](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html#subnet-sizing)
   - 10.0.0.0, network address
   - 10.0.0.1, VPC router
   - 10.0.0.2, R53 DNS
   - 10.0.0.3, future use
   - 10.0.0.255, network bcast
 ![post-VPC-subnet-sizing-reserved-IP](/assets/img/post-VPC-subnet-sizing-reserved-IP.png)
+> 换一个角度，/24 只能分裂出两个 /25，不会再有 /28 的空间了
 
 ### CIDR Reservation
 - prevent AWS from automatically assigning IPv4 or IPv6 addresses within a CIDR range you specify   
@@ -287,12 +289,20 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ![post-VPC-flowlog-cfg](/assets/img/post-VPC-flowlog-cfg.png)
 ![post-VPC-flowlog-GuardDuty-example](/assets/img/post-VPC-flowlog-GuardDuty-example.png)
+![post-VPC-CW-metric-filte-Alarmr-example](/assets/img/post-VPC-CW-metric-filte-Alarmr-example.png)
 
 ## VPC Traffic Mirroring
 - target/destination:  
   - ENI  
   - NLB, UDP listener 4789  
   - GWLBe, layer3 GW  
+
+## NAT-GW
+- EC2(private subnet) -- NAT-GW(public subnet) -- IGW
+- NAT-GW 支持 TCP, UDP, ICMP
+  - [对于 TCP, ICMP，不支持 fragment](https://docs.amazonaws.cn/en_us/vpc/latest/userguide/nat-gateway-troubleshooting.html#nat-gateway-troubleshooting-tcp-issues)
+  - 如果 TCP 流量经过 NAT-GW 有问题，可以直接用 public subnet EC2 通过 IGW 测试
+  ![post-VPC-NAT-GW-not-support-fragment](/assets/img/post-VPC-NAT-GW-not-support-fragment.png)  
 
 # TGW - Transit Gateway
 - centrally connect multiple same region(could cross account) VPCs  
@@ -403,7 +413,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   
 ![post-Direct-Connect-DXGW-example](/assets/img/post-Direct-Connect-DXGW-example.png)
 ![post-DXGW-TGW-example](/assets/img/post-DXGW-TGW-example.png)
-![post-DXGW-example](/assets/img/post-DXGW-example.png) 
+![post-Direct-Connect-DXGW-example](/assets/img/post-Direct-Connect-DXGW-example.png)
 
 ## VIF 分类和使用场景
 ![post-Direct-Connect-VIF-types](/assets/img/post-Direct-Connect-VIF-types.png)  
