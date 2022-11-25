@@ -32,6 +32,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [NAT-GW](#nat-gw)
 - [TGW - Transit Gateway](#tgw---transit-gateway)
   - [TGW flowlog](#tgw-flowlog)
+  - [appliance mode](#appliance-mode)
   - [TGW Network Manager](#tgw-network-manager)
     - [Route Analyzer](#route-analyzer)
 - [ELB 对比](#elb-对比)
@@ -121,7 +122,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 [TD, tutorialsdojo，总结、exam dumps](https://tutorialsdojo.com/aws-certified-advanced-networking-specialty-exam-study-path-guide-ans-c01/)  
 [exam dumps，答案可能有问题，需要自己判断](https://www.awslagi.com/aws-certified-advanced-networking-specialty-practice-exam/)  
-[exampracticetests，答案可能有问题，推荐 Bing 搜索查看 ExamTopics 的讨论](https://exampracticetests.com/aws/Advanced_Networking-Specialty_ANS-C00/)  
+[exampracticetests，答案可能有问题，推荐 Bing 搜索查看 ExamTopics 的讨论；另外，建议倒序刷题](https://exampracticetests.com/aws/Advanced_Networking-Specialty_ANS-C00/)  
 
 # VPC
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)
@@ -318,8 +319,17 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
     ![post-TGW-SD-WAN-how-to](/assets/img/post-TGW-SD-WAN-how-to.png)
   - VPN
     - enable acceleration 
-
+  - DXGW
+    - multiple VPCs -- TGW -- DXGW -- transit VIF -- DX -- on-prem
+    - [TGW1 --- TGW Peering --- TGW2, TGW2 -- DXGW, 那么 TGW1 也可以通过 DXGW 访问 on-prem](https://docs.aws.amazon.com/directconnect/latest/UserGuide/prefix-example.html)
+    - 在 DX 去关联 DXGW, TGW 时候，最多可以写 20 条 **Allowed prefixes**
+    - single transit VIF per DX physical link
+    ![post-Direct-Connect-DXGW-TGW-Peering](/assets/img/post-Direct-Connect-DXGW-TGW-Peering.png)
+    ![post-Direct-Connect-DXGW-TGW-Peering-example](/assets/img/post-Direct-Connect-DXGW-TGW-Peering-example.png)
+    
 ## TGW flowlog
+
+## appliance mode
 
 ## TGW Network Manager
 - [YouTube 视频](https://www.youtube.com/watch?v=xjH7GI95Pgg)  
@@ -403,14 +413,19 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - 10GBASE-LR transfer/SFP for 10Gb
 
 ## DXGW
-- DXGW 只是用来打通 on-premise & VPC 之间通信链路，并不负责 VPC 之间互相通信    
-  - 新功能 [SiteLink](https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-aws-direct-connect-sitelink/)，创建 private/transit VIF 时候如果选择打开 *SiteLink*，就可以实现穿越 DXGW 通信   
+- DXGW 只是用来打通 on-premise & VPC 之间通信链路，并不负责两个 on-prem DC 之间互相通信    
+  - 新功能 [SiteLink](https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-aws-direct-connect-sitelink/)，创建 private/transit VIF 时候如果选择打开 *SiteLink*，就可以 [实现穿越 DXGW 通信](https://aws.amazon.com/cn/blogs/china/new-site-to-site-connectivity-with-aws-direct-connect-sitelink/)   
   - DXGW 是 global 的，不区分 region；VGW 是 regional 的  
   - DXGW 类似于 redundant *BGP RR*，或者说 distributed VRF  
   ![post-Direct-Connect-private-transit-VIF-DXGW-SiteLink](/assets/img/post-Direct-Connect-private-transit-VIF-DXGW-SiteLink.png)
-- on-premise --- DX --- ZHY VPC, VGW -- DXGW --- BJS VPC，可以通过 DXGW 打通 BJS, on-prem 的连接  
-- DXGW -- TGW -- transit VIF -- VPC, if you connect to multiple transit gateways that are in different resions, use unique BGP ASNs for each transit gateway.  
-  
+- if you connect to multiple transit gateways that are in different resions, use unique BGP ASNs for each transit gateway.  
+  - multiple VPCs -- TGW -- DXGW -- transit VIF -- DX -- on-prem
+  - 同一个 physical DX 只能有一个 transit VIF
+  - TGW1 --- TGW Peering --- TGW2, TGW2 -- DXGW, 那么 TGW1 也可以通过 DXGW 访问 on-prem
+  - [注意在关联 TGW, DXGW 时候，**Allowed prefixes** 需要写两个 TGW/region 的 prefix](https://docs.aws.amazon.com/directconnect/latest/UserGuide/prefix-example.html)
+  ![post-Direct-Connect-DXGW-TGW-Peering](/assets/img/post-Direct-Connect-DXGW-TGW-Peering.png)
+  ![post-Direct-Connect-DXGW-TGW-Peering-example](/assets/img/post-Direct-Connect-DXGW-TGW-Peering-example.png)  
+
 ![post-Direct-Connect-DXGW-example](/assets/img/post-Direct-Connect-DXGW-example.png)
 ![post-DXGW-TGW-example](/assets/img/post-DXGW-TGW-example.png)
 ![post-Direct-Connect-DXGW-example](/assets/img/post-Direct-Connect-DXGW-example.png)
