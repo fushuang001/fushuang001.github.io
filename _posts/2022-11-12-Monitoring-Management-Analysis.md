@@ -87,9 +87,11 @@ S3(data is regional)
 DynamoDb  
 
 # AWS Config
-- [AWS Config](https://aws.amazon.com/cn/config/faq/) 是 AWS 托管服务，提供 AWS 资源库存、配置历史记录和配置更改通知，以确保安全性和方便管理  
+[AWS Config Tutorial](https://www.youtube.com/watch?v=qHdFoYSrUvk)  
+- [AWS Config](https://aws.amazon.com/cn/config/faq/) 是 AWS 托管服务，提供 AWS 资源库存、配置历史记录（保存到 S3 桶）和配置更改通知 (SNS)，以确保安全性和方便管理  
 - 借助 AWS Config，您可以找到现有的 AWS 资源，导出 AWS 资源的完整库存清单与所有配置详细信息，并确定在任何时间点上配置资源的方式  
-- 这些功能提供了合规性审计、安全分析、资源更改跟踪和故障排除  
+- 这些功能提供了合规性审计、安全分析、资源更改跟踪和故障排除，顺便还统计了 account 下有多少资源
+- 很好用，不过[费用](https://www.amazonaws.cn/en/config/pricing/)可能比较高
 - [可以通过 SNS, EventBridge 等发送通知](https://docs.aws.amazon.com/config/latest/developerguide/monitoring.html)
   - 可以通过 SNS --> Endpoint SQS 的方式，筛选感兴趣的 changes，比如 security group 的变化，忽略某些 changes 比如 EC2 tags
   ![post-Config-filter-specify-changes-example](/assets/img/post-Config-filter-specify-changes-example.png)
