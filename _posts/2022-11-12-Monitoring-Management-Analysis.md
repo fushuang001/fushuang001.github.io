@@ -14,10 +14,10 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
   - [CW Logs, Logs Insight](#cw-logs-logs-insight)
   - [CW Insights for Lambda, Container, Contributor](#cw-insights-for-lambda-container-contributor)
   - [X-Ray trace](#x-ray-trace)
-- [Cost Explorer](#cost-explorer)
 - [Cloudtrail](#cloudtrail)
   - [AWS Global Services](#aws-global-services)
 - [AWS Config](#aws-config)
+- [AWS Service Catalog](#aws-service-catalog)
 - [CloudFormation CFN](#cloudformation-cfn)
   - [CFN StackSets 堆栈集](#cfn-stacksets-堆栈集)
   - [CFN Stack Drift Detection // 堆栈集资源的配置发生了变化](#cfn-stack-drift-detection--堆栈集资源的配置发生了变化)
@@ -48,8 +48,6 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 ## CW Insights for Lambda, Container, Contributor
 
 ## X-Ray trace
-
-# Cost Explorer
 
 # Cloudtrail
 - AWS 的资源操作，实际上都是 API call，或者通过 SDK, mgmt console, AWS CLI 执行的操作   
@@ -88,10 +86,14 @@ DynamoDb
 
 # AWS Config
 [AWS Config Tutorial](https://www.youtube.com/watch?v=qHdFoYSrUvk)  
-- [AWS Config](https://aws.amazon.com/cn/config/faq/) 是 AWS 托管服务，提供 AWS 资源库存、配置历史记录（保存到 S3 桶）和配置更改通知 (SNS)，以确保安全性和方便管理  
+- [AWS Config](https://aws.amazon.com/cn/config/faq/) 是 AWS 托管服务，提供 AWS 资源库存、配置历史记录（保存到 S3 桶）和配置更改通知 (SNS)，以确保安全性和方便管理，near real-time, post/after-provisioning
 - 借助 AWS Config，您可以找到现有的 AWS 资源，导出 AWS 资源的完整库存清单与所有配置详细信息，并确定在任何时间点上配置资源的方式  
+- automatic remediation/修正 with Config rules，比如 security　group 不合规，可以自动修正（借助 SSM automation documents)
+- conformance packs(organization-wide 推送，member account 无法 disable、删除 rules)
+- custom cfg items（AWS 之外的，比如 AD 域的配置等）
 - 这些功能提供了合规性审计、安全分析、资源更改跟踪和故障排除，顺便还统计了 account 下有多少资源
-- 很好用，不过[费用](https://www.amazonaws.cn/en/config/pricing/)可能比较高
+- 很好用，不过 [费用](https://www.amazonaws.cn/en/config/pricing/) 可能比较高
+![post-AWS-Config-how-to-and-why](/assets/img/post-AWS-Config-how-to-and-why.png)  
 - [可以通过 SNS, EventBridge 等发送通知](https://docs.aws.amazon.com/config/latest/developerguide/monitoring.html)
   - 可以通过 SNS --> Endpoint SQS 的方式，筛选感兴趣的 changes，比如 security group 的变化，忽略某些 changes 比如 EC2 tags
   ![post-Config-filter-specify-changes-example](/assets/img/post-Config-filter-specify-changes-example.png)
@@ -99,6 +101,19 @@ DynamoDb
 - 有很多 aws 已经定义的规则，比如 CFN-drift，也可以通过 lambda 定义规则，比如检查是否所有 EBS 都是 gp3
 ![AWS Config SAA example](/assets/img/post-AWS-Config-SAA.png)  
 ![post-AWS-Config-automate-audit-cfg-changes](/assets/img/post-AWS-Config-automate-audit-cfg-changes.png)  
+
+# AWS Service Catalog
+- [create, share, organize, and govern your IaC templates](https://aws.amazon.com/servicecatalog/)
+- 在符合相关规定的情况下，加速 IaC 的部署
+- 和 **ServiceNow**, **Jira Service Management** 整合，实现 developers 的 self-service，不需要每次找到 admin 去申请
+  - 实现方式，是预先定义 CFN template 给 Service Catalog 使用，预定义合规的资源类型、要求（比如只允许 t2.micro type)；admin 将定义好的 **Catalog Product** 添加到 **Catalog portfoils**，用来限制 user 自助服务一定是合规的
+  - user 通过 Service Catalog 发起**自助请求**（比如 launch EC2，不直接通过 EC2 console，可以不给相关权限）
+  - Service Catalog 和 SSM run commands 整合，允许 user 做一些操作，比如 reboot EC2
+
+|                          | AWS Config                         | Service Catalog                   |
+| ------------------------ | ---------------------------------- | --------------------------------- |
+| how to ensure compliance | Detective controls, post-provision | Preventive controls, provisioning |
+| integration with         | AWS Systems Manager/SSM            | AWS CloufFormation/CFN            |
 
 # CloudFormation CFN
 
