@@ -10,6 +10,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [参考资料](#参考资料)
 - [VPC](#vpc)
   - [AmazonProvidedDNS](#amazonprovideddns)
+  - [CIDR, 2nd CIDR](#cidr-2nd-cidr)
   - [Subnet](#subnet)
     - [CIDR Reservation](#cidr-reservation)
     - [IPv6 - DNS64 settings](#ipv6---dns64-settings)
@@ -128,12 +129,22 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - VPC CIDR plus 2, eg. 10.0.0.2  
 - enableDnsHostNames, enableDnsSupport  
 
+## CIDR, 2nd CIDR
+- VPC, subnet CIDR 范围/16, /28
+- 配置之后，无法修改 VPC CIDR；可以添加第二个、第三个 CIDR
+  - [添加 2nd CIDR，限制条件和原本 CIDR 有关](https://docs.aws.amazon.com/vpc/latest/userguide/configure-your-vpc.html)
+    - 若原本是 publicly routable CIDR，后续只能添加 publicly routable CIDR
+    - 若原本是 private CIDR 比如 10.0.0.0/8，后续可以添加不属于 172.16.0.0/12, 192.168.0.0/16 private CIDR，或者 publicly routable CIDR
+    ![post-VPC-CIDR-restriction](/assets/img/post-VPC-CIDR-restriction.png)
+    ![post-VPC-CIDR-restriction-example](/assets/img/post-VPC-CIDR-restriction-example.png)
+
 ## Subnet
 - [one subnet could only in one specific AZ](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html)  
 - could ipv6 only  
 - *Auto-assign IP settings*: public IP enalbe or not  
 - *Resource-based Name (RBN) settings*: the hostname type for EC2 instances in the subnet, how DNS A/AAAA record queries are handled  
-- minimum /28, maximum /16  
+- CIDR minimum /28, maximum /16  
+- 配置之后，无法修改 subnet CIDR
 - network ACL 在 subnet 级别生效  
 
 ### CIDR Reservation
