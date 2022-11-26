@@ -65,7 +65,6 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Site-to-Site VPN](#site-to-site-vpn)
   - [Client VPN](#client-vpn)
 - [Route53 DNS](#route53-dns)
-  - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
   - [R53 支持的 DNS 类型](#r53-支持的-dns-类型)
     - [alias vs. CNAME](#alias-vs-cname)
   - [R53 DNS routing policy](#r53-dns-routing-policy)
@@ -77,6 +76,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [R53 Resolver](#r53-resolver)
     - [Inbound Resolver Endpoint](#inbound-resolver-endpoint)
     - [Outbound Resolver Endpoint](#outbound-resolver-endpoint)
+    - [Forward Rules](#forward-rules)
+    - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
     - [Public DNS Query logging for Public Hosted Zone](#public-dns-query-logging-for-public-hosted-zone)
     - [Resolver query logging for Private Hosted Zone](#resolver-query-logging-for-private-hosted-zone)
   - [R53 Health Check](#r53-health-check)
@@ -138,6 +139,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 ## AmazonProvidedDNS
 - VPC CIDR plus 2, eg. 10.0.0.2  
+- 另一个可用地址是 169.254.169.253
 - enableDnsHostNames, enableDnsSupport  
 
 ## Security Group & ACL
@@ -724,8 +726,6 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![Route53 failover-health-check SAA example](/assets/img/post-R53-HC.png)  
 ![post-R53-geo-SAA](/assets/img/post-R53-geo-SAA.png)  
 
-## R53 DNS 解析的优先级
-
 ## R53 支持的 DNS 类型
 
 ### alias vs. CNAME
@@ -786,6 +786,22 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ### Outbound Resolver Endpoint
 
+### Forward Rules
+- 与 Outbound Resolver Endpoint 配合使用，指定 example.com 应该去 on-prem 转发，此时使用了 **Rule type: Forward**，默认 example.com 以及 sub domain 都会参考指定 Rule
+- [如果 acme.example.com 是一个例外](https://docs.amazonaws.cn/en_us/Route53/latest/DeveloperGuide/resolver-forwarding-outbound-queries.html#resolver-forwarding-outbound-queries-rule-values)，可以通过 **Rule type: System** 来覆盖 Forward Rule
+
+### R53 DNS 解析的优先级
+- 区分两种场景，是否有 resolver rules(forwarding rules)
+- **如果没有 forwarding rules:**
+  - PHZ(Private Hosted Zone)，需要关联 VPC
+  - VPC Namespace，比如 ec2.internal.
+  - Recursive/递归 Rules(Internet resolver)（默认。2 的 Internet Resolver)，public hosted zone
+- **如果有 forwarding rules:**
+  - conditional Forward rules，针对 example.com 以及所有 sub domain
+  - System ruls，如果需要特殊处理某个 acme.example.com，比如指向 PHZ
+  - Recursive/递归 Rules (Internet resolver)
+  ![post-R53-Forwarding-rule-System-to-override-Forward](/assets/img/post-R53-Forwarding-rule-System-to-override-Forward.png)
+  
 ### Public DNS Query logging for Public Hosted Zone 
 - 所谓 public，两层含义，第一是 clients 来自公网，第二是 hosted zone 类型为 public  
 - [public hosted zone 可以配置，入口在 hosted zone，CW Logs group 接收日志](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html)  
