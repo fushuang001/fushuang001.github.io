@@ -10,6 +10,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [参考资料](#参考资料)
 - [VPC](#vpc)
   - [AmazonProvidedDNS](#amazonprovideddns)
+  - [Security Group \& ACL](#security-group--acl)
   - [CIDR, 2nd CIDR](#cidr-2nd-cidr)
   - [Subnet](#subnet)
     - [Subnet sizing, reserved IP](#subnet-sizing-reserved-ip)
@@ -39,6 +40,9 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [ALB](#alb)
   - [Listener Rule condition types](#listener-rule-condition-types)
   - [Stick session](#stick-session)
+  - [HTTPS Listener](#https-listener)
+    - [SSL/TLS certificates](#ssltls-certificates)
+    - [Security Policy](#security-policy)
 - [NLB](#nlb)
   - [NLB Troubleshooting](#nlb-troubleshooting)
 - [GWLB](#gwlb)
@@ -47,6 +51,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [VIF 分类和使用场景](#vif-分类和使用场景)
   - [DX 故障排查](#dx-故障排查)
   - [data encrypt](#data-encrypt)
+    - [S2S VPN over DX](#s2s-vpn-over-dx)
     - [MACsec](#macsec)
   - [one DX access to multiple US regions](#one-dx-access-to-multiple-us-regions)
   - [access a remote AWS region](#access-a-remote-aws-region)
@@ -95,6 +100,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Same Origin Policy](#same-origin-policy)
     - [CORS 简单介绍](#cors-简单介绍)
   - [Monitor, Metrics, Logs](#monitor-metrics-logs)
+- [AWS Local Zone](#aws-local-zone)
 - [Troubleshooting Tools](#troubleshooting-tools)
   - [DNS](#dns)
   - [packets capture \& analysis](#packets-capture--analysis)
@@ -132,6 +138,17 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ## AmazonProvidedDNS
 - VPC CIDR plus 2, eg. 10.0.0.2  
 - enableDnsHostNames, enableDnsSupport  
+
+## Security Group & ACL
+对比图
+- [Amazon security groups and network ACLs do not filter traffic destined to and from the following:](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Security.html)
+  - Amazon Domain Name Services (DNS)
+  - Amazon Dynamic Host Configuration Protocol (DHCP)
+  - Amazon EC2 instance metadata
+  - Amazon ECS task metadata endpoints
+  - License activation for Windows instances
+  - Amazon Time Sync Service
+  - Reserved IP addresses used by the default VPC router
 
 ## CIDR, 2nd CIDR
 - VPC, subnet CIDR 范围/16, /28
@@ -393,6 +410,18 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 
 ![post-ALB-sticky-session-ALWALB-ANS-example](/assets/img/post-ALB-sticky-session-ALWALB-ANS-example.png)  
 
+## HTTPS Listener 
+- [SSL/TLS offload to ALB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies)
+- 把 SSL/TLS 协商（耗费 CPU) 交给 ALB 来做，需要在 ALB 部署 SSL/TLS 证书
+  
+### SSL/TLS certificates
+- default cert
+  
+### Security Policy
+- Secure Socket Layer (SSL) negotiation configuration, known as a security policy, to negotiate SSL connections between client & ALB
+- security policy 简单来说，包含了 client & ALB 协商 SSL/TLS 时候的加密套件、TLS 版本等
+![post-ALB-HTTPS-listener-security-policy-example](/assets/img/post-ALB-HTTPS-listener-security-policy-example.png)
+
 # NLB
 ![post-NLB-tcp-443-ssl-cert-target-ANS-example](/assets/img/post-NLB-tcp-443-ssl-cert-target-ANS-example.png)
 ![post-NLB-register-IP-targets-PPv2-client-IP](/assets/img/post-NLB-register-IP-targets-PPv2-client-IP.png)  
@@ -526,6 +555,11 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - DX 本身只提供 private connection，并不提供加密  
 - 可以通过 MACsec 或者 IPsec VPN 来提供加密  
 
+### S2S VPN over DX
+- **only public VIF** supported to [establish the VPN over DX](https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/aws-direct-connect-vpn.html)
+- could access VPC resource(similar as private VIF do)
+![post-Direct-Connect-S2S-VPN-over-public-VIF](/assets/img/post-Direct-Connect-S2S-VPN-over-public-VIF.png)
+
 ### MACsec
 - IEEE 802.1 layer2 standard, provides data confidentiality, data integrity, data origin authenticity for DX  
 - only available on dedicated connection, 10 Gbps and 100 Gbps connection
@@ -657,7 +691,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - [enable acceleration](https://docs.aws.amazon.com/vpn/latest/s2svpn/accelerated-vpn.html) when use TGW VPN attachment
   ![post-VPN-S2S-TGW-VPN-enable-acceleration](/assets/img/post-VPN-S2S-TGW-VPN-enable-acceleration.png)
   ![post-VPN-acceleration-TGW-ECMP-tunnels](/assets/img/post-VPN-acceleration-TGW-ECMP-tunnels.png)  
-  
+
 ![post-VPN-S2S-VGW-traffic-flow](/assets/img/post-VPN-S2S-traffic-flow.png)
 ![post-VPN-S2S-TGW-traffic-flow-ECMP-with-BGP](/assets/img/post-VPN-S2S-TGW-traffic-flow-ECMP-with-BGP.png)  
 
@@ -1024,6 +1058,12 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - customize log format
   - CLF(Common Log Format), JSON, XML, CSV
 - Logs to Amazon Kinesis Data Firehose
+
+# AWS Local Zone
+- [将 AWS resource 部署到距离 end user 更近的位置，延迟敏感，或者数据必须保留在本地](https://aws.amazon.com/about-aws/global-infrastructure/localzones/?nc1=h_ls)
+- [按需扩展，按用量付费，边缘计算云服务，更方便混合架构、迁移](https://www.youtube.com/watch?v=zw6MqfgoDGw)
+- Local Zone 提供了部分 AWS 相同的服务，可以无缝扩展，使用体验和 AWS region 相同
+![post-Local-Zone-example](/assets/img/post-Local-Zone-example.png)  
 
 # Troubleshooting Tools
 
