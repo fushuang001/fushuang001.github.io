@@ -444,7 +444,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - **当 NLB target group 的 client IP preservation 打开，client requests 间断性 timeout**
   - 比如 clients 使用了相同 proxy 或者 NAT 设备，同时访问多个 NLB；假设相同 target 同时注册到不同 NLB，对于 target 来说，看到的是同一个 NAT IP、source IP 来访问，容易耗尽 socket 资源
 - **NLB PortAllocationErrorCount metric 增加**
-  - PrivateLink -- NLB，或者 NLB 场景，NLB 针对每个 target ip 支持 55,000 并发连接
+  - PrivateLink -- NLB，或者 NLB 场景，NLB 针对每个 target ip 支持 55,000 并发连接（it supports 55,000 simultaneous connections or about 55,000 connections per minute to each unique target (IP address and port).）
   - 超出限制，服务可能异常
   - 可以增加 target group 里面 targets 数量来解决
   - 如果 NLB, targets 在不同 VPC，比如 VPC peering，那么只能通过 target IP 来注册 (If you have instances in a VPC that is peered with the load balancer VPC, you must register them with your load balancer by IP address, not by instance ID.)
@@ -801,7 +801,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - System ruls，如果需要特殊处理某个 acme.example.com，比如指向 PHZ
   - Recursive/递归 Rules (Internet resolver)
   ![post-R53-Forwarding-rule-System-to-override-Forward](/assets/img/post-R53-Forwarding-rule-System-to-override-Forward.png)
-  
+
 ### Public DNS Query logging for Public Hosted Zone 
 - 所谓 public，两层含义，第一是 clients 来自公网，第二是 hosted zone 类型为 public  
 - [public hosted zone 可以配置，入口在 hosted zone，CW Logs group 接收日志](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html)  
