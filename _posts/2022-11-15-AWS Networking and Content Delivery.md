@@ -69,6 +69,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [R53 支持的 DNS 类型](#r53-支持的-dns-类型)
     - [alias vs. CNAME](#alias-vs-cname)
   - [R53 DNS routing policy](#r53-dns-routing-policy)
+    - [health check](#health-check)
   - [DNSSEC DNS 安全扩展](#dnssec-dns-安全扩展)
   - [R53 Resolver DNS Firewall](#r53-resolver-dns-firewall)
   - [Split-view DNS，对内对外提供不同服务](#split-view-dns对内对外提供不同服务)
@@ -732,8 +733,15 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ## R53 DNS routing policy
 - **latency-based**  
   - for an application that is hosted in multiple AWS regions, latency-based routing can *improve performance* for the application users by serving requests from the AWS region that provides the *lowest latency*, thus ensuring *highest performance*.  
-- geolocation
-- 
+- Geolocation
+- **Geoproximity, traffic flow only**
+  - Use when you want to route traffic based on the location of your resources and, optionally, shift traffic from resources in one location to resources in another.
+
+### health check
+- 对于 latency-based、failover 等记录类型，可以组合配置 R53 health check，检查 records 是否 healthy
+- 如果 record 指向的 target 是 unhealthy，可以使用 failover，切换到其他 DNS 记录
+![post-R53-latency-based-routing-policy-health-check](/assets/img/post-R53-latency-based-routing-policy-health-check.png)
+
 ## DNSSEC DNS 安全扩展
 - [Domain Name System Security Extensions](https://aws.amazon.com/about-aws/whats-new/2020/12/announcing-amazon-route-53-support-dnssec/?nc1=h_ls)，DNS 安全扩展，为 DNS 提供数据来源认证和数据完整性验证，满足 FedRAMP 等法规要求  
 - public hosted zone 功能  
