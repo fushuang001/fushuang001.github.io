@@ -15,12 +15,12 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [Subnet sizing, reserved IP](#subnet-sizing-reserved-ip)
     - [CIDR Reservation](#cidr-reservation)
     - [IPv6 - DNS64 settings](#ipv6---dns64-settings)
+  - [EIGW - Egress-Only Internet Gateway](#eigw---egress-only-internet-gateway)
   - [Route Table](#route-table)
     - [Route Table 优先级](#route-table-优先级)
     - [Route Table propagation](#route-table-propagation)
   - [IPAM - IP Address Manager](#ipam---ip-address-manager)
   - [Network Analysis](#network-analysis)
-  - [EIGW - Egress-Only Internet Gateway](#eigw---egress-only-internet-gateway)
   - [EC2 bandwidth](#ec2-bandwidth)
     - [Enhanced networking - ENA](#enhanced-networking---ena)
     - [Elastic Fabric Adapter - EFA](#elastic-fabric-adapter---efa)
@@ -173,6 +173,15 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![post-VPC-subnet-DNS64-howto](/assets/img/post-VPC-subnet-DNS64-howto.png)
 ![post-VPC-NAT64-DNS64](/assets/img/post-VPC-NAT64-DNS64.png)  
 
+## EIGW - Egress-Only Internet Gateway
+[IPv6 on AWS，建议阅读](https://docs.aws.amazon.com/whitepapers/latest/ipv6-on-aws/amazon-vpc-internet-access.html)  
+- for ipv6, 效果类似于 NAT-GW，VPC --> Internet 流量主动出，拒绝外部始发的流量  
+- 和 NAT-GW 不同点在于，ipv6 并不区分 private, public 网段，所以说，Egress-only IGW 和 clients 都是放在 public subnet 的
+- 不过为了方便区分，使用 IGW 的 ipv6 subnet --> public subnet; [使用 EIGW 的 ipv6 subnet --> private subnet](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-subnets-commands-example-ipv6.html#vpc-subnets-commands-example-private-subnet-ipv6)
+![post-VPC-IPv6-public-private-how-to](/assets/img/post-VPC-IPv6-public-private-how-to.png)
+![post-VPC-Egress-Only-IGW-example](/assets/img/post-VPC-Egress-Only-IGW-example.png)
+![post-VPC-IPv6-EIGW-example](/assets/img/post-VPC-IPv6-EIGW-example.png)
+
 ## Route Table
 - 每个 subnet 只能有一个 route table  
 - [Edge association](https://docs.amazonaws.cn/en_us/vpc/latest/userguide/VPC_Route_Tables.html) 一般用在 GWLB/security appliance 环境，关联 IGW  
@@ -216,12 +225,6 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - identifie unintended network access to your resources on AWS 检测不应该被访问、扫描的服务  
 
 ![post-VPC-Network-Access-Analyzer-howto](/assets/img/post-VPC-Network-Access-Analyzer-howto.png)  
-
-## EIGW - Egress-Only Internet Gateway
-- for ipv6, 效果类似于 NAT-GW，VPC --> Internet 流量主动出，拒绝外部始发的流量  
-- 和 NAT-GW 不同点在于，ipv6 并不区分 private, public 网段，所以说，Egress-only IGW 和 clients 都是放在 public subnet 的  
-
-![post-VPC-Egress-Only-IGW-example](/assets/img/post-VPC-Egress-Only-IGW-example.png)  
 
 ## EC2 bandwidth
 - [network bandwidth available to an EC2 instance depends on several factors](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-network-bandwidth.html)  
@@ -422,6 +425,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - if you connect to multiple transit gateways that are in different resions, use unique BGP ASNs for each transit gateway.  
   - multiple VPCs -- TGW -- DXGW -- transit VIF -- DX -- on-prem
   - 同一个 physical DX 只能有一个 transit VIF
+  - 如果 DXGW 已经关联 private VIF(VGW)，就不能再关联 transit VIF(TGW)，二选一
   - TGW1 --- TGW Peering --- TGW2, TGW2 -- DXGW, 那么 TGW1 也可以通过 DXGW 访问 on-prem
   - [注意在关联 TGW, DXGW 时候，**Allowed prefixes** 需要写两个 TGW/region 的 prefix](https://docs.aws.amazon.com/directconnect/latest/UserGuide/prefix-example.html)
   - [这个 link 提供的参考图，每个 region 的 TGW 都去关联了 DXGW，不过其他 tips 很有用](https://docs.aws.amazon.com/whitepapers/latest/hybrid-connectivity/aws-dx-dxgw-with-aws-transit-gateway-multi-regions-and-aws-public-peering.html)
