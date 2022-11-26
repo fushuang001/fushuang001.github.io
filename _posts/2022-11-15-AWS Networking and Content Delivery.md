@@ -40,6 +40,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Listener Rule condition types](#listener-rule-condition-types)
   - [Stick session](#stick-session)
 - [NLB](#nlb)
+  - [NLB Troubleshooting](#nlb-troubleshooting)
 - [GWLB](#gwlb)
 - [Direct Connect DX 专线](#direct-connect-dx-专线)
   - [DXGW](#dxgw)
@@ -165,8 +166,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 ### IPv6 - DNS64 settings
 - 对于 IPv6 only 的 subnet，如果需要和 IPv4 的资源通信，需要开启 subnet setting 的 *DNS64*  
-- 当 IPv6 only 请求 IPv4 DNS 信息，对应的 IPv4 DNS 会被 DNS64 添加 64:ff9b::/96 前缀，假装是 IPv6  
-- DNS 解决之后，IPv6 --> IPv4 发送报文，为了把 IPv6 转换为 IPv4，需要 NAT-GW 的 *NAT64*（自动开启）功能，手动添加路由    
+- 当 IPv6 only 请求 IPv4 DNS 信息，对应的 IPv4 DNS 会被 DNS64 添加 `64:ff9b::/96` 前缀，假装是 IPv6
+- DNS 解决之后，IPv6 --> IPv4 发送报文，为了把 IPv6 转换为 IPv4，需要 NAT-GW 的 *NAT64*（自动开启）功能，手动添加路由，将 `64:ff9b::/96` 指向 NAT-GW 做 NAT-64 转换
 - IPv6 的 DNS 解析，依赖 RBN  
 
 ![post-VPC-subnet-RBN-cfg](/assets/img/post-VPC-subnet-RBN-cfg.png)
@@ -307,6 +308,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - [对于 TCP, ICMP，不支持 fragment](https://docs.amazonaws.cn/en_us/vpc/latest/userguide/nat-gateway-troubleshooting.html#nat-gateway-troubleshooting-tcp-issues)
   - 如果 TCP 流量经过 NAT-GW 有问题，可以直接用 public subnet EC2 通过 IGW 测试
   ![post-VPC-NAT-GW-not-support-fragment](/assets/img/post-VPC-NAT-GW-not-support-fragment.png)  
+- [idle timeout 350 seconds, NAT-GW send RST for the timeout connection](https://docs.aws.amazon.com/vpc/latest/userguide/nat-gateway-troubleshooting.html#nat-gateway-troubleshooting-timeout)，如果长连接遇到问题，可以设置 client 的 TCP keepalive = 300s
+![post-VPC-NATGW-idle-timeout](/assets/img/post-VPC-NATGW-idle-timeout.png)
 
 # TGW - Transit Gateway
 - centrally connect multiple same region(could cross account) VPCs  
@@ -394,6 +397,27 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 ![post-NLB-tcp-443-ssl-cert-target-ANS-example](/assets/img/post-NLB-tcp-443-ssl-cert-target-ANS-example.png)
 ![post-NLB-register-IP-targets-PPv2-client-IP](/assets/img/post-NLB-register-IP-targets-PPv2-client-IP.png)  
 
+## NLB Troubleshooting
+[官方文档，熟读，要考的](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-troubleshooting.html#port-allocation-errors-privatelink)
+- **target health check failed**
+  - 确认 target 的 security group、ACL 允许 NLB internal IP 做 health check
+  - 确认 target 对应 TCP port 的服务打开了，没有被内部 iptables, firewall 阻止
+  - 使用 target 同 subnet 的 EC2，去做 telnet/curl 测试
+- **NLB TCP_ELB_Reset_Count metric 增加**
+  - NLB default idle timeout for TCP 350s, UDP 120s
+  - 如果 connection 在 idle timeout 期间没有流量，会被 TCP RST
+- **target requests timeout**
+  - 当 NLB 的 target，作为 client 来测试 NLB 服务，可能遇到 timeout
+  - 需要关注 target group "client IP preservation"是否打开，若打开了，关闭即可
+- **当 NLB target group 的 client IP preservation 打开，client requests 间断性 timeout**
+  - 比如 clients 使用了相同 proxy 或者 NAT 设备，同时访问多个 NLB；假设相同 target 同时注册到不同 NLB，对于 target 来说，看到的是同一个 NAT IP、source IP 来访问，容易耗尽 socket 资源
+- **NLB PortAllocationErrorCount metric 增加**
+  - PrivateLink -- NLB，或者 NLB 场景，NLB 针对每个 target ip 支持 55,000 并发连接
+  - 超出限制，服务可能异常
+  - 可以增加 target group 里面 targets 数量来解决
+  - 如果 NLB, targets 在不同 VPC，比如 VPC peering，那么只能通过 target IP 来注册 (If you have instances in a VPC that is peered with the load balancer VPC, you must register them with your load balancer by IP address, not by instance ID.)
+  ![post-NLB-PortAllocationErrorCount-example](/assets/img/post-NLB-PortAllocationErrorCount-example.png)  
+  
 # GWLB
 
 # Direct Connect DX 专线
