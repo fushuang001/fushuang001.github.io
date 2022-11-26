@@ -795,7 +795,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 - **如果没有 forwarding rules:**
   - PHZ(Private Hosted Zone)，需要关联 VPC
   - VPC Namespace，比如 ec2.internal.
-  - Recursive/递归 Rules(Internet resolver)（默认。2 的 Internet Resolver)，public hosted zone
+  - Recursive/递归 Rules(Internet resolver)（默认 .2 的 Internet Resolver)，public hosted zone
 - **如果有 forwarding rules:**
   - conditional Forward rules，针对 example.com 以及所有 sub domain
   - System ruls，如果需要特殊处理某个 acme.example.com，比如指向 PHZ
