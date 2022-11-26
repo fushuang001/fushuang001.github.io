@@ -417,7 +417,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - 可以增加 target group 里面 targets 数量来解决
   - 如果 NLB, targets 在不同 VPC，比如 VPC peering，那么只能通过 target IP 来注册 (If you have instances in a VPC that is peered with the load balancer VPC, you must register them with your load balancer by IP address, not by instance ID.)
   ![post-NLB-PortAllocationErrorCount-example](/assets/img/post-NLB-PortAllocationErrorCount-example.png)  
-  
+
 # GWLB
 
 # Direct Connect DX 专线
@@ -656,7 +656,8 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - AWS --> on-prem, if with TGW, could use all of the tunnels for ECMP    
 - [enable acceleration](https://docs.aws.amazon.com/vpn/latest/s2svpn/accelerated-vpn.html) when use TGW VPN attachment
   ![post-VPN-S2S-TGW-VPN-enable-acceleration](/assets/img/post-VPN-S2S-TGW-VPN-enable-acceleration.png)
-
+  ![post-VPN-acceleration-TGW-ECMP-tunnels](/assets/img/post-VPN-acceleration-TGW-ECMP-tunnels.png)  
+  
 ![post-VPN-S2S-VGW-traffic-flow](/assets/img/post-VPN-S2S-traffic-flow.png)
 ![post-VPN-S2S-TGW-traffic-flow-ECMP-with-BGP](/assets/img/post-VPN-S2S-TGW-traffic-flow-ECMP-with-BGP.png)  
 
