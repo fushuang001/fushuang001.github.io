@@ -291,14 +291,16 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
 区分两种 endpoint，VPC endpoint，service endpoint
 ### Endpoint private DNS names
 - 区分两个场景
-  - **Endpoint Service** 比如 NLB PrivateLink，创建时候可以选择配置 private DNS names，将 public DNS 比如 morning.bio 用来提供服务；后续创建对应 Endpoint，Endpoint 所在的 VPC，就可以直接引用 public DNS 来解析为 private IP，好用、省钱 (private IP/VPC 内流量不收费）
-  ![post-VPC-Endpoint-Service-private-DNS](/assets/img/post-VPC-Endpoint-Service-private-DNS.png)  
+  - **Endpoint Service** 比如 NLB PrivateLink，创建时候可以选择配置 private DNS names，将 public DNS 比如 morning.bio 用来提供服务（需要通过 DNS 验证，具体方式就是在你 DNS 域名服务商那里添加指定的 TXT 记录）；后续创建对应 Endpoint，Endpoint 所在的 VPC，就可以直接引用 public DNS 来解析为 private IP，好用、省钱 (private IP/VPC 内流量不收费）；通过测试，将 VPC Endpoint Service 共享给其他账号下不同 VPC，对应 VPC 创建 Endpoint，虽然 Endpoint 页面不显示 private DNS names，但也可以使用
+  ![post-VPC-Endpoint-Service-private-DNS](/assets/img/post-VPC-Endpoint-Service-private-DNS.png)
+  ![post-VPC-Endpoint-Service-private-DNS-verfication](/assets/img/post-VPC-Endpoint-Service-private-DNS-verfication.png)  
   - **Endpoint** 比如 SQS VPC Endpoint，创建时候默认 enable private DNS names，显示为 `sqs.cn-northwest-1.amazonaws.com.cn`；同 VPC 内解析 sqs... 会解析为 VPC private IP，省钱
     - 不过只是给本 VPC 使用；
     - 如果希望其他 VPC 也可以使用，需要配置 R53 PHZ，关联其他 VPC
     - 如果希望 R53 PHZ 也关联 VPC Endpoint 所在 VPC，那么需要关闭 private DNS names（原理其实是 AWS 托管 R53 为你创建了对应 PHZ 记录）
   ![post-VPC-Endpoint-private-DNS-names](/assets/img/post-VPC-Endpoint-private-DNS-names.png)
   ![post-VPC-Endpoint-private-DNS-names-example](/assets/img/post-VPC-Endpoint-private-DNS-names-example.png)
+- 主要目的是为了方便客户使用，比如 public DNS 直接用到 private 环境；另外就是省钱 (VPC 内没有流量费用）
 
 ### use proxy to access service Endpoint
 ![post-VPC-Endpoint-STS-proxy-exampel](/assets/img/post-VPC-Endpoint-STS-proxy-exampel.png)  
