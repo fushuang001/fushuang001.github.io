@@ -287,8 +287,32 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![post-AWS-managed-prefix-list](/assets/img/post-AWS-managed-prefix-list.png)  
 
 ## VPC Endpoint, Endpoint Services, PrivateLink
-S3 intf 走的是 private subnet/ip；gw 是 public ip
-区分两种 endpoint，VPC endpoint，service endpoint
+- 两种 Endpoint
+  - [VPC Endpoint](https://docs.amazonaws.cn/en_us/vpc/latest/privatelink/what-is-privatelink.html)
+    - 用户手动配置，入口在 VPC
+    - private/public IP 提供服务，走 AWS BB/骨干网
+  - [Service Endpoint](https://docs.amazonaws.cn/en_us/aws/latest/userguide/endpoints-Beijing.html)
+    - AWS 服务对外提供的访问节点，比如 ec2.cn-north-1.amazonaws.com.cn
+    - public IP 提供服务
+
+- 两种类型 VPC Endpoint:
+  - **Interface VPC Endpoint**
+    - 支持大部分 AWS 服务
+    - 通过 private IP 访问，实际 Interface VPC Endpoint 会在对应 VPC 创建 AWS 托管 ENI 来提供服务，需要 DNS 解析
+    - AWS 托管 ENI 支持 security group
+    - 支持 VPC Endpoint policy
+    - 有额外费用
+  - **Gateway VPC Endpoint**
+    - 目前支持 S3, DDB
+    - 通过 public IP 访问，实际 Gateway VPC Endpoint 会在对应 VPC 路由表添加一条 AWS managed prefix-list，将流量通过 AWS BB/骨干网路由到 S3, DDB
+    - 不支持 security group
+    - 支持 VPC Endpoint policy
+    - 不额外收费
+
+- 两种 **VPC Endpoint Service**，或者说 AWS PrivateLink，提供 SaaS 服务
+  - NLB
+  - GWLB
+
 ### Endpoint private DNS names
 - 区分两个场景
   - **Endpoint Service** 比如 NLB PrivateLink，创建时候可以选择配置 private DNS names，将 public DNS 比如 morning.bio 用来提供服务（需要通过 DNS 验证，具体方式就是在你 DNS 域名服务商那里添加指定的 TXT 记录）；后续创建对应 Endpoint，Endpoint 所在的 VPC，就可以直接引用 public DNS 来解析为 private IP，好用、省钱 (private IP/VPC 内流量不收费）；通过测试，将 VPC Endpoint Service 共享给其他账号下不同 VPC，对应 VPC 创建 Endpoint，虽然 Endpoint 页面不显示 private DNS names，但也可以使用
@@ -297,7 +321,7 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - **Endpoint** 比如 SQS VPC Endpoint，创建时候默认 enable private DNS names，显示为 `sqs.cn-northwest-1.amazonaws.com.cn`；同 VPC 内解析 sqs... 会解析为 VPC private IP，省钱
     - 不过只是给本 VPC 使用；
     - 如果希望其他 VPC 也可以使用，需要配置 R53 PHZ，关联其他 VPC
-    - 如果希望 R53 PHZ 也关联 VPC Endpoint 所在 VPC，那么需要关闭 private DNS names（原理其实是 AWS 托管 R53 为你创建了对应 PHZ 记录）
+    - 如果希望 R53 PHZ 也关联 VPC Endpoint 所在 VPC，那么需要关闭 private DNS names（原理其实是 AWS 托管 R53 为你创建了对应 PHZ 记录，所以 user 无法重复创建）
   ![post-VPC-Endpoint-private-DNS-names](/assets/img/post-VPC-Endpoint-private-DNS-names.png)
   ![post-VPC-Endpoint-private-DNS-names-example](/assets/img/post-VPC-Endpoint-private-DNS-names-example.png)
 - 主要目的是为了方便客户使用，比如 public DNS 直接用到 private 环境；另外就是省钱 (VPC 内没有流量费用）
