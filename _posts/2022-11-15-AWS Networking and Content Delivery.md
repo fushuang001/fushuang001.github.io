@@ -651,14 +651,14 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [post-Direct-Connect-public-VIF-route-control-example](/assets/img/post-Direct-Connect-public-VIF-route-control-example.png)
 - [public VIF 收到的客户侧路由明细，不会传播到 Internet 以及 AWS partner](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，使用 `no_export` 属性控制  
   - 但是 [客户侧通告到 AWS 的路由明细，是保留在 AWS DX 同 region，还是到 AWS all region(global)](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，可以通过 `scope BGP community tags` 来控制  
-  - [本地配置](https://aws.amazon.com/premiumsupport/knowledge-center/control-routes-direct-connect/?nc1=h_ls)，on the public prefixs that you advertise to AWS, indicate how far to propagate your prefixs in AWS network，**support by public VIF only**  
+  - [本地配置](https://aws.amazon.com/premiumsupport/knowledge-center/control-routes-direct-connect/?nc1=h_ls)，on the public prefixs that you advertise to AWS, indicate how far to propagate your prefixs in AWS network，**support by public VIF only**；换句话说，on-prem --> AWS，默认 AWS 会把 on-prem 通告的路由，继续通告给 AWS global；如果需要控制，可以在 on-prem 通过对应 BGP community 来实现
     - 7224:9100—Local Amazon Region  
     - 7224:9200—All Amazon Regions for a continent  
       - North America–wide  
       - Asia Pacific  
       - Europe, the Middle East and Africa  
     - 7224:9300—Global (all public Amazon Regions), by default  
-  - AWS DX 为其通告的路由使用以下 BGP community, **support by all VIF**:    
+  - AWS DX 为其通告的路由使用以下 BGP community, **support by all VIF**；换句话说，AWS --> on-prem 的路由，默认是通告 global 的；如果 on-prem 需要控制，可以直接使用对应 BGP community 来修改
     - 7224:8100 – 源自关联了 Amazon 接入点的 Amazon Direct Connect 区域的路由  
     - 7224:8200 – 源自关联了 Amazon Direct Connect 接入点的大陆的路由。  
     - No tag    – 全球 （所有公有 Amazon 区域）。  
@@ -750,17 +750,18 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - Active Directory，无论 AD 部署在什么位置，如果需要，可以借助 AD Connector 转发对应流量   
   - Federated, SAML  
   - manually authentication  
+  ![post-VPN-client-vpn-authentication-authorization](/assets/img/post-VPN-client-vpn-authentication-authorization.png)
 - *client authorization*，授权，通过授权之后，才可以访问具体服务  
   - network-based, authorization rule   
   - security groups  
+  ![post-VPN-client-vpn-authorization-rule](/assets/img/post-VPN-client-vpn-authorization-rule.png)
 - *Connectivity*，配置路由表  
   - UDP performance better than TCP  
 - *manageability*，是否收集日志，配置过程中必须手动 enable 或者 disable  
   - active connections 可以从 console 查看，终止  
- 
-![post-VPN-client-vpn-authentication-authorization](/assets/img/post-VPN-client-vpn-authentication-authorization.png)
-![post-VPN-client-vpn-authorization-rule](/assets/img/post-VPN-client-vpn-authorization-rule.png)
-![post-VPN-client-vpn-connectivity](/assets/img/post-VPN-client-vpn-connectivity.png)  
+- [access to a peered VPC](https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/scenario-peered.html)，只需要配置一个 client VPN 即可
+![post-VPN-client-vpn-connectivity](/assets/img/post-VPN-client-vpn-connectivity.png)
+![post-VPN-client-vpn-example](/assets/img/post-VPN-client-vpn-example.png)
 
 # Route53 DNS
 ![post-R53-at-a-glance](/assets/img/post-R53-at-a-glance.png)  
@@ -1011,6 +1012,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - **502 bad gw, CF received invalid response from upstream server**
   - CF unable to resolve Origin DNS
   - [SSL/TLS issue between CF & Origin](https://aws.amazon.com/premiumsupport/knowledge-center/cloudfront-502-errors/?nc1=h_ls)
+    - Origin 是 ELB，可以用 ACM 证书
+    - [origin 不是 ELB，比如 server/EC2，需要从第三方 Certificate Authority(CA) 申请证书](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-custom-origin.html)
   - Origin ports(80/443) open & in-service, but NOT allow CF to access；服务可用，但是对 CF 未开放
 - **504 gw timeout, CF did not get a response before timeout**
   - Origin is not reachable // 服务不可达，比如 ALB 作为 Origin, security group 没有开放给 CF
