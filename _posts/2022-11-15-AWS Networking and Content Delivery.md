@@ -143,7 +143,15 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ## AmazonProvidedDNS
 - VPC CIDR plus 2, eg. 10.0.0.2  
 - 另一个可用地址是 169.254.169.253
-- enableDnsHostNames, enableDnsSupport  
+- AmazonProvidedDNS 是一个逻辑概念，可以理解为 per Subnet/AZ 的集群，通过 EC2 底层 hardware 实现，所以只能为 AWS resource 提供服务（on-prem 如果把 DNS query 转发到 VPC CIDR .2，会被 drop）
+- 1024 pps limit per ENI，对于 EC2 够用，但是对于 microservice，可能不够用
+- [VPC 和 DNS 解析相关的两个选项如下](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-dns.html)，default VPC 是都打开的；non-default VPC 若创建 PHZ 之后，PHZ 工作异常，需要手动打开 enableDnsHostNames
+  - enableDnsHostNames
+    - VPC 是否给拥有 public IP 的 instances 分配 public DNS hostnames
+    - 此选项默认 false，只有 default VPC 默认打开
+  - enableDnsSupport  
+    - VPC 是否支持使用 AmazonProvidedDNS 做 DNS 解析
+    - 默认 true
 
 ## Security Group & ACL
 对比图
@@ -320,7 +328,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   ![post-VPC-Endpoint-Service-private-DNS-verfication](/assets/img/post-VPC-Endpoint-Service-private-DNS-verfication.png)  
   - **Endpoint** 比如 SQS VPC Endpoint，创建时候默认 enable private DNS names，显示为 `sqs.cn-northwest-1.amazonaws.com.cn`；同 VPC 内解析 sqs... 会解析为 VPC private IP，省钱
     - 不过只是给本 VPC 使用；
-    - 如果希望其他 VPC 也可以使用，需要配置 R53 PHZ，关联其他 VPC
+    - 如果希望其他 VPC 也可以使用（省钱，因为 Endpoint ENI 每小时收费），需要配置 R53 PHZ，关联其他 VPC
     - 如果希望 R53 PHZ 也关联 VPC Endpoint 所在 VPC，那么需要关闭 private DNS names（原理其实是 AWS 托管 R53 为你创建了对应 PHZ 记录，所以 user 无法重复创建）
   ![post-VPC-Endpoint-private-DNS-names](/assets/img/post-VPC-Endpoint-private-DNS-names.png)
   ![post-VPC-Endpoint-private-DNS-names-example](/assets/img/post-VPC-Endpoint-private-DNS-names-example.png)
@@ -825,14 +833,23 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ## R53 Resolver
 
 ### Inbound Resolver Endpoint
-
+- on-prem server ---> DNS server(conditional forwarder) ---> R53 Inbound Endpoint/ENIs ---> R53 Resolver
+- 建议多个 AZ 放置 ENI
+- 10,000 QPS(Queries per Second) per ENI
+  
 ### Outbound Resolver Endpoint
+- AWS server ---> R53 Resolver ---> R53 Outbound Endpoint/ENIs (Forward Rules)---> on-prem DNS server
+- 建议多个 AZ 放置 ENI
+- 10,000 QPS(Queries per Second) per ENI
+![post-R53-outbound-resolver-howto](/assets/img/post-R53-outbound-resolver-howto.png)
 
 ### Forward Rules
 - 与 Outbound Resolver Endpoint 配合使用，指定 example.com 应该去 on-prem 转发，此时使用了 **Rule type: Forward**，默认 example.com 以及 sub domain 都会参考指定 Rule
 - [如果 acme.example.com 是一个例外](https://docs.amazonaws.cn/en_us/Route53/latest/DeveloperGuide/resolver-forwarding-outbound-queries.html#resolver-forwarding-outbound-queries-rule-values)，可以通过 **Rule type: System** 来覆盖 Forward Rule
+  - AWS 默认配置了一个 System rule，将 .(DNS 根域名）通过 AmazonProvidedDNS 解析
 
 ### R53 DNS 解析的优先级
+![post-R53-resolver-priority](/assets/img/post-R53-resolver-priority.png)  
 - 区分两种场景，是否有 resolver rules(forwarding rules)
 - **如果没有 forwarding rules:**
   - PHZ(Private Hosted Zone)，需要关联 VPC
