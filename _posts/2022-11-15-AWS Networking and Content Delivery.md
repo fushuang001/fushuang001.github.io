@@ -27,6 +27,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [Elastic Fabric Adapter - EFA](#elastic-fabric-adapter---efa)
   - [prefix-list](#prefix-list)
   - [VPC Endpoint, Endpoint Services, PrivateLink](#vpc-endpoint-endpoint-services-privatelink)
+    - [Endpoint private DNS names](#endpoint-private-dns-names)
+    - [use proxy to access service Endpoint](#use-proxy-to-access-service-endpoint)
   - [Transit VPC](#transit-vpc)
   - [VPC flowlog](#vpc-flowlog)
   - [VPC Traffic Mirroring](#vpc-traffic-mirroring)
@@ -95,6 +97,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [Cloudfront Functions](#cloudfront-functions)
     - [Lambda@Edge](#lambdaedge)
   - [CF and edge function logging](#cf-and-edge-function-logging)
+  - [CF TS](#cf-ts)
 - [API Gateway](#api-gateway)
   - [Deployment types/部署类型](#deployment-types部署类型)
   - [Security](#security)
@@ -285,7 +288,19 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 ## VPC Endpoint, Endpoint Services, PrivateLink
 S3 intf 走的是 private subnet/ip；gw 是 public ip
+区分两种 endpoint，VPC endpoint，service endpoint
+### Endpoint private DNS names
+- 区分两个场景
+  - **Endpoint Service** 比如 NLB PrivateLink，创建时候可以选择配置 private DNS names，将 public DNS 比如 morning.bio 用来提供服务；后续创建对应 Endpoint，Endpoint 所在的 VPC，就可以直接引用 public DNS 来解析为 private IP，好用、省钱 (private IP/VPC 内流量不收费）
+  ![post-VPC-Endpoint-Service-private-DNS](/assets/img/post-VPC-Endpoint-Service-private-DNS.png)  
+  - **Endpoint** 比如 SQS VPC Endpoint，创建时候默认 enable private DNS names，显示为 `sqs.cn-northwest-1.amazonaws.com.cn`；同 VPC 内解析 sqs... 会解析为 VPC private IP，省钱
+    - 不过只是给本 VPC 使用；
+    - 如果希望其他 VPC 也可以使用，需要配置 R53 PHZ，关联其他 VPC
+    - 如果希望 R53 PHZ 也关联 VPC Endpoint 所在 VPC，那么需要关闭 private DNS names（原理其实是 AWS 托管 R53 为你创建了对应 PHZ 记录）
+  ![post-VPC-Endpoint-private-DNS-names](/assets/img/post-VPC-Endpoint-private-DNS-names.png)
+  ![post-VPC-Endpoint-private-DNS-names-example](/assets/img/post-VPC-Endpoint-private-DNS-names-example.png)
 
+### use proxy to access service Endpoint
 ![post-VPC-Endpoint-STS-proxy-exampel](/assets/img/post-VPC-Endpoint-STS-proxy-exampel.png)  
 [题目参考文档](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-proxy.html)  
 >If you configure a proxy on an Amazon EC2 instance launched with an attached IAM role, ensure that you exempt the address used to access the instance metadata.   
@@ -965,6 +980,18 @@ S3 intf 走的是 private subnet/ip；gw 是 public ip
   - delivery to CW logs group in us-east-1 region  
 
 ![post-CF-realtime-logging-Kinesis-Data-Streams](/assets/img/post-CF-realtime-logging-Kinesis-Data-Streams.png)  
+
+## CF TS
+- **502 bad gw, CF received invalid response from upstream server**
+  - CF unable to resolve Origin DNS
+  - [SSL/TLS issue between CF & Origin](https://aws.amazon.com/premiumsupport/knowledge-center/cloudfront-502-errors/?nc1=h_ls)
+  - Origin ports(80/443) open & in-service, but NOT allow CF to access；服务可用，但是对 CF 未开放
+- **504 gw timeout, CF did not get a response before timeout**
+  - Origin is not reachable // 服务不可达，比如 ALB 作为 Origin, security group 没有开放给 CF
+  - [firewall/security groups on origin is blocking CF](https://aws.amazon.com/premiumsupport/knowledge-center/cloudfront-troubleshoot-504-errors/?nc1=h_ls)
+  - Origin not response within the timeout settings on CF(CF tries 3 times to connect to origin before timing out and exiting with a 504 error, 10s * 3 = 30s)
+
+![post-CF-TS-502-504-example](/assets/img/post-CF-TS-502-504-example.png)  
 
 # API Gateway
 - [API GW](https://www.amazonaws.cn/api-gateway/?nc1=h_ls)  
