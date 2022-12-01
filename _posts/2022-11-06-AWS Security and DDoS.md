@@ -471,6 +471,7 @@ CMK(Customer Managed Keys) 是 per region 的
 - provides intelligent **threat detection** for your AWS infrastructure and resources(eg. instances, container workloads, users, storage). 
 - [Amazon GuardDuty is a continuous security monitoring service that analyzes and processes data sources, such as AWS CloudTrail data events for Amazon S3 logs, CloudTrail management event logs, DNS logs, Amazon EBS volume data, Kubernetes audit logs, and Amazon *VPC flow logs*.](https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html)
 - 可以看到 GuardDuty 并没有传统 IDS 对于流量的监控，应该是通过分析 VPC flowlog 来实现；[通过一些第三方测试，GuardDuty 可以实现传统 IDS 的功能](https://aws.amazon.com/blogs/security/new-third-party-test-compares-amazon-guardduty-to-network-intrusion-detection-systems/) 
+![post-GuardDuty-VPC-flowlog-how-it-works](/assets/img/post-GuardDuty-VPC-flowlog-how-it-works.png)  
 - 可以通过 master account 来管理一批账号的设置  
 - [基于 Amazon GuardDuty 威胁级别的自动化通知](https://aws.amazon.com/cn/blogs/china/automated-notification-based-on-amazon-guardduty-threat-level/)
 ![guardduty](/assets/img/IMG_20220412-220302613.png)  

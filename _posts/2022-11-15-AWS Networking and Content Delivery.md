@@ -11,7 +11,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [VPC](#vpc)
   - [AmazonProvidedDNS](#amazonprovideddns)
   - [Security Group \& ACL](#security-group--acl)
-  - [CIDR, 2nd CIDR](#cidr-2nd-cidr)
+  - [CIDR, 2nd CIDR, IPv4 \& IPv6](#cidr-2nd-cidr-ipv4--ipv6)
+  - [EC2 IP](#ec2-ip)
   - [Subnet](#subnet)
     - [Subnet sizing, reserved IP](#subnet-sizing-reserved-ip)
     - [CIDR Reservation](#cidr-reservation)
@@ -32,6 +33,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Transit VPC](#transit-vpc)
   - [VPC flowlog](#vpc-flowlog)
   - [VPC Traffic Mirroring](#vpc-traffic-mirroring)
+  - [IGW](#igw)
   - [NAT-GW](#nat-gw)
 - [TGW - Transit Gateway](#tgw---transit-gateway)
   - [TGW flowlog](#tgw-flowlog)
@@ -72,7 +74,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [R53 DNS routing policy](#r53-dns-routing-policy)
     - [health check](#health-check)
   - [DNSSEC DNS 安全扩展](#dnssec-dns-安全扩展)
-  - [R53 Resolver DNS Firewall](#r53-resolver-dns-firewall)
+  - [DNS Firewall](#dns-firewall)
   - [Split-view DNS，对内对外提供不同服务](#split-view-dns对内对外提供不同服务)
   - [DNS resolution bw on-prem and AWS using AWS Directory Service](#dns-resolution-bw-on-prem-and-aws-using-aws-directory-service)
   - [R53 Resolver](#r53-resolver)
@@ -105,6 +107,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Same Origin Policy](#same-origin-policy)
     - [CORS 简单介绍](#cors-简单介绍)
   - [Monitor, Metrics, Logs](#monitor-metrics-logs)
+- [AWS Outposts](#aws-outposts)
+- [AWS Wavelength](#aws-wavelength)
 - [AWS Local Zone](#aws-local-zone)
 - [Troubleshooting Tools](#troubleshooting-tools)
   - [DNS](#dns)
@@ -137,12 +141,15 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 [exampracticetests，答案可能有问题，推荐 Bing 搜索查看 ExamTopics 的讨论；另外，建议倒序刷题](https://exampracticetests.com/aws/Advanced_Networking-Specialty_ANS-C00/)  
 
 # VPC
+[AWS re:Invent 2021 - Networking foundations](https://youtu.be/4QoFt8so9hI)  
+
 ![VPC Sharing](/assets/img/IMG_20220504-212047378.png)
 ![post-VPC-pricing-SAA](/assets/img/post-VPC-pricing-SAA.png)  
 
 ## AmazonProvidedDNS
-- VPC CIDR plus 2, eg. 10.0.0.2  
+- IPv4 VPC CIDR plus 2, eg. 10.0.0.2  
 - 另一个可用地址是 169.254.169.253
+- for Nitro only, IPv6 fd00:ec2::253
 - AmazonProvidedDNS 是一个逻辑概念，可以理解为 per Subnet/AZ 的集群，通过 EC2 底层 hardware 实现，所以只能为 AWS resource 提供服务（on-prem 如果把 DNS query 转发到 VPC CIDR .2，会被 drop）
 - 1024 pps limit per ENI，对于 EC2 够用，但是对于 microservice，可能不够用
 - [VPC 和 DNS 解析相关的两个选项如下](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-dns.html)，default VPC 是都打开的；non-default VPC 若创建 PHZ 之后，PHZ 工作异常，需要手动打开 enableDnsHostNames
@@ -164,14 +171,23 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - Amazon Time Sync Service
   - Reserved IP addresses used by the default VPC router
 
-## CIDR, 2nd CIDR
-- VPC, subnet CIDR 范围/16, /28
+## CIDR, 2nd CIDR, IPv4 & IPv6
+- IPv4 VPC/subnet CIDR 范围/16, /28
+- IPv6 VPC CIDR /56 固定大小，subnet CIDR /64 固定大小
 - 配置之后，无法修改 VPC CIDR；可以添加第二个、第三个 CIDR
   - [添加 2nd CIDR，限制条件和原本 CIDR 有关](https://docs.aws.amazon.com/vpc/latest/userguide/configure-your-vpc.html)
     - 若原本是 publicly routable CIDR，后续只能添加 publicly routable CIDR
     - 若原本是 private CIDR 比如 10.0.0.0/8，后续可以添加不属于 172.16.0.0/12, 192.168.0.0/16 private CIDR，或者 publicly routable CIDR
   ![post-VPC-CIDR-restriction](/assets/img/post-VPC-CIDR-restriction.png)
   ![post-VPC-CIDR-restriction-example](/assets/img/post-VPC-CIDR-restriction-example.png)
+
+## EC2 IP
+- private IP 和 ENI 绑定
+  - 如果 EC2 通过 NAT-GW 访问公网，只需要 private IP
+- public IP 通过 1:1 NAT 的形式分配给 EC2 ENI，在 EC2 查看 `ifconfig` 不会看到 public IP
+  - 可以通过 metadata 查看，比如 `	wget -q -O - http://169.254.169.254/latest/meta-data/`
+  - public IP 是在 EC2 开机时候随机分配，EC2 重启之后会变化；如果需要固定，可以使用 EIP
+  - 如果 EC2 通过 IGW 访问公网，EC2 必须要有 public IP/EIP
 
 ## Subnet
 - [one subnet could only in one specific AZ](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html)  
@@ -181,9 +197,9 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - network ACL 在 subnet 级别生效  
 
 ### Subnet sizing, reserved IP
-- subnet CIDR minimum /28, maximum /16  
+- subnet CIDR for IPv4, minimum /28, maximum /16  
 - 配置之后，无法修改 subnet CIDR
-- [每个 subnet，都有 5 个 reserved IP](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html#subnet-sizing)
+- [每个 subnet，都有 5 个 reserved IP, IPv4](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html#subnet-sizing)
   - 10.0.0.0, network address
   - 10.0.0.1, VPC router
   - 10.0.0.2, R53 DNS
@@ -192,6 +208,14 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![post-VPC-subnet-sizing-reserved-IP](/assets/img/post-VPC-subnet-sizing-reserved-IP.png)
 > 换一个角度，/24 只能分裂出两个 /25，不会再有 /28 的空间了
 
+- IPv6 预留 IP
+  - fd00:ec2::/32, reserved
+  - fe80::X:Xff:feX:X/64, VPC router
+  - 2001:db8:ec2:01:0
+  - 2001:db8:ec2:01:1
+  - 2001:db8:ec2:01:2
+  - 2001:db8:ec2:01:3
+  - 2001:db8:ec2:01:ffff::ffff::ffff::ffff
 ### CIDR Reservation
 - prevent AWS from automatically assigning IPv4 or IPv6 addresses within a CIDR range you specify   
 
@@ -358,6 +382,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - 三个层面可以配置，VPC, Subnet, ENI
 - 默认格式，自定义格式（比如 EKS 环境，希望查看真实 src/dest packets IP)
 - 保存到 S3 桶或者 CW Logs group，或者直接最为 producer 发送 stream data 到 Kinesis Firehose
+  - 实际上 AWS GuardDuty 也可以用来分析 VPC flowlog 并且可以有效提醒类似于 DDoS 等威胁
+  ![post-GuardDuty-VPC-flowlog-how-it-works](/assets/img/post-GuardDuty-VPC-flowlog-how-it-works.png)  
 - 聚合时间 1 分钟，或者 10 分钟
 - [有一些 limitation](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html) 比如 DHCP, traffic mirror, 169.254 metadata, DNS, to NLB Endpoint Service 不会被记录
 
@@ -370,6 +396,9 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - ENI  
   - NLB, UDP listener 4789  
   - GWLBe, layer3 GW  
+
+## IGW
+![post-VPC-IGW](/assets/img/post-VPC-IGW.png)
 
 ## NAT-GW
 - EC2(private subnet) -- NAT-GW(public subnet) -- IGW
@@ -426,6 +455,9 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - diagnose route-related issues that are causing traffic disruption in your global network  
 
 # ELB 对比
+手画一个图，参考  
+![post-ELB-arch](/assets/img/post-ELB-arch.png)  
+
 把之前做的表格添加过来  
 
 # ALB
@@ -750,6 +782,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ## Client VPN
 - AWS managed client-based VPN service  
 - secure access to any resource in AWS and on-premises from anywhere using *OpenVPN* clients  
+  - also support client to client connection
 - client VPN Endpoint, is the terminate endpoint for your client VPN, in specific subnet    
   - client VPN Endpoint could in *same VPC multiple subnets*, each AZ one subnet(similar with TGW)  
   - AWS 在指定 subnet 放置一张 ENI，用来做 routing，实现方式和 TGW 类似  
@@ -772,6 +805,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![post-VPN-client-vpn-example](/assets/img/post-VPN-client-vpn-example.png)
 
 # Route53 DNS
+[AWS re:Invent 2019: Deep dive on DNS in the hybrid cloud (NET410)，关注 R53 Resolver, Inbound/Outbound Endpoint](https://www.youtube.com/watch?v=_Z5jAs2gvPA)  
+[AWS re:Invent 2021 - Amazon Route 53: A year in review (REPEAT)，关注 Resolver query log, DNS FW, DNSSEC](https://www.youtube.com/watch?v=77V23phAaAE)  
 ![post-R53-at-a-glance](/assets/img/post-R53-at-a-glance.png)  
 ![Route53 failover-health-check SAA example](/assets/img/post-R53-HC.png)  
 ![post-R53-geo-SAA](/assets/img/post-R53-geo-SAA.png)  
@@ -794,24 +829,28 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 ## DNSSEC DNS 安全扩展
 - [Domain Name System Security Extensions](https://aws.amazon.com/about-aws/whats-new/2020/12/announcing-amazon-route-53-support-dnssec/?nc1=h_ls)，DNS 安全扩展，为 DNS 提供数据来源认证和数据完整性验证，满足 FedRAMP 等法规要求  
+  - 并不负责 privacy/encryption
 - public hosted zone 功能  
 - Route 53 DNSSEC provides __data origin authentication__ and __data integrity verification__ for DNS and can help customers meet compliance mandates, such as FedRAMP.  
 - 若在 hosted zone 启用 DNSSEC，R53 会以加密方式对 hosted zone 当中每条 record 进行签名；R53 管理区域签名密钥，用户在 KMS 的 CMK(Customer Managed Key) 管理密钥签名密钥  
   - 后续不要对 CMK 进行任何权限上的修改，可能导致 KSK 状态变为 ACTION_NEEDED  
   - CMK 是 asymmetric，ECC_NIST_P256  
   - 必须在 us-east-1 region  
+- 添加、删除 DNSSEC 配置，都要注意 DNS cache，可能在 1-2 天左右，clients 没办法获取最新 DNS 信息
+- 从其他 DNS 服务商比如阿里云迁移到 R53，需要先关闭 DNSSEC，完成迁移之后再打开（国内 AWS R53 不支持 DNSSEC)
 - When you enable DNSSEC signing on a hosted zone, Route 53 cryptographically signs each record in that hosted zone. Route 53 manages the zone-signing key, and you can manage the __key-signing key(KSK)__ in AWS Key Management Service (AWS KMS).   
 
 ![post-R53-DNSSEC-Key-signing-key-cfg](/assets/img/post-R53-DNSSEC-Key-signing-key-cfg.png)
 ![post-R53-DNSSEC-KSK-CMK-ANS-example](/assets/img/post-R53-DNSSEC-KSK-CMK-ANS-example.png)
 ![post-R53-DNSSEC-KSK-CMK-ANS-example1](/assets/img/post-R53-DNSSEC-KSK-CMK-ANS-example1.png)  
 
-## R53 Resolver DNS Firewall 
+## DNS Firewall 
 - monitor and control the domains that applications within your VPCs can access   
 - supports allow lists or deny lists to filter the set of domains that you can use
 - can effectively prevent the use of DNS queries to exfiltrate data 防范 [域名解析泄露](https://www.infoblox.com/dns-security-resource-center/dns-security-issues-threats/dns-security-threats-data-exfiltration/)    
   - DNS tunneling 的一种应用，重点在于将数据送出去，不一定得到 DNS response   
     ![post-R53-DNS-exfiltrate-how-it-works](/assets/img/post-R53-DNS-exfiltrate-how-it-works.png)   
+- 可以根据设置，ALLOW, BLOCK, ALERT，并且有 CloudWatch metrics
 
 ## Split-view DNS，对内对外提供不同服务
 - 假设 example.com 对外、对内提供的服务不同，可以通过 R53 配置两个 hosted zone 都叫做 example.com，一个 public 对外，一个 private 关联 VPC 对内  
@@ -873,7 +912,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 ### Resolver query logging for Private Hosted Zone
 - [private hosted zone，配置入口在 R53 Resolver，需要关联 VPC](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-query-logs.html)  
-
+![post-R53-Resolver-query-logging-PHZ](/assets/img/post-R53-Resolver-query-logging-PHZ.png)
 ![post-R53-Resolver-query-logging-public-and-PHZ](/assets/img/post-R53-Resolver-query-logging-public-and-PHZ.png)  
 
 ## R53 Health Check
@@ -1155,6 +1194,11 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - customize log format
   - CLF(Common Log Format), JSON, XML, CSV
 - Logs to Amazon Kinesis Data Firehose
+
+# AWS Outposts
+
+# AWS Wavelength
+- 5G, mobile
 
 # AWS Local Zone
 - [将 AWS resource 部署到距离 end user 更近的位置，延迟敏感，或者数据必须保留在本地](https://aws.amazon.com/about-aws/global-infrastructure/localzones/?nc1=h_ls)
