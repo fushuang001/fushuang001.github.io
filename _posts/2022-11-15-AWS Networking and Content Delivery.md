@@ -245,9 +245,10 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ### Route Table 优先级
 - local 优先级最高，比如 local CIDR 10.0.0.0/16，那么即使用户有 LPM 10.0.0.0/24 static，也还是 local 优先  
 - 有一个例外，GWLB endpoint 环境，Internet --> VPC 的流量，用 LPM 先送去 GWLBe 做安全检查
+  ![post-RT-priority-VPC--LPM-GWLBe](/assets/img/post-RT-priority-VPC--LPM-GWLBe.png)   
 
-![post-RT-priority-VPC](/assets/img/post-RT-priority-VPC.png)
-![post-RT-priority-VPC--LPM-GWLBe](/assets/img/post-RT-priority-VPC--LPM-GWLBe.png)  
+![post-RT-priority-VPC](/assets/img/post-RT-priority-VPC.png) 
+![post-VPC-RT-example](/assets/img/post-VPC-RT-example.png)
 
 ### Route Table propagation
 - 创建 VGW  
