@@ -42,6 +42,9 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 - based on Metrics to set Alarms, if triggered then you see Alerts  
 
 ## CW Metrics
+![post-CW-metrics-looks-like](/assets/img/post-CW-metrics-looks-like.ong)
+![post-CW-how-to-read-CW-example](/assets/img/post-CW-how-to-read-CW-example.png)
+> [题目参考文档](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Statistic)
 
 ## CW Logs, Logs Insight
 
@@ -59,6 +62,12 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
   - Cloudtrail 是保存在 AWS internal S3 桶的，Cloudtrail Eventhistory 会保持最近 90 天记录；若客户需要保持更久的记录，需要自行配置 Trails  
   - Cloudtrail 可以记录对于大部分 AWS 资源操作的记录，不过并不包括类似于 S3 upload object（可以配置 Cloudtrail trails 来记录） 
   - [AWS CLI 配置 Trails](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-create-and-update-a-trail-by-using-the-aws-cli.html)，需要注意`--is-multi-region-trail`(default: false) 参数，以及`--include-global-service-events`(default: true)    
+- An AWS CloudTrail log file provide the following details.
+  * Identity of the API caller
+  * Time of the API call
+  * Source IP address of the API caller
+  * Request parameters
+  * Response elements
 
 ## AWS Global Services
 [Global services](https://jayendrapatil.com/aws-global-vs-regional-vs-az-resources/) 的特点：  
