@@ -756,11 +756,11 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
    ![post-VPN-firewall-rules](/assets/img/post-VPN-firewall-rules.png)  
 - charged per hour per VPN connection  
 - VPN setup options:
-  - Static  
+  - **Static**  
     - policy-based or route-based  
     - static routing  
     - pre-shared key  for tunnel authenication
-  - Dynamic  
+  - **Dynamic**  
     - route-based only  
     - dynamic routing(both side support BGP)  
     - pre-shared key  
