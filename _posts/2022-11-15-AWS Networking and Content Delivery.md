@@ -980,9 +980,9 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![post-CF-S3-OAI-WAF-SAA](/assets/img/post-CF-S3-OAI-WAF-SAA.png)  
 
 ### field-level encryption
-- enforce secure *end-to-end* connections *to origin* servers by using HTTPS  
+- enforce secure **end-to-end** connections **to origin** servers by using HTTPS  
 - client/viewer -- HTTPS --- Cloudfront --- HTTP Listener --- origin ALB --- EC2, only EC2 could decrypt and see the content 
-- [you need to specify the set of fields in POST requests that you want to be encrypted](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html), and the *public key*(asymmetric encryption) to use to encrypt them   
+- you need to [specify the set of fields](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html) in POST requests that you want to be encrypted, and the **public key**(asymmetric encryption) to use to encrypt them   
 
 ![post-CF-field-level-encryption-howto](/assets/img/post-CF-field-level-encryption-howto.png)
 ![post-CF-field-level-encryption-example](/assets/img/post-CF-field-level-encryption-example.png)  
