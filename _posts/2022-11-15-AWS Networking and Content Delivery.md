@@ -69,22 +69,22 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - [Site-to-Site VPN](#site-to-site-vpn)
   - [Client VPN](#client-vpn)
 - [Route53 DNS](#route53-dns)
-  - [R53 支持的 DNS 类型](#r53-支持的-dns-类型)
+  - [R53 支持的 DNS record types/类型](#r53-支持的-dns-record-types类型)
     - [alias vs. CNAME](#alias-vs-cname)
   - [R53 DNS routing policy](#r53-dns-routing-policy)
     - [health check](#health-check)
   - [DNSSEC DNS 安全扩展](#dnssec-dns-安全扩展)
   - [DNS Firewall](#dns-firewall)
   - [Split-view DNS，对内对外提供不同服务](#split-view-dns对内对外提供不同服务)
-  - [DNS resolution bw on-prem and AWS using AWS Directory Service](#dns-resolution-bw-on-prem-and-aws-using-aws-directory-service)
-  - [R53 Resolver](#r53-resolver)
-    - [Inbound Resolver Endpoint](#inbound-resolver-endpoint)
-    - [Outbound Resolver Endpoint](#outbound-resolver-endpoint)
+  - [Hybrid DNS](#hybrid-dns)
+    - [DNS resolution bw on-prem and AWS using AWS Directory Service](#dns-resolution-bw-on-prem-and-aws-using-aws-directory-service)
+    - [R53 Resolver - Inbound Endpoint](#r53-resolver---inbound-endpoint)
+    - [R53 Resolver - Outbound Endpoint](#r53-resolver---outbound-endpoint)
     - [Forward Rules](#forward-rules)
     - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
+  - [R53 DNS monitoring and log](#r53-dns-monitoring-and-log)
     - [Public DNS Query logging for Public Hosted Zone](#public-dns-query-logging-for-public-hosted-zone)
     - [Resolver query logging for Private Hosted Zone](#resolver-query-logging-for-private-hosted-zone)
-  - [R53 Health Check](#r53-health-check)
 - [Global Accelerator](#global-accelerator)
   - [Global Accelerator vs Cloudfront](#global-accelerator-vs-cloudfront)
 - [Cloudfront](#cloudfront)
@@ -803,13 +803,12 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![post-VPN-client-vpn-example](/assets/img/post-VPN-client-vpn-example.png)
 
 # Route53 DNS
-[AWS re:Invent 2019: Deep dive on DNS in the hybrid cloud (NET410)，关注 R53 Resolver, Inbound/Outbound Endpoint](https://www.youtube.com/watch?v=_Z5jAs2gvPA)  
-[AWS re:Invent 2021 - Amazon Route 53: A year in review (REPEAT)，关注 Resolver query log, DNS FW, DNSSEC](https://www.youtube.com/watch?v=77V23phAaAE)  
-![post-R53-at-a-glance](/assets/img/post-R53-at-a-glance.png)  
-![Route53 failover-health-check SAA example](/assets/img/post-R53-HC.png)  
-![post-R53-geo-SAA](/assets/img/post-R53-geo-SAA.png)  
+[AWS re:Invent 2019: Deep dive on DNS in the hybrid cloud (NET410)](https://www.youtube.com/watch?v=_Z5jAs2gvPA)，关注点在 R53 Resolver, Inbound/Outbound Endpoint  
+[AWS re:Invent 2021 - Amazon Route 53: A year in review (REPEAT)](https://www.youtube.com/watch?v=77V23phAaAE)，关注点在 Resolver query log, DNS FW, DNSSEC  
+![post-R53-at-a-glance](/assets/img/post-R53-at-a-glance.png)
+![Route53 failover-health-check SAA example](/assets/img/post-R53-HC.png)
 
-## R53 支持的 DNS 类型
+## R53 支持的 DNS record types/类型
 
 ### alias vs. CNAME
 
@@ -817,6 +816,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - **latency-based**  
   - for an application that is hosted in multiple AWS regions, latency-based routing can *improve performance* for the application users by serving requests from the AWS region that provides the *lowest latency*, thus ensuring *highest performance*.  
 - Geolocation
+  - 根据 client/viewer 的地理位置，来提供不同的 response
+  ![post-R53-geo-SAA](/assets/img/post-R53-geo-SAA.png)  
 - **Geoproximity, traffic flow only**
   - Use when you want to route traffic based on the location of your resources and, optionally, shift traffic from resources in one location to resources in another.
 
@@ -856,7 +857,12 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 ![post-R53-split-view-dns-ANS-example](/assets/img/post-R53-split-view-dns-ANS-example.png)  
 
-## DNS resolution bw on-prem and AWS using AWS Directory Service
+## Hybrid DNS 
+- 云上、云下的资源，使用 VPN, DX 打通之后，业务可能要求混合解析 DNS
+- on-prem 部分资源需要去 VPC 解析 DNS，VPC 内部资源也需要去 on-prem 解析
+- 在 R53 Inbound/Outbound Endpoint Resover 出现之前，客户通常是用 custom EC2/AD 自建，自己维护 
+
+### DNS resolution bw on-prem and AWS using AWS Directory Service
 - 类似于 R53 inbound、outbound resolve endpoint，打通 on-prem 与 VPC 之间的 DNS 解析  
 - [需要将 R53(VPC CIDR x.x.x.2) 与 AWS Directory Service Simple AD 结合使用](https://aws.amazon.com/cn/blogs/security/how-to-set-up-dns-resolution-between-on-premises-networks-and-aws-using-aws-directory-service-and-amazon-route-53/)  
 - Simple AD provides redundant and managed DNS services across AZs  
@@ -867,14 +873,12 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - 举个栗子，ANS-C00 考试题
 ![post-intergate-DNS-on-prem-VPC-R53](/assets/img/post-intergate-DNS-on-prem-VPC-R53.png)  
 
-## R53 Resolver
-
-### Inbound Resolver Endpoint
+### R53 Resolver - Inbound Endpoint
 - on-prem server ---> DNS server(conditional forwarder) ---> R53 Inbound Endpoint/ENIs ---> R53 Resolver
 - 建议多个 AZ 放置 ENI
 - 10,000 QPS(Queries per Second) per ENI
   
-### Outbound Resolver Endpoint
+### R53 Resolver - Outbound Endpoint
 - AWS server ---> R53 Resolver ---> R53 Outbound Endpoint/ENIs (Forward Rules)---> on-prem DNS server
 - 建议多个 AZ 放置 ENI
 - 10,000 QPS(Queries per Second) per ENI
@@ -898,6 +902,10 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - Recursive/递归 Rules (Internet resolver)
   ![post-R53-Forwarding-rule-System-to-override-Forward](/assets/img/post-R53-Forwarding-rule-System-to-override-Forward.png)
 
+## R53 DNS monitoring and log
+- DNS 解析的 log，方便监控、查询
+- 对于 Inbound/Outbound Endpoint Resover 来说，没有日志，如果有需要，可以使用 VPC traffic mirror 抓包
+
 ### Public DNS Query logging for Public Hosted Zone 
 - 所谓 public，两层含义，第一是 clients 来自公网，第二是 hosted zone 类型为 public  
 - [public hosted zone 可以配置，入口在 hosted zone，CW Logs group 接收日志](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html)  
@@ -912,8 +920,6 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - [private hosted zone，配置入口在 R53 Resolver，需要关联 VPC](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-query-logs.html)  
 ![post-R53-Resolver-query-logging-PHZ](/assets/img/post-R53-Resolver-query-logging-PHZ.png)
 ![post-R53-Resolver-query-logging-public-and-PHZ](/assets/img/post-R53-Resolver-query-logging-public-and-PHZ.png)  
-
-## R53 Health Check
 
 # Global Accelerator 
 - [Global Accelerator](https://aws.amazon.com/global-accelerator/?nc1=h_ls) 使用 AWS 全球骨干网，加速用户的访问  
