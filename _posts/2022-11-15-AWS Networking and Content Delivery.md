@@ -1057,7 +1057,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - **real-time logs**  
   - get info about requests made to a distribution in real time(*logs are delivered within seconds of receiving the requests*)，可以是多个 distribution，近乎实时的日志  
   - delivery to data stream in Amazon Kinesis Data Streams  
-  - sameling rate: the percentage of requests for which you want to receive real-time log records  
+  - sampling rate: the percentage of requests for which you want to receive real-time log records  
   - specific fields(total 43 fields available)  
     - origin-fbl(first-byte latency)  
     - origin-lbl  
