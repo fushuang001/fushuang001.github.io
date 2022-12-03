@@ -892,6 +892,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ### R53 DNS 解析的优先级
 ![post-R53-resolver-priority](/assets/img/post-R53-resolver-priority.png)  
 - 区分两种场景，是否有 resolver rules(forwarding rules)
+  - 简单来说，System rule 可以覆盖 Forward rule
 - **如果没有 forwarding rules:**
   - PHZ(Private Hosted Zone)，需要关联 VPC
   - VPC Namespace，比如 ec2.internal.
@@ -908,7 +909,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 ### Public DNS Query logging for Public Hosted Zone 
 - 所谓 public，两层含义，第一是 clients 来自公网，第二是 hosted zone 类型为 public  
-- [public hosted zone 可以配置，入口在 hosted zone，CW Logs group 接收日志](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html)  
+- [public hosted zone 才可以配置](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/query-logs.html)，入口在 hosted zone，CW Logs group 接收日志  
 - [中国区暂时不支持 public DNS query logs](https://docs.amazonaws.cn/en_us/aws/latest/userguide/route53.html)  
 - Query logs contain only the queries that DNS resolvers forward to Route 53. 如果 DNS resolver 已经由缓存了，会在 R53 声明的 TTL 到期前，回复缓存内容  
 - 如果不需要明细内容，可以查看 [CW Metrics -- R53 -- Hosted Zone Metrics -- DNSQueries](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zone-public-viewing-query-metrics.html)
