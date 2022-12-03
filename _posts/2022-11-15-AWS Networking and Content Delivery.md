@@ -185,7 +185,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - private IP 和 ENI 绑定
   - 如果 EC2 通过 NAT-GW 访问公网，只需要 private IP
 - public IP 通过 1:1 NAT 的形式分配给 EC2 ENI，在 EC2 查看 `ifconfig` 不会看到 public IP
-  - 可以通过 metadata 查看，比如 `	wget -q -O - http://169.254.169.254/latest/meta-data/`
+  - 可以通过 metadata 查看，比如 `wget -q -O - http://169.254.169.254/latest/meta-data/`
   - public IP 是在 EC2 开机时候随机分配，EC2 重启之后会变化；如果需要固定，可以使用 EIP
   - 如果 EC2 通过 IGW 访问公网，EC2 必须要有 public IP/EIP
 

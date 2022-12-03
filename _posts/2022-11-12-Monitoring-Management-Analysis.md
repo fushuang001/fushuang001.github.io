@@ -13,6 +13,7 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
   - [CW Metrics](#cw-metrics)
   - [CW Logs, Logs Insight](#cw-logs-logs-insight)
   - [CW Insights for Lambda, Container, Contributor](#cw-insights-for-lambda-container-contributor)
+  - [CW Agent 采集自定义 metric，application log](#cw-agent-采集自定义-metricapplication-log)
   - [X-Ray trace](#x-ray-trace)
 - [Cloudtrail](#cloudtrail)
   - [AWS Global Services](#aws-global-services)
@@ -50,6 +51,11 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 
 ## CW Insights for Lambda, Container, Contributor
 
+## CW Agent 采集自定义 metric，application log
+- CW 收集 EC2 相关的指标包括
+- CW 不收集的 EC2 指标比如
+- **可以通过 CWAgent 来采集自定义的指标，application log 等**
+
 ## X-Ray trace
 
 # Cloudtrail
@@ -58,13 +64,12 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 - 可以通过多种方式来过滤 Cloudtrail  
 - AWS global services 的 Cloudtrail 会保存到 us-east-1 region  
 - Cloudtrail -- Trails -- Insights events, 可以针对 Trails 打开 insights，实现异常情况下自动提醒。  
-- 用户可以自己配置 Cloudtrail trails  
+- **用户可以自己配置 Cloudtrail trails**  
   - Cloudtrail 是保存在 AWS internal S3 桶的，默认开启 SSE-S3 加密；客户配置 Trails 时候，默认开启了 SSE-KMS，客户指定 KMS
   - 通过 log file **integrity validation **来校验 Trails log 没有被修改过，Trails 配置选项 "Log file validation"，默认打开
   - Cloudtrail Eventhistory 会保持最近 90 天记录；若客户需要保持更久的记录，需要自行配置 Trails  
   - Cloudtrail 可以记录对于大部分 AWS 资源操作的记录，不过并不包括类似于 S3 upload object（可以配置 Cloudtrail trails 来记录） 
   - [AWS CLI 配置 Trails](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-create-and-update-a-trail-by-using-the-aws-cli.html)，需要注意`--is-multi-region-trail`(default: false) 参数，以及`--include-global-service-events`(default: true)    
-  - 
 - An AWS CloudTrail log file provide the following details.
   * Identity of the API caller
   * Time of the API call
