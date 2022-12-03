@@ -688,7 +688,6 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - 默认情况下，public VIF 会将 AWS global public IP prefix 通过 BGP 通告给 on-prem；用户可以联系 AWS 来通告 customer-owned IP prefix  
 - public VIF, private VIF 都可以使用 public(customer must own it) or private(64512-65535) ASN  
   - 如果使用 public BGP ASN，customer must own it; only public BGP ASG support AS_PATH Prepending
-  - ![post-Direct-Connect-public-VIF-route-control-example](/assets/img/post-Direct-Connect-public-VIF-route-control-example.png)
 - [public VIF 收到的客户侧路由明细，不会传播到 Internet 以及 AWS partner](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，使用 `no_export` 属性控制  
   - 但是 [客户侧通告到 AWS 的路由明细，是保留在 AWS DX 同 region，还是到 AWS all region(global)](https://docs.amazonaws.cn/en_us/directconnect/latest/UserGuide/routing-and-bgp.html)，可以通过 `scope BGP community tags` 来控制  
   - [本地配置](https://aws.amazon.com/premiumsupport/knowledge-center/control-routes-direct-connect/?nc1=h_ls)，on the public prefixs that you advertise to AWS, indicate how far to propagate your prefixs in AWS network，**support by public VIF only**；换句话说，on-prem --> AWS，默认 AWS 会把 on-prem 通告的路由，继续通告给 AWS global；如果需要控制，可以在 on-prem 通过对应 BGP community 来实现
