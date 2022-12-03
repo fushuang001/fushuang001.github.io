@@ -1114,7 +1114,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
   - reduced latency for requests from around the world, designed for a globally distributed set of clients
 - **Regional endpoint**  
   - reduced latency for requests that originate in the same region
-  - can cfg your own CDN/CF
+  - can cfg your own CDN/CF, custom CNAME
   - can protect with WAF
   - recommended API type for general use cases
 - **Private endpoint**
