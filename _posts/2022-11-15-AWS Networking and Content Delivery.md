@@ -720,10 +720,9 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 
 ### on-prem 视角
 - 站在 on-prem 视角，影响 `on-prem --> AWS` 的路由选路  
-- Local Pref，on-prem 设置  
-- Advertise more specific prefixes over one DX connection，从 AWS 侧控制  
-
-![post-Direct-Connect_Route-how-to-example](/assets/img/post-Direct-Connect_Route-how-to-example.png)  
+- Local Pref，on-prem 设置，影响 on-prem outbound
+- Advertise more specific prefixes over one DX connection，从 on-prem 实现，影响 AWS outbound  
+![post-Direct-Connect_public-VIF-Act-Stby-example](/assets/img/post-Direct-Connect_public-VIF-Act-Stby-example.png)  
 
 ### Active/Passive 路由
 [Active/Passive](https://aws.amazon.com/premiumsupport/knowledge-center/active-passive-direct-connect/?nc1=h_ls)    
