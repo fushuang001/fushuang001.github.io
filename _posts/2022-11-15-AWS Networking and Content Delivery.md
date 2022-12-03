@@ -84,7 +84,7 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
     - [R53 DNS 解析的优先级](#r53-dns-解析的优先级)
   - [R53 DNS monitoring and log](#r53-dns-monitoring-and-log)
     - [Public DNS Query logging for Public Hosted Zone](#public-dns-query-logging-for-public-hosted-zone)
-    - [Resolver query logging for Private Hosted Zone](#resolver-query-logging-for-private-hosted-zone)
+    - [Resolver query logging](#resolver-query-logging)
 - [Global Accelerator](#global-accelerator)
   - [Global Accelerator vs Cloudfront](#global-accelerator-vs-cloudfront)
 - [Cloudfront](#cloudfront)
@@ -917,8 +917,8 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 ![post-R53-public-hosted-zone-query-logging](/assets/img/post-R53-public-hosted-zone-query-logging.png)
 ![post-R53-public-hosted-zone-query-logging-cfg](/assets/img/post-R53-public-hosted-zone-query-logging-cfg.png)  
 
-### Resolver query logging for Private Hosted Zone
-- [private hosted zone，配置入口在 R53 Resolver，需要关联 VPC](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-query-logs.html)  
+### Resolver query logging
+- [VPC 内资源 DNS query logging 的配置](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-query-logs.html)，入口在 R53 Resolver，需要关联 VPC  
 ![post-R53-Resolver-query-logging-PHZ](/assets/img/post-R53-Resolver-query-logging-PHZ.png)
 ![post-R53-Resolver-query-logging-public-and-PHZ](/assets/img/post-R53-Resolver-query-logging-public-and-PHZ.png)  
 
