@@ -60,16 +60,18 @@ tags:           AWS, SAA, CloudWatch, Cloudtrail, EventBridge, Trust Advisor, At
 
 # Cloudtrail
 - AWS 的资源操作，实际上都是 API call，或者通过 SDK, mgmt console, AWS CLI 执行的操作   
-- Events are typically updated in CloudTrail **within 15 minutes** after an API call  
+- Events are typically updated in [CloudTrail](https://aws.amazon.com/cloudtrail/faqs/) **within 15 minutes** after an API call  
 - 可以通过多种方式来过滤 Cloudtrail  
 - AWS global services 的 Cloudtrail 会保存到 us-east-1 region  
 - Cloudtrail -- Trails -- Insights events, 可以针对 Trails 打开 insights，实现异常情况下自动提醒。  
 - **用户可以自己配置 Cloudtrail trails**  
   - Cloudtrail 是保存在 AWS internal S3 桶的，默认开启 SSE-S3 加密；客户配置 Trails 时候，默认开启了 SSE-KMS，客户指定 KMS
-  - 通过 log file **integrity validation **来校验 Trails log 没有被修改过，Trails 配置选项 "Log file validation"，默认打开
+  - 通过 log file **integrity validation** 来校验 Trails log 没有被修改过，Trails 配置选项 "Log file validation"，默认打开
   - Cloudtrail Eventhistory 会保持最近 90 天记录；若客户需要保持更久的记录，需要自行配置 Trails  
   - Cloudtrail 可以记录对于大部分 AWS 资源操作的记录，不过并不包括类似于 S3 upload object（可以配置 Cloudtrail trails 来记录） 
-  - [AWS CLI 配置 Trails](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-create-and-update-a-trail-by-using-the-aws-cli.html)，需要注意`--is-multi-region-trail`(default: false) 参数，以及`--include-global-service-events`(default: true)    
+  - [AWS CLI 配置 Trails](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-create-and-update-a-trail-by-using-the-aws-cli.html)，需要注意 `--is-multi-region-trail`(default: false) 参数，以及 `--include-global-service-events`(default: true)
+    - “--is-multi-region-trail” 如果不打开，那么只针对特定 region 生效
+    - You can create **up to 5 trails in a Region**. A trail that applies to all Regions exists in each Region and is counted as one trail in each Region.
 - An AWS CloudTrail log file provide the following details.
   * Identity of the API caller
   * Time of the API call

@@ -1201,12 +1201,13 @@ tags:           AWS, Networking, Content Delivery, VPC, Cloudfront, Route 53, EL
 - Logs to Amazon Kinesis Data Firehose
 
 # AWS Outposts
+- 将 AWS 部署到客户 on-prem
 
 # AWS Wavelength
 - 5G, mobile
 
 # AWS Local Zone
-- [将 AWS resource 部署到距离 end user 更近的位置，延迟敏感，或者数据必须保留在本地](https://aws.amazon.com/about-aws/global-infrastructure/localzones/?nc1=h_ls)
+- 作为 AWS Region, AZ 的补充，[将 AWS resource 部署到距离 end user 更近的位置](https://aws.amazon.com/about-aws/global-infrastructure/localzones/?nc1=h_ls)，延迟敏感，或者数据必须保留在本地
 - [按需扩展，按用量付费，边缘计算云服务，更方便混合架构、迁移](https://www.youtube.com/watch?v=zw6MqfgoDGw)
 - Local Zone 提供了部分 AWS 相同的服务，可以无缝扩展，使用体验和 AWS region 相同
 ![post-Local-Zone-example](/assets/img/post-Local-Zone-example.png)  
