@@ -137,11 +137,13 @@ Network ACL act as Subnet level firewall. Stateless, allow and deny
 ![ENI, ENA, EFA exam tips](/assets/img/IMG_20220526-110513168.png)  
 [ENA - 增强联网](https://docs.amazonaws.cn/zh_cn/AWSEC2/latest/UserGuide/enhanced-networking.html)，single root I/O Virtualization(SR-IOV) 提供更高网络性能，没有额外费用。可选 ENA/up to 100G, Intel 82599 Virtual Function(VF) intf/up to 10G  
 non-Nitro 平台的 EC2（比如 t2.micro) 升级 Nitro 平台（比如 t3.micro)，需要启用 ENA。  
-[EFA通常用于HPC, 机器学习场景，instance可以bypass OS 直接和网卡硬件交互](https://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/efa.html)  
+[EFA 通常用于 HPC, 机器学习场景，instance 可以 bypass OS 直接和网卡硬件交互](https://docs.aws.amazon.com/zh_cn/AWSEC2/latest/UserGuide/efa.html)  
 
 ## EC2 Placement Group 置放群组
-为了满足特定 workload 需求，可以将 EC2 逻辑上放到同一个 [placement group](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html)，优势可能包括低延迟、高吞吐量  
->There is no charge for creating a placement group.
+- 为了满足特定 workload 需求，可以将 EC2 逻辑上放到同一个 [placement group](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html)，优势可能包括低延迟、高吞吐量  
+- There is no charge for creating a placement group.
+- Current generation instances, except for burstable performance instances (for example, T2) and Mac1 instances，换句话说，不支持 T2
+![post-EC2-placement-group-example](/assets/img/post-EC2-placement-group-example.png)  
 
 **Cluster-集群** 
 - instances inside same AZ  
